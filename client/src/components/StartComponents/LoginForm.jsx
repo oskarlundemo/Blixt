@@ -1,16 +1,21 @@
 import {Inputfield} from "../InputField.jsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {SectionSplitter} from "../SectionSplitter.jsx";
 
 
 export const LoginForm = ({setShowLogin}) => {
 
     const [errors, setErrors] = useState([]);
+    const [disabled, setDisabled] = useState(true);
 
     const [formData, setFormData] = useState({
         password: "",
         username: "",
     });
+
+    useEffect(() => {
+        setDisabled(!(formData.password.length > 0 && formData.username.length > 0));
+    }, [formData])
 
 
     // This function is used for updating the state of the form
@@ -29,11 +34,16 @@ export const LoginForm = ({setShowLogin}) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+
+        console.log('Submiting');
+
     }
 
     return (
-        <>
         <section className="login-section">
+
+            <h1>Login</h1>
 
             <form onSubmit={handleSubmit}>
 
@@ -59,12 +69,11 @@ export const LoginForm = ({setShowLogin}) => {
                     svg={<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M80-200v-80h800v80H80Zm46-242-52-30 34-60H40v-60h68l-34-58 52-30 34 58 34-58 52 30-34 58h68v60h-68l34 60-52 30-34-60-34 60Zm320 0-52-30 34-60h-68v-60h68l-34-58 52-30 34 58 34-58 52 30-34 58h68v60h-68l34 60-52 30-34-60-34 60Zm320 0-52-30 34-60h-68v-60h68l-34-58 52-30 34 58 34-58 52 30-34 58h68v60h-68l34 60-52 30-34-60-34 60Z"/></svg>}
                 />
 
-                <button type="submit">Login</button>
+                <button disabled={disabled} type="submit">Login</button>
 
             </form>
 
             <SectionSplitter/>
-
 
             <div className='google-box'>
                 <h4>Sign in with Google</h4>
@@ -74,9 +83,8 @@ export const LoginForm = ({setShowLogin}) => {
                 </svg>
             </div>
 
-        </section>
+            <span>Don't have an account? <a onClick={() => setShowLogin(false)}>Create one</a></span>
 
-        <h4>No account? <a onClick={() => setShowLogin(false)}>Create one</a></h4>
-    </>
+        </section>
 )
 }

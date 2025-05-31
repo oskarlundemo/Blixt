@@ -1,6 +1,6 @@
 
 
-
+import '../styles/Start.css'
 
 
 export const CompanyLogo = ({height, width = 'auto'}) => {
@@ -18,8 +18,6 @@ export const CompanyLogo = ({height, width = 'auto'}) => {
                 src={
                 'blixt-logo.png'
                 }/>
-
-
         </div>
     )
 

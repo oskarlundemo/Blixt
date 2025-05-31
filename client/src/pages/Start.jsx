@@ -10,21 +10,16 @@ export const Start = ({}) => {
     const [showLogin, setShowLogin] = useState(true);
 
     return (
-        <main className="login">
+        <main className="start">
 
-            <div className="left-container">
+            <CompanyLogo
+                height={300}
+            />
+
+            <div className='start-container'>
 
                 <SmartphoneFrame
-                    height={400}
-                />
-
-            </div>
-
-
-            <div className="right-container">
-
-                <CompanyLogo
-                    height={100}
+                    height={500}
                 />
 
                 {showLogin ? (
