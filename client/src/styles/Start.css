@@ -1,29 +1,32 @@
 
 
 
-.login {
+.start {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-self: center;
     justify-self: center;
     width: 100%;
     height: fit-content;
     align-items: center;
     justify-content: center;
-
-
-    > div {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
 }
 
+
+.start-container {
+    display: flex;
+    flex-direction: row;
+}
 
 .login-section, .create-section {
     display: flex;
     flex-direction: column;
+
+    span {
+        margin: auto auto 0 auto;
+        align-self: flex-end;
+        justify-self: flex-end;
+    }
 
     button {
         width: 100%;
@@ -31,10 +34,33 @@
 }
 
 
+
+
+
 .login-section, .create-section {
     padding: 1rem;
     box-shadow: var(--soft-box-shadow);
     border-radius: var(--border-radius);
+    min-width: 200px;
+
+    h1, h4 {
+        text-align: center;
+    }
+
+    span {
+        text-align: center;
+
+        & a:hover {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+    }
+}
+
+.mock-iphone {
+    background-color: transparent;
+    width: fit-content;
+    object-fit: contain;
 }
 
 
@@ -42,10 +68,86 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    gap: 1rem;
+    justify-content: center;
+
+    h4 {
+        margin: 0;
+    }
 
     svg {
         height: 25px;
         width: auto;
     }
+}
+
+.company-logo {
+    clip-path: inset(50px 0px 50px 0); !important;
+}
+
+
+
+
+.checks {
+    opacity: 0;
+    transition: opacity var(--default-transition);
+    color: var(--error-color);
+
+
+    svg {
+        fill: var(--error-color);
+    }
+}
+
+
+.show {
+    opacity: 1;
+}
+
+
+.checks {
+    display: flex;
+    flex-direction: column;
+
+    > div {
+        display: flex;
+        align-items: center;
+
+        p {
+            margin: 0.5rem;
+        }
+
+        > div {
+            display: flex;
+            align-items: center;
+
+            p {
+                margin: 0.5rem;
+            }
+        }
+    }
+
+    > div:last-of-type {
+        margin-bottom: 1rem;
+    }
+}
+
+
+.error-msg {
+    color: var(--error-color);
+    svg {
+        fill: var(--error-color) !important;
+    }
+}
+
+
+.approved {
+    color: var(--approved-color);
+    svg {
+        fill: var(--approved-color) !important;
+    }
+}
+
+.approved svg {
+    fill: var(--approved-color) !important;
 }

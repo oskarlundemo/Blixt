@@ -16,7 +16,9 @@
   --default-transition: 200ms ease-in-out;
   --border-radius: 10px;
   --accent-color: #646cff;
-  --soft-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --soft-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  --approved-color: green;
+  --error-color: red;
 
 }
 
@@ -53,6 +55,7 @@ h1 {
 
 
 
+
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -62,15 +65,22 @@ button {
   font-family: inherit;
   background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: var(--default-transition);
 }
 button:hover {
   border-color: #646cff;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+
+button:disabled {
+  border-color: transparent;
+  cursor: not-allowed;
+}
+
 
 @media (prefers-color-scheme: light) {
   :root {
@@ -94,6 +104,11 @@ button:focus-visible {
   font-size: 0.9rem;
   margin: 0rem 0;
   position: relative;
+
+  h3 {
+    font-size: 1rem;
+    margin: 1rem 0;
+  }
 }
 
 .section-splitter::before,
@@ -103,4 +118,33 @@ button:focus-visible {
   height: 1px;
   background-color: #ccc;
   margin: 0 1rem;
+}
+
+
+h1 {
+  font-size: clamp(1.75rem, 4vw, 3rem);
+}
+
+h2 {
+  font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+}
+
+h3 {
+  font-size: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+h4 {
+  font-size: clamp(1.125rem, 2vw, 1.75rem);
+}
+
+h5 {
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+}
+
+h6 {
+  font-size: clamp(0.875rem, 1.25vw, 1.125rem);
+}
+
+p {
+  font-size: clamp(0.875rem, 1vw, 1rem);
 }
