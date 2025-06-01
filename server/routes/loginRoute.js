@@ -3,7 +3,7 @@
 
 
 import {Router} from "express";
-import {login, loginGuestAccount} from "../controllers/loginController";
+import { login, loginGuestAccount } from "../controllers/loginController.js";
 
 const LoginRoute = new Router();
 

@@ -5,9 +5,9 @@
 
 
 import {Router} from "express";
-import {signUpUser, uniqueEmail, uniqueUsername} from "../controllers/createAccountController";
+import { signUpUser, uniqueEmail, uniqueUsername } from "../controllers/createAccountController.js";
 
-const signUpRoute = new Router();
+const createAccountRoute = new Router();
 
 import { body, validationResult } from 'express-validator';
 
@@ -52,7 +52,7 @@ export const validateUserInfo = [
 ];
 
 
-signUpRoute.post("/", validateUserInfo, (req, res, next) => {
+createAccountRoute.post("/", validateUserInfo, (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         console.log(errors);
@@ -64,4 +64,4 @@ signUpRoute.post("/", validateUserInfo, (req, res, next) => {
 
 
 
-export default signUpRoute;
+export default createAccountRoute;
