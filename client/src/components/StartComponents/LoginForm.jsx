@@ -31,6 +31,14 @@ export const LoginForm = ({setShowLogin}) => {
         });
     }
 
+    /**
+     * Tillräckligt för att stå ut med varandra men mindre än att vi tycker fireball känns som en bra idé?
+     *
+     *
+     * Insåg det också, men ska vi boka andra dejten prelimnärt 11/6?
+     *
+     * @param e
+     */
 
     const handleSubmit = (e) => {
         e.preventDefault();

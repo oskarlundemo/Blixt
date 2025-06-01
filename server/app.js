@@ -1,16 +1,16 @@
 
+import express from "express";
+import cors from "cors";
+import createAccountRoute from "./routes/createAccountRoute.js";
+import loginRoute from "./routes/loginRoute.js";
 
-const express = require("express");
-const cors = require("cors");
-const createAccountRoute = require("./routes/createAccountRoute");
-const loginRoute = require("./routes/loginRoute");
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.use('/login/account', loginRoute);
-app.use('/create/account', createAccountRoute);
+app.use('/auth/signup', createAccountRoute);
+app.use('/auth/login', loginRoute);
 
 app.get("/", (req, res) => {
     res.send("API is running");

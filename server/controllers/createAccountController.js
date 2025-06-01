@@ -2,7 +2,7 @@
 
 
 
-import {prisma} from '../prisma';
+import { prisma } from '../prisma/index.js';
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -91,8 +91,6 @@ export async function uniqueEmail (email) {
         throw err;
     }
 }
-
-
 
 
 /**
