@@ -3,6 +3,7 @@ import './App.css'
 import {Start} from "./pages/Start.jsx";
 import ProtectedRoute from "./context/ProtectedRoute.jsx";
 import {Feed} from "./pages/Feed.jsx";
+import {Profile} from "./pages/Profile.jsx";
 function App() {
 
   const PRODUCTION_URL = import.meta.env.VITE_API_BASE_URL;
@@ -36,6 +37,13 @@ function App() {
                      */
 
                 }/>
+
+            <Route
+                path="/profile"
+                element={
+                <Profile/>
+                }
+            />
 
 
             <Route
