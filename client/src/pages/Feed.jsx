@@ -2,6 +2,7 @@
 
 import '../styles/Feed.css'
 import {Post} from "../components/FeedComponents/Post.jsx";
+import {Link} from "react-router-dom";
 
 
 export const Feed = ({}) => {
@@ -26,9 +27,7 @@ export const Feed = ({}) => {
                     username={'Lundemo'}
                 />
 
-
             </section>
-
 
 
             <footer className={'feed-footer'}>
