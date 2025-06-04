@@ -4,11 +4,17 @@ import {useEffect, useState} from "react";
 import {UsernameCheck} from "./UsernameCheck.jsx";
 import {EmailCheck} from "./EmailCheck.jsx";
 import {PasswordChecks} from "./PasswordChecks.jsx";
+import { supabase } from '../../services/SupabaseClient.js';
+import {useNavigate} from "react-router-dom";
+import {useAuth} from "../../context/AuthContext.jsx";
+
 
 
 export const CreateForm = ({setShowLogin}) => {
 
 
+    const {login} = useAuth();
+    const navigate = useNavigate();  // Used to navigate to chats after creation is successful
     const [errors, setErrors] = useState([]);
     const [disabled, setDisabled] = useState(true);
 
@@ -42,12 +48,47 @@ export const CreateForm = ({setShowLogin}) => {
             };
             return updatedData;
         });
+
+
     }
 
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-    }
+
+        const { email, password, username } = formData;
+
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    username,
+                },
+            },
+        });
+
+        if (error) {
+            setErrors([error.message]);
+        } else {
+            console.log("User signed up!", data);
+
+            const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
+
+            if (signInError) {
+                setErrors([signInError.message]);
+                return;
+            }
+
+            if (signInData.session) {
+                login(signInData.session.access_token);
+                navigate("/feed");
+            }
+        }
+    };
 
 
     return (

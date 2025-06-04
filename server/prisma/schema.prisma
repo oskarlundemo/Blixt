@@ -14,11 +14,10 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model Users {
-  id       Int     @id @default(autoincrement())
-  username String  @unique
-  password String
+model User {
+  id       String  @id @default(uuid()) @map("id")
   email    String  @unique
+  username String  @unique
   bio      String?
   avatar   String?
 

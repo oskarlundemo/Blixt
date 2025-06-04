@@ -2,6 +2,7 @@
 
 import React, {createContext, useState, useEffect, useContext} from "react";
 import { jwtDecode } from "jwt-decode";
+import {supabase} from "../services/SupabaseClient.js";
 
 /**
  * This context is used to create and assign users with their
@@ -14,41 +15,46 @@ const AuthContext = createContext();
 
 
 export const AuthProvider = ({ children }) => {
+    const [user, setUser] = useState(null);
 
-    const [user, setUser] = useState(null); // State to hold the user
-
-    // This hook is used for creating the token and storing it in the local storage
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            try {
-                const decoded = jwtDecode(token);
-                setUser(decoded); // Set the token here
-            } catch (error) {
-                console.error("Invalid token", error);
+        // Check if there is a session on load
+        const session = supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session?.access_token) {
+                setUser(jwtDecode(session.access_token));
+                localStorage.setItem("token", session.access_token);
             }
-        }
-    }, [])
+        });
+
+        // Listen for auth state changes
+        const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+            if (session?.access_token) {
+                setUser(jwtDecode(session.access_token));
+                localStorage.setItem("token", session.access_token);
+            } else {
+                setUser(null);
+                localStorage.removeItem("token");
+            }
+        });
+
+        return () => {
+            authListener.subscription.unsubscribe();
+        };
+    }, []);
 
 
-    // This function is used for login-in, called in the LoginBox.jsx component
-    const login = (newToken) => {
-        localStorage.setItem("token", newToken);
-        const decoded = jwtDecode(newToken);
-        setUser(decoded);
+    const logout = async () => {
+        await supabase.auth.signOut();
+        setUser(null);
+        localStorage.removeItem("token");
     };
 
-    // This function is used for logging-out, called in the UserProfile.jsx
-    const logout = () => {
-        localStorage.removeItem("token");
-        setUser(null);
-    }
-
     return (
-        <AuthContext.Provider value={{user, login, logout}}>
+        <AuthContext.Provider value={{ user, logout }}>
             {children}
         </AuthContext.Provider>
-    )
-}
+    );
+};
+
 
 export const useAuth = () => useContext(AuthContext);

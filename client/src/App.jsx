@@ -4,6 +4,7 @@ import {Start} from "./pages/Start.jsx";
 import ProtectedRoute from "./context/ProtectedRoute.jsx";
 import {Feed} from "./pages/Feed.jsx";
 import {Profile} from "./pages/Profile.jsx";
+import {NewPost} from "./pages/NewPost.jsx";
 function App() {
 
   const PRODUCTION_URL = import.meta.env.VITE_API_BASE_URL;
@@ -22,6 +23,14 @@ function App() {
                 <Start/>
               }
              />
+
+
+            <Route
+                path="/new/post"
+                element={
+                    <NewPost/>
+                }
+            />
 
             <Route
                 path="/feed"
