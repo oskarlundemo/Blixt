@@ -78,6 +78,7 @@ export const CreateForm = ({setShowLogin}) => {
                 password,
             });
 
+
             if (signInError) {
                 setErrors([signInError.message]);
                 return;
