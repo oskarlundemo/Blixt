@@ -1,30 +1,20 @@
 
 
 .feed-wrapper {
-    width: 80%;
+    width: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    height: 100vh; /* Use full viewport height */
-    position: relative; /* For positioning children if needed */
+    height: 100%;
+    position: relative;
 }
 
-.feed-header {
-    position: fixed;
-    top: 0;
-    left: 10%;
-    width: 80%;
-    height: 5vh;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    padding: 0 1rem;
-}
+
 
 .feed-footer {
     position: fixed;
     bottom: 0;
-    left: 10%; /* same as header */
+    left: 10%;
     width: 80%;
     height: 5vh;
     display: flex;
@@ -44,9 +34,6 @@
 }
 
 .feed {
-    margin-top: 5vh;
-    margin-bottom: 5vh;
-    height: calc(100vh - 10vh); /* full viewport minus header and footer */
     overflow-y: auto;
     display: flex;
     flex-direction: column;

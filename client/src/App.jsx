@@ -4,6 +4,8 @@ import {Start} from "./pages/Start.jsx";
 import ProtectedRoute from "./context/ProtectedRoute.jsx";
 import {Feed} from "./pages/Feed.jsx";
 import {Profile} from "./pages/Profile.jsx";
+import {NewPost} from "./pages/NewPost.jsx";
+import {ResetPassword} from "./pages/ResetPassword.jsx";
 function App() {
 
   const PRODUCTION_URL = import.meta.env.VITE_API_BASE_URL;
@@ -24,6 +26,21 @@ function App() {
              />
 
             <Route
+                path="/new/post"
+                element={
+                    <NewPost/>
+                }
+            />
+
+
+            <Route
+                path="/reset-password"
+                element={
+                    <ResetPassword/>
+                }
+            />
+
+            <Route
                 path="/feed"
                 element={
 
@@ -39,7 +56,7 @@ function App() {
                 }/>
 
             <Route
-                path="/profile"
+                path="/profile/:uuid"
                 element={
                 <Profile/>
                 }
