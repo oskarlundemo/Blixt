@@ -3,6 +3,9 @@
 .post {
     display: flex;
     flex-direction: column;
+    width: 80%;
+    align-self: center;
+    max-width: 750px;
 }
 
 
@@ -22,9 +25,14 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 200px;
     justify-content: center;
     align-items: center;
+
+    img {
+        object-fit: contain;
+        width: 100%;
+        pointer-events: none;
+    }
 }
 
 

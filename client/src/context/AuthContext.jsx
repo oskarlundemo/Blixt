@@ -10,38 +10,41 @@ import {supabase} from "../services/SupabaseClient.js";
  * @type {React.Context<unknown>}
  */
 
-
 const AuthContext = createContext();
-
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true); // new
 
     useEffect(() => {
-        // Check if there is a session on load
-        const session = supabase.auth.getSession().then(({ data: { session } }) => {
+        const init = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
             if (session?.access_token) {
                 setUser(jwtDecode(session.access_token));
                 localStorage.setItem("token", session.access_token);
             }
-        });
+            setLoading(false);
+        };
 
-        // Listen for auth state changes
-        const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-            if (session?.access_token) {
-                setUser(jwtDecode(session.access_token));
-                localStorage.setItem("token", session.access_token);
-            } else {
-                setUser(null);
-                localStorage.removeItem("token");
+        init();
+
+        const { data: authListener } = supabase.auth.onAuthStateChange(
+            (_event, session) => {
+                if (session?.access_token) {
+                    const decodedUser = jwtDecode(session.access_token);
+                    setUser(decodedUser);
+                    localStorage.setItem("token", session.access_token);
+                } else {
+                    setUser(null);
+                    localStorage.removeItem("token");
+                }
             }
-        });
+        );
 
         return () => {
             authListener.subscription.unsubscribe();
         };
     }, []);
-
 
     const logout = async () => {
         await supabase.auth.signOut();
@@ -50,11 +53,10 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, logout }}>
+        <AuthContext.Provider value={{ user, logout, loading }}>
             {children}
         </AuthContext.Provider>
     );
 };
-
 
 export const useAuth = () => useContext(AuthContext);
