@@ -30,7 +30,6 @@ LoginRoute.post('/', validateLogin, (req, res, next) => {
     login(req, res)
 })
 
-LoginRoute.post('/guest', loginGuestAccount)
 
 
 export default LoginRoute;

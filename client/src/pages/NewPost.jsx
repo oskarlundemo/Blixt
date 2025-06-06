@@ -1,16 +1,89 @@
 
 import '../styles/NewPost.css'
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {NavigationBar} from "../components/NavigationBar.jsx";
-
-
+import {closestCorners, DndContext, PointerSensor, TouchSensor, useSensor, useSensors} from "@dnd-kit/core";
+import {ImageGridContainer} from "../components/NewPostComponents/ImageGridContainer.jsx";
+import {arrayMove, SortableContext} from "@dnd-kit/sortable";
+import {Overlay} from "../components/Overlay.jsx";
+import {PopUpModule} from "../components/PopUpModule.jsx";
 
 
 export const NewPost = ({}) => {
 
 
-    const [caption, setCaption] = useState('')
+    const [caption, setCaption] = useState('');
+    const [images, setImages] = useState([])
+    const [numberOfImages, setNumberOfImages] = useState(0);
 
+    const [showPopup, setShowPopup] = useState(false);
+    const [showOverlay, setShowOverlay] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(null);
+
+
+    useEffect(() => {
+        setNumberOfImages(images.length)
+        console.log(images)
+    }, [images])
+
+
+    const removeImage = (id) => {
+        setImages(prev => prev.filter(image => image.id !== id));
+    };
+
+
+    const inspectImage = (image) => {
+        console.log('Image clicked:', image);
+        setSelectedImage(image);
+        setShowPopup(true);
+        setShowOverlay(true);
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        console.log(caption);
+
+        const response = await fetch('/posts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ caption }),
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+            })
+            .catch(err => console.log(err));
+    }
+
+
+
+    const getImagePos = id => images.findIndex(image => image.id === id)
+
+    const handleDragEnd = (e) => {
+        const {active, over} = e;
+
+        if (active.id === over.id) return;
+
+        setImages(images => {
+            const originalPos = getImagePos(active.id)
+            const newPos = getImagePos(over.id)
+
+            return arrayMove(images, originalPos, newPos)
+        })
+    }
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(TouchSensor, {
+            activationConstraint: {
+                delay: 200,
+                tolerance: 10,
+            },
+        })
+    );
 
 
     return (
@@ -19,21 +92,18 @@ export const NewPost = ({}) => {
 
             <section className={'new-post-images-container'}>
 
-                <div className={'image-grid-container'}>
+                <DndContext
+                    sensors={sensors}
+                    onDragEnd={handleDragEnd}
+                    collisionDetection={closestCorners}>
+                        <ImageGridContainer
+                            inspectImage={inspectImage}
+                            images={images}
+                            removeImage={removeImage}
+                            setImages={setImages}/>
+                </DndContext>
 
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                   
-
-                </div>
-
-                <span>0 / 10</span>
+                <span>{numberOfImages} / 10</span>
 
             </section>
 
@@ -41,9 +111,9 @@ export const NewPost = ({}) => {
             <section className="new-post-description">
 
 
-                <form>
+                <form onSubmit={handleSubmit}>
                     <fieldset>
-                        <legend>Description</legend>
+                        <legend>Caption</legend>
                         <textarea
                             name="caption"
                             value={caption}
@@ -54,14 +124,17 @@ export const NewPost = ({}) => {
                         />
                     </fieldset>
 
-                    <button>Post</button>
-
+                    <button disabled={images.length === 0} type="submit">Post</button>
                 </form>
 
             </section>
 
 
             <NavigationBar/>
+
+            <PopUpModule images={images} showPopup={showPopup}/>
+
+            <Overlay showOverlay={showOverlay}/>
 
         </main>
     )
