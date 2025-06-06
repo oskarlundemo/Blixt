@@ -34,17 +34,16 @@
 
 .image-grid-container > div {
     aspect-ratio: 1 / 1;
-    background-color: lightgray;
     border-radius: 8px;
 }
 
-
+form, fieldset, textarea {
+    box-sizing: border-box;
+}
 
 .new-post-description {
     display: flex;
     flex-direction: column;
-
-
 
     form {
         display: flex;
@@ -52,8 +51,10 @@
         align-items: center;
         gap: 1rem;
         flex-grow: 1;
+        width: 100%;
 
         fieldset {
+            width: 100%;
             display: flex;
             border-radius: var(--border-radius);
             border: 1px solid lightgray;
@@ -87,7 +88,98 @@
             }
         }
     }
-
 }
+
+.file-select-box {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+}
+
+.file-btn {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-box {
+    position: relative;
+    border-radius: 50%;
+    overflow: hidden;
+    transition: 200ms ease-in-out;
+
+    &:hover {
+        scale: 1.1;
+        cursor: pointer;
+    }
+
+    img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+    }
+}
+
+
+.image-box svg {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    outline: none;
+    background: transparent;
+
+    &:hover {
+        fill: var(--error-color)
+    }
+}
+
+
+.file-btn {
+    outline: none;
+    border: none;
+}
+
+.file-btn:focus {
+    outline: none;
+    border: none;
+}
+
+.file-btn svg {
+    width: 48px;
+    height: 48px;
+    fill: lightgray;
+    transition: transform 0.4s ease, fill 0.2s ease;
+    transform-origin: center;
+    outline: none;
+}
+
+.file-btn:hover svg {
+    animation: subtle-spin 0.6s ease forwards;
+}
+
+@keyframes subtle-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    33% {
+        transform: rotate(20deg); /* rotate right */
+    }
+    66% {
+        transform: rotate(-10deg); /* then left */
+    }
+    100% {
+        transform: rotate(0deg); /* back to normal */
+    }
+}
+
+
 
 

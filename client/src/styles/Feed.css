@@ -9,19 +9,19 @@
     position: relative;
 }
 
-
-
 .feed-footer {
     position: fixed;
     bottom: 0;
-    left: 10%;
-    width: 80%;
-    height: 5vh;
+    left: 0;
+    width: 100%;
+    height: 60px;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
     z-index: 1000;
+    background-color: #ffffff;
+    box-shadow: 0 -5px 5px rgba(0, 0, 0, 0.2);
 
     svg {
         fill: black;
