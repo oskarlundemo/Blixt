@@ -16,6 +16,11 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true); // new
 
+    const API_URL = import.meta.env.MODE === "production"
+        ? import.meta.env.VITE_API_PROD_URL
+        : "/api";
+
+
     useEffect(() => {
         const init = async () => {
             const { data: { session } } = await supabase.auth.getSession();
@@ -53,7 +58,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, logout, loading }}>
+        <AuthContext.Provider value={{ user, API_URL, logout, loading }}>
             {children}
         </AuthContext.Provider>
     );

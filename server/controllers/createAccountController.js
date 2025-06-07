@@ -134,3 +134,24 @@ export const signUpUser = async(req, res) => {
         res.status(500).send({error: 'Error while signing up'});
     }
 }
+
+
+
+export const addUser = async (req, res) => {
+    try {
+        const { email, username, id } = req.body;
+
+        await prisma.user.create({
+            data: {
+                id,
+                email,
+                username,
+            }
+        });
+
+        res.status(201).json({ message: 'User created' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Error while signing up' });
+    }
+};

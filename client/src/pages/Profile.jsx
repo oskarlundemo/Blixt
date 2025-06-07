@@ -2,10 +2,42 @@
 
 import '../styles/Profile.css'
 import {NavigationBar} from "../components/NavigationBar.jsx";
+import {useEffect, useState} from "react";
+import {useAuth} from "../context/AuthContext.jsx";
+import {useNavigate} from "react-router-dom";
 
 
 
 export const Profile = ({}) => {
+
+
+    const navigate = useNavigate();
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const {user, API_URL} = useAuth();
+
+
+    useEffect(() => {
+
+        fetch(`${API_URL}/profile/fetch/posts/${user.sub}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                setPosts(data.posts);
+                setLoading(false);
+                console.log(data.posts);
+            })
+            .catch(err => console.log(err));
+
+    }, [])
+
+
+
 
 
 
@@ -74,26 +106,28 @@ export const Profile = ({}) => {
 
             <section className="profile-content-grid">
 
-                <img
-                    src={'/sigge.jpeg'}
-                />
+                {/* Snygga till och bryt ut till komponenter */}
 
+                {loading ? (
+                    <p>Loading...</p>
+                ) : (
+                    (posts.length > 0 ? (
+                            posts.map((post) => (
+                                <div
+                                    onClick={() => navigate(`/${post.poster.username}/${post.id}`)}
 
-                <img
-                    src={'/sigge.jpeg'}
-                />
-
-                <img
-                    src={'/sigge.jpeg'}
-                />
-
-                <img
-                    src={'/sigge.jpeg'}
-                />
-
-                <img
-                    src={'/sigge.jpeg'}
-                />
+                                    key={post.id}>
+                                    {post.images[0] && post.images.length > 0 ? (
+                                        <img src={post.images[0].url} alt={`Post ${post.id}`} />
+                                    ) : (
+                                        <p>No image available</p>
+                                    )}
+                                </div>
+                            ))
+                        ) : (
+                            <p>No posts yet! Create one</p>
+                        ))
+                )}
 
             </section>
 

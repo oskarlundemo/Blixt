@@ -13,7 +13,7 @@ import {useAuth} from "../../context/AuthContext.jsx";
 export const CreateForm = ({setShowLogin}) => {
 
 
-    const {login} = useAuth();
+    const {login, API_URL} = useAuth();
     const navigate = useNavigate();  // Used to navigate to chats after creation is successful
     const [errors, setErrors] = useState([]);
     const [disabled, setDisabled] = useState(true);
@@ -70,24 +70,44 @@ export const CreateForm = ({setShowLogin}) => {
 
         if (error) {
             setErrors([error.message]);
-        } else {
-            console.log("User signed up!", data);
+            return;
+        }
 
-            const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-                email,
-                password,
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        });
+
+        if (signInError) {
+            setErrors([signInError.message]);
+            return;
+        }
+
+        if (signInData.session) {
+
+            const user = signInData.user;
+
+
+            const response = await fetch(`${API_URL}/auth/signup/supabase`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    id: user.id,
+                    email: user.email,
+                    username: user.user_metadata.username || username,
+                }),
             });
 
-
-            if (signInError) {
-                setErrors([signInError.message]);
+            if (!response.ok) {
+                const err = await response.json();
+                setErrors([err.error || 'Failed to create user']);
                 return;
             }
 
-            if (signInData.session) {
-                login(signInData.session.access_token);
-                navigate("/feed");
-            }
+            login(signInData.session.access_token);
+            navigate("/feed");
         }
     };
 

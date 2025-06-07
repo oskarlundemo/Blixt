@@ -2,20 +2,12 @@
 
 
 
-
-import {Router} from "express";
+import { Router } from "express";
+import { createNewPost } from "../controllers/postController.js";
+import upload from "../middleware/upload.js";
 
 const PostRoute = new Router();
 
-
-
-PostRoute.post('/', (req, res) => {
-    console.log(req.body);
-    console.log('I post controller');
-
-    res.status(200).json({ message: 'Post received' });  // Send a success response
-});
-
-
+PostRoute.post('/new/:user_id', upload.array('images', 10), createNewPost);
 
 export default PostRoute;

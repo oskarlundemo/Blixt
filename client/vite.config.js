@@ -9,12 +9,13 @@ export default defineConfig({
     include: ["jwt-decode"]
   },
 
+  base: '/',
   server: {
     proxy: {
       '/api': {
         target: 'http://localhost:5002',
         changeOrigin: true,
-        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },

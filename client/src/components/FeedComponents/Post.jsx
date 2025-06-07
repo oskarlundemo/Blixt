@@ -1,9 +1,16 @@
 
 
 import '../../styles/Post.css'
+import {Carousel} from "../Carousel.jsx";
 
 
-export const Post = ({username, caption, likes, comments}) => {
+export const Post = ({
+                         username = 'Unknown',
+                         caption = '',
+                         likes = [],
+                         comments = [],
+                         images = [],
+                     }) => {
 
 
     return (
@@ -20,7 +27,6 @@ export const Post = ({username, caption, likes, comments}) => {
                     }}
                 />
 
-
                 <h2>{username}</h2>
 
                 {/* Här kör vi en userAvatar component*/}
@@ -30,15 +36,24 @@ export const Post = ({username, caption, likes, comments}) => {
             <div className='post-body'>
 
 
-                <div className='post-image-container'>
-
+                {images.length > 1 ? (
+                    <Carousel>
+                        {images.map((image, index) => (
+                            <img
+                                key={index}
+                                src={image.url}
+                                alt={`Image ${index}`}
+                                style={{ maxWidth: '100%', height: 'auto' }}
+                            />
+                        ))}
+                    </Carousel>
+                ) : (
                     <img
-                        src={'/sigge.jpeg'}
+                        src={images[0].url}
+                        style={{ maxWidth: '100%', height: 'auto' }}
                     />
+                )}
 
-                </div>
-
-                <p>lundemo: {caption}</p>
 
             </div>
 
@@ -48,7 +63,7 @@ export const Post = ({username, caption, likes, comments}) => {
                 <div className='post-interactions'>
 
                     <div className='post-likes'>
-                        <span>13</span>
+                        <span>{comments.length || 0}</span>
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
                              fill="#e3e3e3">
                             <path
@@ -58,7 +73,7 @@ export const Post = ({username, caption, likes, comments}) => {
 
 
                     <div className='post-comments'>
-                        <span>37</span>
+                        <span>{likes.length || 0}</span>
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
                              fill="#e3e3e3">
                             <path
@@ -68,14 +83,14 @@ export const Post = ({username, caption, likes, comments}) => {
 
                 </div>
 
+                <p>{username}: {caption}</p>
 
-                <p>lundemo: {caption}</p>
-
-
-                <div className='post-comments'>
-                    <p>@gurra: This is crazy</p>
-                    <p>@axa: Woof?</p>
-                </div>
+                {comments?.length > 0 && (
+                    <div className='post-comments'>
+                        <p>@gurra: This is crazy</p>
+                        <p>@axa: Woof?</p>
+                    </div>
+                )}
 
             </div>
 

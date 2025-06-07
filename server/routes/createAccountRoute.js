@@ -5,7 +5,7 @@
 
 
 import {Router} from "express";
-import { signUpUser, uniqueEmail, uniqueUsername } from "../controllers/createAccountController.js";
+import {addUser, signUpUser, uniqueEmail, uniqueUsername} from "../controllers/createAccountController.js";
 
 const createAccountRoute = new Router();
 
@@ -62,6 +62,6 @@ createAccountRoute.post("/", validateUserInfo, (req, res, next) => {
 })
 
 
-
+createAccountRoute.post('/supabase', addUser)
 
 export default createAccountRoute;

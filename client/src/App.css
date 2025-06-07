@@ -45,3 +45,53 @@
   opacity: 0;
   pointer-events: none;
 }
+
+
+.carousel-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.carousel-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.carousel-controls {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+
+.carousel-control-prev,
+.carousel-control-next {
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 50%;
+  pointer-events: all;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.carousel-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  transform: translateY(-50%);
+  pointer-events: none;
+  align-items: center;
+  justify-content: center;
+}

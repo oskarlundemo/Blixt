@@ -1,11 +1,11 @@
 import {Routes, Route} from 'react-router-dom';
 import './App.css'
 import {Start} from "./pages/Start.jsx";
-import ProtectedRoute from "./context/ProtectedRoute.jsx";
 import {Feed} from "./pages/Feed.jsx";
 import {Profile} from "./pages/Profile.jsx";
 import {NewPost} from "./pages/NewPost.jsx";
 import {ResetPassword} from "./pages/ResetPassword.jsx";
+import {InspectPost} from "./components/ProfileComponents/InspectPost.jsx";
 function App() {
 
   const PRODUCTION_URL = import.meta.env.VITE_API_BASE_URL;
@@ -29,6 +29,13 @@ function App() {
                 path="/new/post"
                 element={
                     <NewPost/>
+                }
+            />
+
+            <Route
+                path="/:username/:postid"
+                element={
+                    <InspectPost/>
                 }
             />
 
