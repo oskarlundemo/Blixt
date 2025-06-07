@@ -1,0 +1,55 @@
+import {useParams} from "react-router-dom";
+import {useEffect, useState} from "react";
+import {useAuth} from "../../context/AuthContext.jsx";
+import {Post} from "../FeedComponents/Post.jsx";
+
+import '../../styles/InspectPost.css'
+
+export const InspectPost = ({}) => {
+
+    const {API_URL, user} = useAuth();
+    const {username, postid} = useParams();
+    const [post, setPost] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+
+        console.log(username, postid);
+
+        fetch(`${API_URL}/profile/inspect/${postid}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                setPost(data);
+                console.log(data);
+                setLoading(false);
+            })
+            .catch((err) => {
+                console.error(err);
+                setLoading(false);
+            });
+
+    }, [username, postid]);
+
+    return (
+        <main className="single-post">
+            {loading ? (
+                <p>Loading...</p>
+            ) : post ? (
+                <Post
+                    user={post.poster?.username || null}
+                    likes={post.likes}
+                    comments={post.comments}
+                    caption={post.caption}
+                    images={post.images}
+                />
+            ) : (
+                <p>Post not found</p>
+            )}
+        </main>
+    );
+}

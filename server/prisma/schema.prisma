@@ -20,6 +20,44 @@ model User {
   username String  @unique
   bio      String?
   avatar   String?
+  posts    Post[]  @relation("UserPosts")
 
   @@map("users")
+}
+
+model Post {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  caption    String?
+
+  user_id String
+  poster  User   @relation("UserPosts", fields: [user_id], references: [id])
+
+  likes    Likes[]    @relation("PostLikes")
+  comments Comments[] @relation("PostComments")
+
+  images Images[] @relation("PostImages")
+
+  @@map("posts")
+}
+
+model Images {
+  id      Int    @id @default(autoincrement())
+  url     String
+  post_id Int
+  post    Post   @relation("PostImages", fields: [post_id], references: [id])
+  index   Int
+}
+
+model Likes {
+  id      Int  @id @default(autoincrement())
+  post_id Int
+  post    Post @relation("PostLikes", fields: [post_id], references: [id])
+}
+
+model Comments {
+  id      Int    @id @default(autoincrement())
+  post_id Int
+  comment String
+  post    Post   @relation("PostComments", fields: [post_id], references: [id])
 }

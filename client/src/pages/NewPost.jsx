@@ -7,11 +7,14 @@ import {ImageGridContainer} from "../components/NewPostComponents/ImageGridConta
 import {arrayMove, SortableContext} from "@dnd-kit/sortable";
 import {Overlay} from "../components/Overlay.jsx";
 import {PopUpModule} from "../components/PopUpModule.jsx";
+import {useAuth} from "../context/AuthContext.jsx";
 
 
 export const NewPost = ({}) => {
 
 
+    const {API_URL} = useAuth();
+    const {user} = useAuth();
     const [caption, setCaption] = useState('');
     const [images, setImages] = useState([])
     const [numberOfImages, setNumberOfImages] = useState(0);
@@ -25,7 +28,6 @@ export const NewPost = ({}) => {
         setNumberOfImages(images.length)
         console.log(images)
     }, [images])
-
 
     const removeImage = (id) => {
         setImages(prev => prev.filter(image => image.id !== id));
@@ -42,23 +44,26 @@ export const NewPost = ({}) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log(caption);
+        const formData = new FormData();
+        formData.append('caption', caption);
 
-        const response = await fetch('/posts', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ caption }),
-        })
-            .then(res => res.json())
-            .then(data => {
-                console.log(data);
-            })
-            .catch(err => console.log(err));
-    }
+        images.forEach((image) => {
+            formData.append('images', image.file);
+        });
+
+        try {
+            const response = await fetch(`${API_URL}/posts/new/${user.sub}`, {
+                method: 'POST',
+                body: formData,
+            });
+            const data = await response.json();
 
 
+
+        } catch (err) {
+            console.error('Error submitting post:', err);
+        }
+    };
 
     const getImagePos = id => images.findIndex(image => image.id === id)
 
