@@ -29,6 +29,8 @@ export const Feed = ({}) => {
             })
             .catch(err => console.log(err));
 
+        console.log(user)
+
     }, [])
 
 
@@ -44,12 +46,14 @@ export const Feed = ({}) => {
                             posts.map((post, index) => (
                                 <Post
                                     key={index}
-                                    user={post.poster?.username || null}
+                                    username={post.poster?.username || null}
                                     picture={post.images?.length > 0 ? post.images[0].url : null}
                                     likes={post.likes}
                                     comments={post.comments}
                                     caption={post.caption}
                                     images={post.images}
+                                    post={post}
+                                    poster={post.poster}
                                 />
                             ))
                         ) : (
@@ -63,7 +67,6 @@ export const Feed = ({}) => {
                             </p>
                     ))
                 )}
-
 
             </section>
 

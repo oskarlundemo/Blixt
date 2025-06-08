@@ -49,3 +49,95 @@ export const createNewPost = async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 }
+
+
+
+export const likePost = async (req, res) => {
+
+
+    try {
+
+        const {user_id, post_id} = req.params;
+
+        const liked = await prisma.likes.findFirst({
+            where: {
+                post_id: parseInt(post_id),
+                user_id: user_id,
+            }
+        })
+
+        if (!liked) {
+            await prisma.likes.create({
+                data: {
+                    user_id: user_id,
+                    post_id: parseInt(post_id),
+                }
+            })
+        } else {
+            await prisma.likes.delete({
+                where: {
+                    id: liked.id
+                }
+            })
+        }
+
+        res.status(200).json({ message: 'Post succuesfully liked!'});
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+}
+
+
+
+export const getComments = async (req, res) => {
+
+
+    try {
+
+        const comments = await prisma.comments.findMany({
+            where: {
+                post_id: parseInt(req.params.post_id)
+            },
+            include: {
+                user: true
+            }
+        })
+
+        return res.status(200).json({comments})
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+}
+
+
+
+export const createComment = async (req, res) => {
+
+    try {
+
+        const {user_id, post_id} = req.params;
+        const {comment} = req.body;
+
+        if (!comment) {
+            return res.status(400).json({ error: "Comment is required" });
+        }
+
+        await prisma.comments.create({
+            data: {
+                user_id: user_id,
+                post_id: parseInt(post_id),
+                comment: comment
+            }
+        })
+
+        return res.status(200).json({ message: "Comment created!" });
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+}

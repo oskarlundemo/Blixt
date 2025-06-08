@@ -6,6 +6,7 @@ import {Profile} from "./pages/Profile.jsx";
 import {NewPost} from "./pages/NewPost.jsx";
 import {ResetPassword} from "./pages/ResetPassword.jsx";
 import {InspectPost} from "./components/ProfileComponents/InspectPost.jsx";
+import {CommentSection} from "./pages/CommentSection.jsx";
 function App() {
 
   const PRODUCTION_URL = import.meta.env.VITE_API_BASE_URL;
@@ -41,6 +42,14 @@ function App() {
 
 
             <Route
+                path="/:username/:postid/comments"
+                element={
+                    <CommentSection/>
+                }
+            />
+
+
+            <Route
                 path="/reset-password"
                 element={
                     <ResetPassword/>
@@ -63,7 +72,7 @@ function App() {
                 }/>
 
             <Route
-                path="/profile/:uuid"
+                path="profile/:username/:uuid"
                 element={
                 <Profile/>
                 }

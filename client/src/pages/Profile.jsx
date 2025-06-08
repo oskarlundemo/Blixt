@@ -4,7 +4,8 @@ import '../styles/Profile.css'
 import {NavigationBar} from "../components/NavigationBar.jsx";
 import {useEffect, useState} from "react";
 import {useAuth} from "../context/AuthContext.jsx";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
+import {UserAvatar} from "../components/UserAvatar.jsx";
 
 
 
@@ -13,14 +14,38 @@ export const Profile = ({}) => {
 
     const navigate = useNavigate();
     const [posts, setPosts] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const [profileUser, setProfileUser] = useState({});
 
-    const {user, API_URL} = useAuth();
+    const { username, uuid } = useParams();
+
+    useEffect(() => {
+        console.log("Username:", username);
+        console.log("UUID:", uuid);
+
+        // Fetch user data by username or UUID here
+    }, [username, uuid]);
+
+    const {API_URL, user} = useAuth();
 
 
     useEffect(() => {
 
-        fetch(`${API_URL}/profile/fetch/posts/${user.sub}`, {
+        fetch(`${API_URL}/profile/fetch/user/${uuid}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                setProfileUser(data);
+                console.log(data);
+            })
+            .catch(err => console.log(err));
+
+
+        fetch(`${API_URL}/profile/fetch/posts/${uuid}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -29,16 +54,11 @@ export const Profile = ({}) => {
             .then(res => res.json())
             .then(data => {
                 setPosts(data.posts);
-                setLoading(false);
                 console.log(data.posts);
             })
             .catch(err => console.log(err));
 
     }, [])
-
-
-
-
 
 
     return (
@@ -48,24 +68,17 @@ export const Profile = ({}) => {
 
                 <section className={'profile-header'}>
 
-                    <div className="profile-avatar">
-
-                        <img src={'/sigge.jpeg'}
-                             style={{
-                                 height: '50px',
-                                 width: '50px',
-                                 borderRadius: '50%',
-
-                             }}
-                             draggable={false}
-                        />
-
-                    </div>
+                    <UserAvatar
+                        user={profileUser}
+                        height={'50px'}
+                        width={'50px'}
+                        selectPicture={true}
+                    />
 
                     <div className="profile-followers">
 
                         <div>
-                            <p>3</p>
+                            <p>{posts.length}</p>
                             <p>Posts</p>
                         </div>
 
@@ -80,9 +93,15 @@ export const Profile = ({}) => {
                         </div>
 
 
-                        <button>
-                            Follow
-                        </button>
+                        {!uuid === user.id ? (
+                            <button>
+                                Follow
+                            </button>
+                        ) : (
+                            <button>
+                                Edit
+                            </button>
+                        )}
 
                     </div>
 
@@ -96,9 +115,9 @@ export const Profile = ({}) => {
                             margin: "10px auto",
                             fontSize: '1.5rem',
                         }}
-                    >@lundemo</h1>
+                    >@{profileUser.username}</h1>
 
-                    <p>This is my bio 😩 😜</p>
+                    <p>{profileUser.bio}</p>
                 </div>
 
             </header>
@@ -113,16 +132,15 @@ export const Profile = ({}) => {
                 ) : (
                     (posts.length > 0 ? (
                             posts.map((post) => (
-                                <div
+                                <article
                                     onClick={() => navigate(`/${post.poster.username}/${post.id}`)}
-
                                     key={post.id}>
                                     {post.images[0] && post.images.length > 0 ? (
-                                        <img src={post.images[0].url} alt={`Post ${post.id}`} />
+                                        <img draggable={false} src={post.images[0].url} alt={`Post ${post.id}`} />
                                     ) : (
                                         <p>No image available</p>
                                     )}
-                                </div>
+                                </article>
                             ))
                         ) : (
                             <p>No posts yet! Create one</p>

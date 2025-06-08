@@ -3,12 +3,14 @@
 
 
 import {Router} from 'express';
-import {FetchProfilePosts, InspectSinglePost} from "../controllers/profileController.js";
+import {FetchProfilePosts, FetchProfileUser, InspectSinglePost} from "../controllers/profileController.js";
 
 
 const profileRoute = Router();
 
 profileRoute.get('/fetch/posts/:user_id', FetchProfilePosts)
+
+profileRoute.get('/fetch/user/:user_id', FetchProfileUser)
 
 profileRoute.get('/inspect/:post_id', InspectSinglePost)
 
