@@ -1,8 +1,31 @@
 import {prisma} from "../prisma/index.js";
 
 
-export const FetchProfilePosts = async (req, res) => {
+export const FetchProfileUser = async (req, res) => {
 
+
+    try {
+
+        const userId = req.params.user_id;
+
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId,
+            }
+        })
+        res.status(200).json(user);
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            message: 'Something went wrong', error: err
+        })
+    }
+}
+
+
+
+export const FetchProfilePosts = async (req, res) => {
 
     try {
 
@@ -15,6 +38,12 @@ export const FetchProfilePosts = async (req, res) => {
             include: {
                 images: true,
                 poster: true,
+                comments: {
+                    include: {
+                        user: true,
+                    },
+                },
+                likes: true,
             }
         })
 
@@ -35,7 +64,6 @@ export const FetchProfilePosts = async (req, res) => {
 
 export const InspectSinglePost = async (req, res) => {
 
-
     try {
 
         const postID = parseInt(req.params.post_id);
@@ -46,7 +74,11 @@ export const InspectSinglePost = async (req, res) => {
             }, include: {
                 images: true,
                 poster: true,
-                comments: true,
+                comments: {
+                    include: {
+                        user: true,
+                    },
+                },
                 likes: true,
             }
         })

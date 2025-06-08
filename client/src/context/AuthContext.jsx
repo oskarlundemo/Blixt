@@ -25,8 +25,34 @@ export const AuthProvider = ({ children }) => {
         const init = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (session?.access_token) {
-                setUser(jwtDecode(session.access_token));
-                localStorage.setItem("token", session.access_token);
+
+                const userId = session?.user.id;
+
+                try {
+                    const response = await fetch(`${API_URL}/users/token/${userId}`, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                        }
+                    })
+
+                    if (!response.ok) {
+                        console.error("Failed to fetch user profile");
+                        return;
+                    }
+
+                    const profile = await response.json();
+
+                    setUser({
+                        ...jwtDecode(session.access_token),
+                        ...profile,
+                    });
+
+                    localStorage.setItem("token", session.access_token);
+
+                } catch (error) {
+                    console.error(error);
+                }
             }
             setLoading(false);
         };
@@ -34,11 +60,34 @@ export const AuthProvider = ({ children }) => {
         init();
 
         const { data: authListener } = supabase.auth.onAuthStateChange(
-            (_event, session) => {
+            async (_event, session) => {
                 if (session?.access_token) {
-                    const decodedUser = jwtDecode(session.access_token);
-                    setUser(decodedUser);
-                    localStorage.setItem("token", session.access_token);
+                    const userId = session.user.id;
+
+                    try {
+                        const response = await fetch(`${API_URL}/users/token/${userId}`, {
+                            method: "GET",
+                            headers: {
+                                "Content-Type": "application/json",
+                            }
+                        });
+
+                        if (!response.ok) {
+                            console.error("Failed to fetch user profile on auth change");
+                            return;
+                        }
+
+                        const profile = await response.json();
+
+                        setUser({
+                            ...jwtDecode(session.access_token),
+                            ...profile,
+                        });
+
+                        localStorage.setItem("token", session.access_token);
+                    } catch (error) {
+                        console.error("Error fetching profile on auth change:", error);
+                    }
                 } else {
                     setUser(null);
                     localStorage.removeItem("token");

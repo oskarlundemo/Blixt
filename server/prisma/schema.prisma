@@ -15,12 +15,16 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(uuid()) @map("id")
-  email    String  @unique
-  username String  @unique
-  bio      String?
-  avatar   String?
-  posts    Post[]  @relation("UserPosts")
+  id        String     @id @default(uuid()) @map("id")
+  email     String     @unique
+  username  String     @unique
+  bio       String?
+  avatar    String?
+  posts     Post[]     @relation("UserPosts")
+  Likes     Likes[]    @relation("UserLikes")
+  Comments  Comments[] @relation("AuthorComment")
+  followers Follows[]  @relation("Followed")
+  following Follows[]  @relation("Following")
 
   @@map("users")
 }
@@ -50,14 +54,35 @@ model Images {
 }
 
 model Likes {
-  id      Int  @id @default(autoincrement())
+  id      Int    @id @default(autoincrement())
   post_id Int
-  post    Post @relation("PostLikes", fields: [post_id], references: [id])
+  user_id String
+
+  created_at DateTime @default(now())
+  user       User     @relation("UserLikes", fields: [user_id], references: [id])
+  post       Post     @relation("PostLikes", fields: [post_id], references: [id])
 }
 
 model Comments {
   id      Int    @id @default(autoincrement())
   post_id Int
+  user_id String
   comment String
-  post    Post   @relation("PostComments", fields: [post_id], references: [id])
+
+  created_at DateTime @default(now())
+  user       User     @relation("AuthorComment", fields: [user_id], references: [id])
+  post       Post     @relation("PostComments", fields: [post_id], references: [id])
+}
+
+model Follows {
+  id Int @id @default(autoincrement())
+
+  follower_id String
+  followed_id String
+
+  create_at DateTime @default(now())
+  followed  User     @relation("Followed", fields: [followed_id], references: [id])
+  following User     @relation("Following", fields: [follower_id], references: [id])
+
+  @@unique([follower_id, followed_id])
 }

@@ -12,9 +12,8 @@ export const InspectPost = ({}) => {
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
 
-        console.log(username, postid);
+    useEffect(() => {
 
         fetch(`${API_URL}/profile/inspect/${postid}`, {
             method: "GET",
@@ -41,11 +40,13 @@ export const InspectPost = ({}) => {
                 <p>Loading...</p>
             ) : post ? (
                 <Post
-                    user={post.poster?.username || null}
+                    username={post.poster?.username || null}
                     likes={post.likes}
                     comments={post.comments}
                     caption={post.caption}
                     images={post.images}
+                    id={post.id}
+                    post={post}
                 />
             ) : (
                 <p>Post not found</p>

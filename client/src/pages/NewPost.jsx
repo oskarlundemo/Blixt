@@ -58,8 +58,6 @@ export const NewPost = ({}) => {
             });
             const data = await response.json();
 
-
-
         } catch (err) {
             console.error('Error submitting post:', err);
         }

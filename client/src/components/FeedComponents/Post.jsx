@@ -2,7 +2,12 @@
 
 import '../../styles/Post.css'
 import {Carousel} from "../Carousel.jsx";
-
+import {likePost} from "../../services/helperFunctions.js";
+import {useAuth} from "../../context/AuthContext.jsx";
+import {UserAvatar} from "../UserAvatar.jsx";
+import {useNavigate} from "react-router-dom";
+import {CommentCard} from "../CommentSectionComponents/CommentCard.jsx";
+import {useState} from "react";
 
 export const Post = ({
                          username = 'Unknown',
@@ -10,8 +15,36 @@ export const Post = ({
                          likes = [],
                          comments = [],
                          images = [],
-                     }) => {
+                         id = 0,
+                         post = null,
+                         poster = null,
+                      }) => {
 
+
+
+    const {user, API_URL} = useAuth();
+    const [liked, setLiked] = useState(false);
+    const navigate = useNavigate();
+
+    const likePost = async (postID, userID) => {
+        try {
+            const response = await fetch(`${API_URL}/posts/like/${postID}/${userID}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            });
+
+            if (!response.ok) {
+                console.error("HTTP error", response.status, response.statusText);
+            } else {
+                console.log('Like Post');
+            }
+
+        } catch (err) {
+            console.error("Network or fetch error:", err);
+        }
+    }
 
     return (
 
@@ -19,22 +52,15 @@ export const Post = ({
 
             <div className='post-header'>
 
-                <img
-                    src={'default.jpg'}
-                    style={{
-                        height: '30px',
-                        width: '30px',
-                    }}
-                />
+                <UserAvatar/>
 
-                <h2>{username}</h2>
+                <h2>{post.poster?.username}</h2>
 
                 {/* Här kör vi en userAvatar component*/}
 
             </div>
 
             <div className='post-body'>
-
 
                 {images.length > 1 ? (
                     <Carousel>
@@ -62,8 +88,11 @@ export const Post = ({
 
                 <div className='post-interactions'>
 
-                    <div className='post-likes'>
-                        <span>{comments.length || 0}</span>
+                    <div onClick={() => {
+                        likePost(id, user.sub)
+                    }} className='post-likes'>
+
+                        <span>{likes.length || 0}</span>
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
                              fill="#e3e3e3">
                             <path
@@ -72,8 +101,12 @@ export const Post = ({
                     </div>
 
 
-                    <div className='post-comments'>
-                        <span>{likes.length || 0}</span>
+                    <div
+
+                        onClick={() => navigate(`/${post.poster.username}/${post.id}/comments`)}
+
+                        className='post-comments'>
+                        <span>{comments.length || 0}</span>
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
                              fill="#e3e3e3">
                             <path
@@ -86,10 +119,14 @@ export const Post = ({
                 <p>{username}: {caption}</p>
 
                 {comments?.length > 0 && (
-                    <div className='post-comments'>
-                        <p>@gurra: This is crazy</p>
-                        <p>@axa: Woof?</p>
-                    </div>
+                    (comments.map(comment => (
+                        <CommentCard
+                            key={comment.id}
+                            comment={comment.comment}
+                            timestamp={comment.created_at ? comment.created_at : undefined}
+                            user={comment.user || null}
+                        />
+                    )))
                 )}
 
             </div>
