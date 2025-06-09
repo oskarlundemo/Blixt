@@ -1,7 +1,7 @@
 import {prisma} from "../prisma/index.js";
 
 
-export const FetchProfileUser = async (req, res) => {
+export const fetchUser = async (req, res, next) => {
 
 
     try {
@@ -13,7 +13,10 @@ export const FetchProfileUser = async (req, res) => {
                 id: userId,
             }
         })
-        res.status(200).json(user);
+
+
+        res.locals.user = user;
+        next();
 
     } catch (err) {
         console.log(err)
@@ -25,7 +28,52 @@ export const FetchProfileUser = async (req, res) => {
 
 
 
-export const FetchProfilePosts = async (req, res) => {
+export const fetchFollowers = async (req, res, next) => {
+
+    try {
+
+        const userId = req.params.user_id;
+
+        const followers = await prisma.follows.findMany({
+            where: {
+                followed_id: userId,
+            }
+        })
+
+        const following = await prisma.follows.findMany({
+            where: {
+                follower_id: userId,
+            }
+        })
+
+        res.locals.followers = followers;
+        res.locals.following = following;
+
+        next();
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            message: 'Something went wrong', error: err,
+        })
+    }
+
+
+}
+
+
+export const sendProfileData = async (req, res, next) => {
+    res.status(200).json({
+        user: res.locals.user,
+        posts: res.locals.posts,
+        followers: res.locals.followers,
+        following: res.locals.following,
+    });
+}
+
+
+
+export const fetchPosts = async (req, res, next) => {
 
     try {
 
@@ -44,13 +92,15 @@ export const FetchProfilePosts = async (req, res) => {
                     },
                 },
                 likes: true,
+            },
+            orderBy: {
+                created_at: 'desc'
             }
         })
 
-        return res.status(200).json({
-            posts,
-            message: 'Posts posts successfully'
-        })
+
+        res.locals.posts = posts;
+        next();
 
     } catch (err) {
         console.log(err)
@@ -89,5 +139,34 @@ export const InspectSinglePost = async (req, res) => {
         console.log(err)
         res.status(500).json({message: 'Something went wrong', error: err});
     }
+}
 
+
+export const loadFeed = async (req, res) => {
+
+    try {
+        const {user_id} = req.params;
+
+        const posts = await prisma.post.findMany({
+            where: {
+                user_id: user_id,
+            },
+            include: {
+                images: true,
+                poster: true,
+                comments: {
+                    include: {
+                        user: true,
+                    },
+                },
+                likes: true,
+            }
+        })
+
+        res.status(200).json(posts)
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({err: err, message: "Server error"});
+    }
 }
