@@ -47,6 +47,7 @@ export const InspectPost = ({}) => {
                     images={post.images}
                     id={post.id}
                     post={post}
+                    poster={post.poster}
                 />
             ) : (
                 <p>Post not found</p>

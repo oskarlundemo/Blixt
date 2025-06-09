@@ -3,16 +3,21 @@
 
 
 import {Router} from 'express';
-import {FetchProfilePosts, FetchProfileUser, InspectSinglePost} from "../controllers/profileController.js";
+import {
+    fetchFollowers,
+    fetchPosts,
+    fetchUser,
+    InspectSinglePost, loadFeed, sendProfileData
+} from "../controllers/profileController.js";
 
 
 const profileRoute = Router();
 
-profileRoute.get('/fetch/posts/:user_id', FetchProfilePosts)
-
-profileRoute.get('/fetch/user/:user_id', FetchProfileUser)
+profileRoute.get('/fetch/data/:user_id', fetchPosts, fetchUser, fetchFollowers, sendProfileData);
 
 profileRoute.get('/inspect/:post_id', InspectSinglePost)
+
+profileRoute.get('/load/:feed/:user_id', loadFeed)
 
 
 export default profileRoute

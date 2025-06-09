@@ -6,6 +6,8 @@ import {useEffect, useState} from "react";
 import {useAuth} from "../context/AuthContext.jsx";
 import {useNavigate, useParams} from "react-router-dom";
 import {UserAvatar} from "../components/UserAvatar.jsx";
+import {BioInput} from "../components/ProfileComponents/BioInput.jsx";
+import {ButtonContainer} from "../components/ProfileComponents/ButtonContainer.jsx";
 
 
 
@@ -16,22 +18,29 @@ export const Profile = ({}) => {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [profileUser, setProfileUser] = useState({});
+    const [following, setFollowing] = useState(0);
+    const [followers, setFollowers] = useState(0);
 
-    const { username, uuid } = useParams();
+    const [avatar, setAvatar] = useState(null);
+    const [avatarPreview, setAvatarPreview] = useState(null); // for visual preview
 
-    useEffect(() => {
-        console.log("Username:", username);
-        console.log("UUID:", uuid);
 
-        // Fetch user data by username or UUID here
-    }, [username, uuid]);
+    const [editedBio, setEditedBio] = useState('');
+
+
+    const [bioLength, setBioLength] = useState(0);
+    const [bio, setBio] = useState("");
+    const [username, setUsername] = useState("");
+
+
+    const [editing, setEditing] = useState(false);
+    const { uuid } = useParams();
 
     const {API_URL, user} = useAuth();
 
-
     useEffect(() => {
 
-        fetch(`${API_URL}/profile/fetch/user/${uuid}`, {
+        fetch(`${API_URL}/profile/fetch/data/${uuid}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -39,26 +48,52 @@ export const Profile = ({}) => {
         })
             .then(res => res.json())
             .then(data => {
-                setProfileUser(data);
-                console.log(data);
-            })
-            .catch(err => console.log(err));
-
-
-        fetch(`${API_URL}/profile/fetch/posts/${uuid}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            }
-        })
-            .then(res => res.json())
-            .then(data => {
+                setProfileUser(data.user);
+                setBio(data.user.bio);
+                setEditedBio(data.user.bio);
+                setUsername(data.user.username);
                 setPosts(data.posts);
-                console.log(data.posts);
+                setFollowing(data.followers.length);
+                setFollowers(data.following.length);
             })
             .catch(err => console.log(err));
-
     }, [])
+
+
+    useEffect(() => {
+        setBioLength(editedBio ? editedBio.length : 0);
+    }, [editedBio]);
+
+    const handleSubmit = async (e) => {
+
+        e.preventDefault();
+
+        setBio(editedBio);
+        console.log(editedBio);
+
+        console.log(bio);
+        console.log('Submitting changes')
+
+        console.log(avatar);
+
+        const formData = new FormData();
+        formData.append("bio", bio);
+        formData.append("avatar", avatar);
+
+
+        try {
+            await fetch(`${API_URL}/users/update/profile/${uuid}/${user.id}`, {
+                method: "POST",
+                body: formData
+            })
+
+        } catch (err) {
+            console.error('Error' + err);
+        }
+
+
+    }
+
 
 
     return (
@@ -70,9 +105,14 @@ export const Profile = ({}) => {
 
                     <UserAvatar
                         user={profileUser}
-                        height={'50px'}
-                        width={'50px'}
+                        size="100px"
                         selectPicture={true}
+                        setEdit={setEditing}
+                        setFile={(file) => {
+                            setAvatar(file);
+                            setAvatarPreview(URL.createObjectURL(file));
+                        }}
+                        file={avatarPreview}
                     />
 
                     <div className="profile-followers">
@@ -83,24 +123,37 @@ export const Profile = ({}) => {
                         </div>
 
                         <div>
-                            <p>10</p>
+                            <p>{followers}</p>
                             <p>Followers</p>
                         </div>
 
                         <div>
-                            <p>9</p>
+                            <p>{following}</p>
                             <p>Following</p>
                         </div>
-
 
                         {!uuid === user.id ? (
                             <button>
                                 Follow
                             </button>
                         ) : (
-                            <button>
-                                Edit
-                            </button>
+
+                            (editing ? (
+
+                                <ButtonContainer
+                                    handleSubmit={handleSubmit}
+                                    setEditing={setEditing}
+                                />
+
+                            ) : (
+
+                                <button
+                                    onClick={() => setEditing(true)}
+                                    className="edit-button">
+                                    Edit
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/></svg>
+                                </button>
+                            ))
                         )}
 
                     </div>
@@ -115,9 +168,19 @@ export const Profile = ({}) => {
                             margin: "10px auto",
                             fontSize: '1.5rem',
                         }}
-                    >@{profileUser.username}</h1>
+                    >@{username}</h1>
 
-                    <p>{profileUser.bio}</p>
+                    {editing ? (
+                        <BioInput
+                            editedBio={editedBio}
+                            bio={bio}
+                            setEditedBio={setEditedBio}
+                            bioLength={bioLength}
+                        />
+                    ) : (
+                        <p>{bio || 'No bio yet'}</p>
+                    )}
+
                 </div>
 
             </header>

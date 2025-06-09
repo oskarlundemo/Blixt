@@ -9,6 +9,7 @@ export const CommentInput = ({postId}) => {
 
     const {API_URL, user} = useAuth();
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -30,8 +31,9 @@ export const CommentInput = ({postId}) => {
             const text = await response.text();
             throw new Error(`Server Error: ${response.status} - ${text}`);
         }
-    }
 
+        setComment('');
+    }
 
 
     return (

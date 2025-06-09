@@ -15,7 +15,7 @@ export const Feed = ({}) => {
 
     useEffect(() => {
 
-        fetch(`${API_URL}/profile/fetch/posts/${user.sub}`, {
+        fetch(`${API_URL}/profile/load/feed/${user.sub}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -23,13 +23,14 @@ export const Feed = ({}) => {
         })
             .then(res => res.json())
             .then(data => {
-                setPosts(data.posts);
+                setPosts(data);
+                console.log(data);
                 setLoading(false);
-                console.log(data.posts);
             })
-            .catch(err => console.log(err));
-
-        console.log(user)
+            .catch(err => {
+                console.log(err);
+                setLoading(false);
+            });
 
     }, [])
 
@@ -54,6 +55,7 @@ export const Feed = ({}) => {
                                     images={post.images}
                                     post={post}
                                     poster={post.poster}
+                                    id={post.id}
                                 />
                             ))
                         ) : (
@@ -63,7 +65,7 @@ export const Feed = ({}) => {
                                         textAlign: 'center',
                                         alignSelf: 'center',
                                     }}>
-                                No posts yet, create on or follow others!
+                                No posts yet, create one or follow others!
                             </p>
                     ))
                 )}

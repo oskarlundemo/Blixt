@@ -3,12 +3,13 @@
 
 
 .profile {
-        width: 80%;
-        margin: 0 auto;
-        display: flex;
-        flex-direction: column;
-        height: 100vh; /* Use full viewport height */
-        position: relative; /* For positioning children if needed */
+    width: 80%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: relative;
+    gap: 1rem;
 }
 
 
@@ -53,14 +54,10 @@
 .profile-content-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    aspect-ratio: 1 / 1 !important;
     gap: 1rem;
     align-items: flex-start;
     justify-content: center;
 }
-
-
-
 
 
 .profile-content-grid article {
@@ -86,12 +83,12 @@
 
 
 .user-avatar-select-picture {
-    overflow: hidden;
     border-radius: 50%;
     position: relative;
     inset: 0;
     width: 100%;
     height: 100%;
+    aspect-ratio: 1 / 1;
     background: transparent;
     border: none;
     cursor: pointer;
@@ -99,13 +96,32 @@
     align-items: center;
     justify-content: center;
 
+
+    transition: var(--default-transition);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 
+    svg {
+        opacity: 0;
+        transition: var(--default-transition);
+    }
+
+
+    &:hover {
+        svg {
+            opacity: 1;
+            fill: var(--accent-color)
+        }
+
+        opacity: 0.5;
+    }
 }
 
 .user-avatar-select-box {
+    border-radius: 50%;
+    aspect-ratio: 1 / 1;
+
     position: absolute;
     inset: 0;
     width: 100%;
@@ -123,4 +139,65 @@
     cursor: pointer;
     padding: 0;
     margin: 0;
+    outline: none;
+}
+
+
+
+
+.bio-input {
+    display: flex;
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid var(--accent-color);
+    border-radius: 0.5rem;
+
+    &:has(textarea:focus-within) {
+        transition: var(--default-transition);
+        border: 1px solid var(--accent-color);
+    }
+}
+
+.bio-input textarea {
+    width: 100%;
+    resize: none;
+    padding: 8px;
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+    outline: none;
+}
+
+
+.buttonContainer {
+    grid-area: 2 / 1 / 2 / 6;
+    width: 100%;
+
+
+    button {
+        width: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        transition: var(--default-transition);
+
+        &:hover {
+            scale: 1.03;
+        }
+    }
+}
+
+.edit-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+
+.cancel-button {
+    svg {
+        fill: var(--error-color)
+    }
 }

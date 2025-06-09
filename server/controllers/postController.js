@@ -1,8 +1,8 @@
 import {prisma} from "../prisma/index.js";
 
 
-export const createNewPost = async (req, res) => {
 
+export const createNewPost = async (req, res) => {
     try {
 
         if (!req.files?.length) {
@@ -52,21 +52,50 @@ export const createNewPost = async (req, res) => {
 
 
 
-export const likePost = async (req, res) => {
 
+export const fetchEnrichedComments = async (req, res) => {
+
+    try {
+
+        const {comment_id} = req.params;
+
+        const enrichedComment = await prisma.comments.findFirst({
+            where: {
+                id: comment_id,
+            },
+            include: {
+                user: true
+            }
+        })
+
+        res.status(200).json(enrichedComment);
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+
+}
+
+
+
+
+
+export const likePost = async (req, res) => {
 
     try {
 
         const {user_id, post_id} = req.params;
+        let liked = true;
 
-        const liked = await prisma.likes.findFirst({
+        const alreadyLiked = await prisma.likes.findFirst({
             where: {
                 post_id: parseInt(post_id),
                 user_id: user_id,
             }
         })
 
-        if (!liked) {
+        if (!alreadyLiked) {
             await prisma.likes.create({
                 data: {
                     user_id: user_id,
@@ -76,12 +105,20 @@ export const likePost = async (req, res) => {
         } else {
             await prisma.likes.delete({
                 where: {
-                    id: liked.id
+                    id: alreadyLiked.id
                 }
             })
+
+            liked = false;
         }
 
-        res.status(200).json({ message: 'Post succuesfully liked!'});
+        const likes = await prisma.likes.findMany({
+            where: {
+                post_id: parseInt(post_id),
+            }
+        })
+
+        res.status(200).json({ liked: liked, likes: likes, message: 'Post succuesfully liked!'});
 
     } catch (err) {
         console.log(err);
@@ -92,7 +129,6 @@ export const likePost = async (req, res) => {
 
 
 export const getComments = async (req, res) => {
-
 
     try {
 
