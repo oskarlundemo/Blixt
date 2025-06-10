@@ -138,8 +138,14 @@ export const signUpUser = async(req, res) => {
 
 
 export const addUser = async (req, res) => {
+
     try {
+
         const { email, username, id } = req.body;
+
+        if (!id || !email || !username) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
 
         await prisma.user.create({
             data: {

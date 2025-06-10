@@ -2,7 +2,10 @@
 
 
 .input-field {
+
+
     fieldset {
+        background-color: var(--background-color);
         text-align: left;
         border-radius: var(--border-radius);
         transition: var(--default-transition);

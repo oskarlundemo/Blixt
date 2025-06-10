@@ -43,7 +43,11 @@ export const Inputfield = ({ title, type, id, name, onChange, value, example, sv
     return (
         <div className="input-field">
             <fieldset className="input-fieldset">
-                <legend>{title}</legend>
+
+                {title && (
+                    <legend>{title}</legend>
+                )}
+
                 <div className="input-card">
                     <input
                         type={type}

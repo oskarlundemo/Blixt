@@ -14,7 +14,6 @@ export const fetchUser = async (req, res, next) => {
             }
         })
 
-
         res.locals.user = user;
         next();
 
@@ -25,6 +24,57 @@ export const fetchUser = async (req, res, next) => {
         })
     }
 }
+
+
+export const follow = async (req, res, next) => {
+
+
+    try {
+
+        const {user_profile_id, logged_in_user_id} = req.params;
+        let follows = false;
+
+        console.log(logged_in_user_id);
+        console.log(user_profile_id);
+
+        const alreadyFollowing = await prisma.follows.findFirst({
+            where: {
+                follower_id: logged_in_user_id,
+                followed_id: user_profile_id,
+            }
+        });
+
+
+        if (alreadyFollowing)
+            res.status(200).json({
+                message: 'Unfollow', follows
+            })
+
+
+
+        await prisma.follows.create({
+            data: {
+                follower_id: user_profile_id,
+                followed_id: logged_in_user_id,
+            }
+        })
+
+        follows = true
+
+        res.status(200).json({
+            follows
+        })
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            message: 'Something went wrong', error: err
+        })
+    }
+}
+
+
+
 
 
 

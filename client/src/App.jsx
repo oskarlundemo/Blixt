@@ -7,6 +7,8 @@ import {NewPost} from "./pages/NewPost.jsx";
 import {ResetPassword} from "./pages/ResetPassword.jsx";
 import {InspectPost} from "./components/ProfileComponents/InspectPost.jsx";
 import {CommentSection} from "./pages/CommentSection.jsx";
+import {Notifications} from "./pages/Notifications.jsx";
+import {Explore} from "./pages/Explore.jsx";
 function App() {
 
   const PRODUCTION_URL = import.meta.env.VITE_API_BASE_URL;
@@ -50,11 +52,26 @@ function App() {
 
 
             <Route
+                path="/explore"
+                element={
+                    <Explore/>
+                }
+            />
+
+            <Route
                 path="/reset-password"
                 element={
                     <ResetPassword/>
                 }
             />
+
+            <Route
+                path="/notifications/:user_id"
+                element={
+                    <Notifications/>
+                }
+            />
+
 
             <Route
                 path="/feed"

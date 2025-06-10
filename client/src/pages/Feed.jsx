@@ -32,7 +32,9 @@ export const Feed = ({}) => {
                 setLoading(false);
             });
 
+
     }, [])
+
 
 
     return (

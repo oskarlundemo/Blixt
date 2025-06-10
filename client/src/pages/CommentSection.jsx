@@ -1,4 +1,4 @@
-import {use, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
 
 import '../styles/CommentSection.css'
@@ -10,12 +10,21 @@ import {supabase} from "../services/SupabaseClient.js";
 
 export const CommentSection = ({}) => {
 
+    const { user, loading } = useAuth();
     const [comments, setComments] = useState([]);
     const {postid} = useParams();
     const {API_URL} = useAuth();
 
 
     useEffect(() => {
+
+        if (loading || !user) return;
+
+
+        console.log('User:', user);
+        console.log('Loading:', loading);
+        console.log('Post ID:', postid);
+
 
         fetch(`${API_URL}/posts/comments/all/${postid}`, {
             method: "GET",
@@ -29,12 +38,18 @@ export const CommentSection = ({}) => {
             })
             .catch(err => console.log(err));
 
-        const commentsChannel = supabase.channel(`comments.${postid}`);
 
-        localStorage.setItem("supabase.realtime.debug", "true");
+        const accessToken = localStorage.getItem('token');
 
+        console.log('Access Token:', accessToken);
 
-
+        const commentsChannel = supabase.channel(`comments-${postid}`, {
+            config: {
+                params: {
+                    authToken: accessToken,
+                },
+            },
+        });
         commentsChannel.on(
             "postgres_changes",
             {
@@ -42,70 +57,32 @@ export const CommentSection = ({}) => {
                 schema: "public",
                 table: "Comments"
             },
+
+
             async (payload) => {
-                const newComment = payload.new; // New group message
+                const newComment = payload.new;
                 console.log(newComment);
 
                 try {
                     const res = await fetch(`${API_URL}/posts/comments/new/${postid}/${newComment.id}`); // Fetch the enirched message from backend
                     const data = await res.json();
-                    // Add it to the messages displayed in the chat window
                     setComments(prev => [...prev, data]);
                 } catch (err) {
                     console.error("Error fetching group message:", err);
                 }
             }
-        ).subscribe();
+        ).subscribe((status) => {
+            console.log('Subscription status:', status);
+        });
 
 
         return () => {
             supabase.removeChannel(commentsChannel);
         };
 
-    }, [postid]);
+    }, [postid, loading, user]);
 
 
-    useEffect(() => {
-        const channels = supabase.channel('custom-insert-channel')
-            .on(
-                'postgres_changes',
-                { event: '*', schema: 'public', table: 'Comments' },
-                (payload) => {
-                    console.log('Change received!', payload)
-                }
-            )
-            .subscribe()
-
-        return () => {
-            supabase.removeChannel(channels);
-        }
-    }, []);
-
-    useEffect(() => {
-        const channel = supabase
-            .channel('debug-comments')
-            .on(
-                'postgres_changes',
-                {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'Comments',
-                },
-                (payload) => {
-                    console.log('New comment inserted:', payload);
-                }
-            )
-            .subscribe((status) => {
-                console.log('Subscription status:', status);
-            });
-
-        return () => {
-            supabase.removeChannel(channel);
-        };
-    }, []);
-
-
-    console.log(postid);
 
     return (
         <main className="comment-section">

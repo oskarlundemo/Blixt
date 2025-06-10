@@ -29,6 +29,9 @@ export const updateBio = async (req, res, next) => {
         const { user_id, uuid } = req.params;
         const { bio } = req.body;
 
+        console.log(user_id, uuid);
+
+
         console.log('Updating bio:', bio);
 
         if (user_id !== uuid) {
@@ -64,7 +67,6 @@ export const updateAvatar = async (req, res) => {
         console.log('Updating avatar:', avatarFile);
 
         if (!avatarFile) {
-            // No avatar uploaded, just return success
             return res.status(200).json({ message: 'Profile updated.' });
         }
 
@@ -73,7 +75,7 @@ export const updateAvatar = async (req, res) => {
         await prisma.user.update({
             where: { id: user_id },
             data: {
-                avatar: avatarFile.path, // or .path, depending on your DB
+                avatar: avatarFile.path,
             },
         });
 

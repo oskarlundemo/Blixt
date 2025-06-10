@@ -82,19 +82,29 @@ export const UserAvatar = ({ user, setEdit = false, setFile, file, size = '50px'
                 (loadingAvatar ? (
                     <div style={{height: size, width: size}} className="loading-avatar"></div>
                 ) : (
+
+                    <div
+                        style={{
+                            backgroundImage: `url(${file || user?.avatar || '/default.jpg'})`,
+                            height: size,
+                            width: size,
+                        }}
+
+                        className="user-avatar-select-picture">
                     <img
                         key={Date.now()}
                         className="user-avatar-select-picture-default"
                         src={userAvatar || '/default.jpg'}
                         alt="user-avatar"
-                        style={{ height: size,
-                            width: size,
-                            objectFit: "cover",
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: "contain",
                             objectPosition: "center",
                             borderRadius: "50%",
                         }}
-                        draggable={false}
-                    />
+                        draggable={false}/>
+                    </div>
                 ))
             )}
         </>
