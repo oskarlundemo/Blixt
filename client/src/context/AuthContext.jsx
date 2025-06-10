@@ -26,6 +26,7 @@ export const AuthProvider = ({ children }) => {
             const { data: { session } } = await supabase.auth.getSession();
             if (session?.access_token) {
 
+                await supabase.auth.setSession(session);
                 const userId = session?.user.id;
 
                 try {

@@ -2,7 +2,7 @@
 
 import '../styles/Profile.css'
 import {NavigationBar} from "../components/NavigationBar.jsx";
-import {useEffect, useState} from "react";
+import {use, useEffect, useState} from "react";
 import {useAuth} from "../context/AuthContext.jsx";
 import {useNavigate, useParams} from "react-router-dom";
 import {UserAvatar} from "../components/UserAvatar.jsx";
@@ -21,16 +21,18 @@ export const Profile = ({}) => {
     const [following, setFollowing] = useState(0);
     const [followers, setFollowers] = useState(0);
 
-    const [avatar, setAvatar] = useState(null);
-    const [avatarPreview, setAvatarPreview] = useState(null); // for visual preview
+    const [follows, setFollows] = useState(false);
 
+    const [avatar, setAvatar] = useState(null);
+    const [avatarPreview, setAvatarPreview] = useState(null);
 
     const [editedBio, setEditedBio] = useState('');
-
 
     const [bioLength, setBioLength] = useState(0);
     const [bio, setBio] = useState("");
     const [username, setUsername] = useState("");
+
+
 
 
     const [editing, setEditing] = useState(false);
@@ -48,16 +50,20 @@ export const Profile = ({}) => {
         })
             .then(res => res.json())
             .then(data => {
+                console.log(data);
                 setProfileUser(data.user);
                 setBio(data.user.bio);
                 setEditedBio(data.user.bio);
-                setUsername(data.user.username);
+                setUsername(data.user.username || data.user.user_metadata.username);
                 setPosts(data.posts);
                 setFollowing(data.followers.length);
+                setFollows(data.follows.some(follow => follow.id === data.user.id));
                 setFollowers(data.following.length);
             })
             .catch(err => console.log(err));
     }, [])
+
+
 
 
     useEffect(() => {
@@ -69,17 +75,11 @@ export const Profile = ({}) => {
         e.preventDefault();
 
         setBio(editedBio);
-        console.log(editedBio);
-
-        console.log(bio);
-        console.log('Submitting changes')
-
         console.log(avatar);
 
         const formData = new FormData();
-        formData.append("bio", bio);
+        formData.append("bio", editedBio);
         formData.append("avatar", avatar);
-
 
         try {
             await fetch(`${API_URL}/users/update/profile/${uuid}/${user.id}`, {
@@ -90,8 +90,29 @@ export const Profile = ({}) => {
         } catch (err) {
             console.error('Error' + err);
         }
+    }
 
 
+    const handleFollow = async (e) => {
+
+        console.log('Följ');
+
+        try {
+            await fetch(`${API_URL}/profile/follow/${uuid}/${user.id}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                setFollows(data.follows);
+                })
+                .catch(err => console.log(err));
+
+        } catch (err) {
+            console.error('Error' + err);
+        }
     }
 
 
@@ -132,19 +153,31 @@ export const Profile = ({}) => {
                             <p>Following</p>
                         </div>
 
-                        {!uuid === user.id ? (
-                            <button>
-                                Follow
-                            </button>
+                        {uuid !== user.id ? (
+
+                            (follows ? (
+                                <button
+                                    onClick={() => {
+                                        handleFollow()
+                                    }}
+                                >
+                                    Unfollow
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={() => {
+                                        handleFollow()
+                                    }}
+                                >
+                                    Follow
+                                </button>
+                            ))
                         ) : (
-
                             (editing ? (
-
                                 <ButtonContainer
                                     handleSubmit={handleSubmit}
                                     setEditing={setEditing}
                                 />
-
                             ) : (
 
                                 <button
@@ -206,7 +239,15 @@ export const Profile = ({}) => {
                                 </article>
                             ))
                         ) : (
-                            <p>No posts yet! Create one</p>
+                            <p
+
+                                style={{
+                                    textAlign: "center",
+                                    position: "relative",
+                                    gridArea:  "1 / 2 / 2 / 2"
+                                }}
+
+                            >No posts yet! Create one</p>
                         ))
                 )}
 

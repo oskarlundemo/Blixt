@@ -15,17 +15,23 @@ datasource db {
 }
 
 model User {
-  id        String     @id @default(uuid()) @map("id")
-  email     String     @unique
-  username  String     @unique
-  bio       String?
-  avatar    String?
-  posts     Post[]     @relation("UserPosts")
-  Likes     Likes[]    @relation("UserLikes")
-  Comments  Comments[] @relation("AuthorComment")
-  followers Follows[]  @relation("Followed")
-  following Follows[]  @relation("Following")
+  id       String     @id @default(uuid()) @map("id")
+  email    String     @unique
+  username String     @unique
+  bio      String?
+  avatar   String?
+  posts    Post[]     @relation("UserPosts")
+  Likes    Likes[]    @relation("UserLikes")
+  Comments Comments[] @relation("AuthorComment")
 
+  followers Follows[] @relation("Followed")
+  following Follows[] @relation("Following")
+
+  sentNotifications     Notification[] @relation("NotificationNotifier")
+  receivedNotifications Notification[] @relation("NotificationReceiver")
+
+  @@index([username])
+  @@index([email])
   @@map("users")
 }
 
@@ -40,7 +46,8 @@ model Post {
   likes    Likes[]    @relation("PostLikes")
   comments Comments[] @relation("PostComments")
 
-  images Images[] @relation("PostImages")
+  images       Images[]       @relation("PostImages")
+  Notification Notification[]
 
   @@map("posts")
 }
@@ -58,9 +65,10 @@ model Likes {
   post_id Int
   user_id String
 
-  created_at DateTime @default(now())
-  user       User     @relation("UserLikes", fields: [user_id], references: [id])
-  post       Post     @relation("PostLikes", fields: [post_id], references: [id])
+  created_at   DateTime       @default(now())
+  user         User           @relation("UserLikes", fields: [user_id], references: [id])
+  post         Post           @relation("PostLikes", fields: [post_id], references: [id])
+  Notification Notification[]
 }
 
 model Comments {
@@ -69,9 +77,10 @@ model Comments {
   user_id String
   comment String
 
-  created_at DateTime @default(now())
-  user       User     @relation("AuthorComment", fields: [user_id], references: [id])
-  post       Post     @relation("PostComments", fields: [post_id], references: [id])
+  created_at   DateTime       @default(now())
+  user         User           @relation("AuthorComment", fields: [user_id], references: [id])
+  post         Post           @relation("PostComments", fields: [post_id], references: [id])
+  Notification Notification[]
 }
 
 model Follows {
@@ -85,4 +94,32 @@ model Follows {
   following User     @relation("Following", fields: [follower_id], references: [id])
 
   @@unique([follower_id, followed_id])
+}
+
+model Notification {
+  id          Int              @id @default(autoincrement())
+  type        NotificationType
+  notifier_id String
+  user_id     String?
+
+  post_id    Int?
+  like_id    Int?
+  comment_id Int?
+
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  notifier User  @relation("NotificationNotifier", fields: [notifier_id], references: [id])
+  user     User? @relation("NotificationReceiver", fields: [user_id], references: [id])
+
+  post    Post?     @relation(fields: [post_id], references: [id])
+  like    Likes?    @relation(fields: [like_id], references: [id])
+  comment Comments? @relation(fields: [comment_id], references: [id])
+}
+
+enum NotificationType {
+  LIKE
+  COMMENT
+  FOLLOW
+  MENTION
 }

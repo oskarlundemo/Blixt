@@ -7,6 +7,7 @@ import PostsRoute from "./routes/postsRoute.js";
 import { v2 as cloudinary } from 'cloudinary';
 import profileRoute from "./routes/profileRoute.js";
 import userRoute from "./routes/userRoute.js";
+import exploreRoute from "./routes/exploreRoute.js";
 
 dotenv.config();
 cloudinary.config({
@@ -22,6 +23,7 @@ const PORT = process.env.PORT || 5002;
 app.use(cors());
 app.use(express.json());
 
+app.use('/explore', exploreRoute)
 app.use('/users', userRoute)
 app.use('/profile', profileRoute);
 app.use('/auth/signup', createAccountRoute);

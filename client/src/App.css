@@ -38,6 +38,8 @@
   background-color: rgba(0, 0, 0, 0.8);
   transition: opacity 250ms ease-in-out;
   opacity: 1;
+  z-index: 100;
+
   pointer-events: all;
 }
 
@@ -94,4 +96,25 @@
   pointer-events: none;
   align-items: center;
   justify-content: center;
+}
+
+
+.loading-box {
+  background: lightgray;
+  animation: loadingPulse 3s infinite linear;
+  aspect-ratio: 1 / 1;
+}
+
+@keyframes loadingPulse {
+
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
 }

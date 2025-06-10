@@ -68,6 +68,7 @@ export const CreateForm = ({setShowLogin}) => {
             },
         });
 
+
         if (error) {
             setErrors([error.message]);
             return;
@@ -86,7 +87,6 @@ export const CreateForm = ({setShowLogin}) => {
         if (signInData.session) {
 
             const user = signInData.user;
-
 
             const response = await fetch(`${API_URL}/auth/signup/supabase`, {
                 method: "POST",
