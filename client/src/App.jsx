@@ -66,7 +66,7 @@ function App() {
             />
 
             <Route
-                path="/notifications/:user_id"
+                path="/notifications"
                 element={
                     <Notifications/>
                 }
@@ -89,7 +89,7 @@ function App() {
                 }/>
 
             <Route
-                path="profile/:username/:uuid"
+                path="/:username"
                 element={
                 <Profile/>
                 }

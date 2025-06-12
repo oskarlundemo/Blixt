@@ -5,6 +5,7 @@ import {Post} from "../components/FeedComponents/Post.jsx";
 import {NavigationBar} from "../components/NavigationBar.jsx";
 import {useEffect, useState} from "react";
 import {useAuth} from "../context/AuthContext.jsx";
+import {LoadingTitle} from "../components/LoadingTitle.jsx";
 
 export const Feed = ({}) => {
 
@@ -15,7 +16,7 @@ export const Feed = ({}) => {
 
     useEffect(() => {
 
-        fetch(`${API_URL}/profile/load/feed/${user.sub}`, {
+        fetch(`${API_URL}/feed/load/${user.sub}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -31,8 +32,6 @@ export const Feed = ({}) => {
                 console.log(err);
                 setLoading(false);
             });
-
-
     }, [])
 
 
@@ -43,7 +42,7 @@ export const Feed = ({}) => {
             <section className={'feed'}>
 
                 {loading ? (
-                    <p>Loading..</p>
+                    <LoadingTitle/>
                 ) : (
                     (posts.length > 0 ? (
                             posts.map((post, index) => (

@@ -1,4 +1,5 @@
 import {prisma} from "../prisma/index.js";
+import {cloudinary} from "../middleware/cloudinary.js";
 
 
 
@@ -81,12 +82,14 @@ export const fetchEnrichedComments = async (req, res) => {
 
 
 
-export const likePost = async (req, res) => {
+export const likePost = async (req, res, next) => {
 
     try {
 
         const {user_id, post_id} = req.params;
         let liked = true;
+
+        let like;
 
         const alreadyLiked = await prisma.likes.findFirst({
             where: {
@@ -96,21 +99,28 @@ export const likePost = async (req, res) => {
         })
 
         if (!alreadyLiked) {
-            await prisma.likes.create({
+            like = await prisma.likes.create({
                 data: {
                     user_id: user_id,
                     post_id: parseInt(post_id),
                 }
             })
         } else {
-            await prisma.likes.delete({
+            like = await prisma.likes.delete({
                 where: {
                     id: alreadyLiked.id
                 }
             })
 
+            await prisma.notification.deleteMany({
+                where: {
+                    like_id: alreadyLiked.id,
+                },
+            });
+
             liked = false;
         }
+
 
         const likes = await prisma.likes.findMany({
             where: {
@@ -118,7 +128,11 @@ export const likePost = async (req, res) => {
             }
         })
 
-        res.status(200).json({ liked: liked, likes: likes, message: 'Post succuesfully liked!'});
+        res.locals.liked = liked
+        res.locals.likes = likes
+        res.locals.like = like
+
+        next();
 
     } catch (err) {
         console.log(err);
@@ -150,8 +164,48 @@ export const getComments = async (req, res) => {
 }
 
 
+function extractPublicIdFromUrl(url) {
+    const parts = url.split('/upload/');
+    if (parts.length < 2) return null;
+    const afterUpload = parts[1];
+    return afterUpload.replace(/\.[^/.]+$/, ''); // remove extension like .jpg
+}
 
-export const createComment = async (req, res) => {
+
+export const deletePost = async (req, res) => {
+    try {
+        const { post_id } = req.params;
+        const userIdFromToken = req.user.id;
+
+        const post = await prisma.post.findUnique({
+            where: { id: parseInt(post_id) },
+        });
+
+        if (!post) return res.status(404).json({ error: "Post not found" });
+
+        if (post.user_id !== userIdFromToken)
+            return res.status(403).json({ error: "Unauthorized action" });
+
+        const images = await prisma.images.findMany({ where: { id: parseInt(post_id) } });
+
+        for (const image of images) {
+            const publicId = extractPublicIdFromUrl(image.url);
+            await cloudinary.v2.uploader.destroy(publicId);
+        }
+
+        await prisma.post.delete({ where: { id: parseInt(post_id) } });
+
+        return res.status(200).json({ message: "Post deleted successfully" });
+
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: "Server error" });
+    }
+};
+
+
+
+export const createComment = async (req, res, next) => {
 
     try {
 
@@ -162,7 +216,7 @@ export const createComment = async (req, res) => {
             return res.status(400).json({ error: "Comment is required" });
         }
 
-        await prisma.comments.create({
+        const comment_id = await prisma.comments.create({
             data: {
                 user_id: user_id,
                 post_id: parseInt(post_id),
@@ -170,7 +224,9 @@ export const createComment = async (req, res) => {
             }
         })
 
-        return res.status(200).json({ message: "Comment created!" });
+        res.locals.comment_id = comment_id.id;
+
+        next();
 
     } catch (err) {
         console.log(err);

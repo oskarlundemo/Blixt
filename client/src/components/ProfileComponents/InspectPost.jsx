@@ -4,6 +4,7 @@ import {useAuth} from "../../context/AuthContext.jsx";
 import {Post} from "../FeedComponents/Post.jsx";
 
 import '../../styles/InspectPost.css'
+import {LoadingTitle} from "../LoadingTitle.jsx";
 
 export const InspectPost = ({}) => {
 
@@ -36,7 +37,7 @@ export const InspectPost = ({}) => {
     return (
         <main className="single-post">
             {loading ? (
-                <p>Loading...</p>
+                <LoadingTitle/>
             ) : post ? (
                 <Post
                     username={post.poster?.username || null}

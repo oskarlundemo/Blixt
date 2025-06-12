@@ -10,11 +10,6 @@ export const NavigationBar = ({searchHasFocus}) => {
 
     const {user} = useAuth();
 
-    useEffect(() => {
-
-        console.log(user);
-    }, [])
-
     const {footerIndex, setFooterIndex} = useUI();
 
     const getFillColor = (index) => (index === footerIndex ? 'var(--accent-color)' : '#e3e3e3');
@@ -58,7 +53,7 @@ export const NavigationBar = ({searchHasFocus}) => {
             <svg
                 onClick={() => {
                     setFooterIndex(3)
-                    navigate(`/notifications/${user?.sub}`)
+                    navigate(`/notifications`)
                 }}
 
                 fill={getFillColor(3)}
@@ -69,7 +64,7 @@ export const NavigationBar = ({searchHasFocus}) => {
             <svg onClick={
                 () => {
                     setFooterIndex(4)
-                    navigate(`/profile/${user.username || user.user_metadata.username}/${user?.sub}`)
+                    navigate(`/${user.username || user.user_metadata.username}`)
                 }}
 
                  fill={getFillColor(4)}
