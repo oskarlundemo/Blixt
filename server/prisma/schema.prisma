@@ -56,7 +56,7 @@ model Images {
   id      Int    @id @default(autoincrement())
   url     String
   post_id Int
-  post    Post   @relation("PostImages", fields: [post_id], references: [id])
+  post    Post   @relation("PostImages", fields: [post_id], references: [id], onDelete: Cascade)
   index   Int
 }
 
@@ -67,7 +67,7 @@ model Likes {
 
   created_at   DateTime       @default(now())
   user         User           @relation("UserLikes", fields: [user_id], references: [id])
-  post         Post           @relation("PostLikes", fields: [post_id], references: [id])
+  post         Post           @relation("PostLikes", fields: [post_id], references: [id], onDelete: Cascade)
   Notification Notification[]
 }
 
@@ -79,7 +79,7 @@ model Comments {
 
   created_at   DateTime       @default(now())
   user         User           @relation("AuthorComment", fields: [user_id], references: [id])
-  post         Post           @relation("PostComments", fields: [post_id], references: [id])
+  post         Post           @relation("PostComments", fields: [post_id], references: [id], onDelete: Cascade)
   Notification Notification[]
 }
 
@@ -105,6 +105,7 @@ model Notification {
   post_id    Int?
   like_id    Int?
   comment_id Int?
+  follow_id  Int?
 
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
@@ -113,8 +114,8 @@ model Notification {
   user     User? @relation("NotificationReceiver", fields: [user_id], references: [id])
 
   post    Post?     @relation(fields: [post_id], references: [id])
-  like    Likes?    @relation(fields: [like_id], references: [id])
-  comment Comments? @relation(fields: [comment_id], references: [id])
+  like    Likes?    @relation(fields: [like_id], references: [id], onDelete: Cascade)
+  comment Comments? @relation(fields: [comment_id], references: [id], onDelete: Cascade)
 }
 
 enum NotificationType {

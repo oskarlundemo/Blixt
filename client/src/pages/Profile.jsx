@@ -2,12 +2,13 @@
 
 import '../styles/Profile.css'
 import {NavigationBar} from "../components/NavigationBar.jsx";
-import {use, useEffect, useState} from "react";
+import {use, useEffect, useRef, useState} from "react";
 import {useAuth} from "../context/AuthContext.jsx";
 import {useNavigate, useParams} from "react-router-dom";
 import {UserAvatar} from "../components/UserAvatar.jsx";
 import {BioInput} from "../components/ProfileComponents/BioInput.jsx";
 import {ButtonContainer} from "../components/ProfileComponents/ButtonContainer.jsx";
+import {LoadingBox} from "../components/LoadingBox.jsx";
 
 
 
@@ -16,8 +17,9 @@ export const Profile = ({}) => {
 
     const navigate = useNavigate();
     const [posts, setPosts] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [profileUser, setProfileUser] = useState({});
+
     const [following, setFollowing] = useState(0);
     const [followers, setFollowers] = useState(0);
 
@@ -30,19 +32,43 @@ export const Profile = ({}) => {
 
     const [bioLength, setBioLength] = useState(0);
     const [bio, setBio] = useState("");
-    const [username, setUsername] = useState("");
+    const [profileUsername, setProfileUsername] = useState("");
 
 
+    const [active, setActive] = useState('posts')
+    const postsRef = useRef(null);
+    const archiveRef = useRef(null);
+    const sliderRef = useRef(null);
+
+    useEffect(() => {
+
+        const updateSlider = () => {
+            const target = active === 'posts' ? postsRef.current : archiveRef.current;
+            if (target && sliderRef.current) {
+                sliderRef.current.style.width = `${target.offsetWidth}px`;
+                sliderRef.current.style.left = `${target.offsetLeft}px`;
+            }
+        };
+
+        updateSlider();
+
+        window.addEventListener('resize', updateSlider);
+
+        return () => {
+            window.removeEventListener('resize', updateSlider);
+        };
+
+    }, [active])
 
 
     const [editing, setEditing] = useState(false);
-    const { uuid } = useParams();
+    const {username } = useParams();
 
     const {API_URL, user} = useAuth();
 
     useEffect(() => {
 
-        fetch(`${API_URL}/profile/fetch/data/${uuid}`, {
+        fetch(`${API_URL}/profile/fetch/data/${user.id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -50,19 +76,25 @@ export const Profile = ({}) => {
         })
             .then(res => res.json())
             .then(data => {
-                console.log(data);
+
                 setProfileUser(data.user);
-                setBio(data.user.bio);
+                setBio(data.user?.bio || 'No bio');
                 setEditedBio(data.user.bio);
-                setUsername(data.user.username || data.user.user_metadata.username);
+                setProfileUsername(data.user.username || data.user.user_metadata.username);
                 setPosts(data.posts);
-                setFollowing(data.followers.length);
-                setFollows(data.follows.some(follow => follow.id === data.user.id));
-                setFollowers(data.following.length);
+
+                setFollowing(data.following.length);
+                setFollowing(data.following?.length || 0);
+                setFollowers(data.followers?.length || 0);
+
+                const isFollowing = data.followers?.some(follower => follower.follower_id === user.id) || false;
+
+                setFollows(isFollowing);
+                setLoading(false);
+
             })
             .catch(err => console.log(err));
-    }, [])
-
+    }, [username])
 
 
 
@@ -75,14 +107,13 @@ export const Profile = ({}) => {
         e.preventDefault();
 
         setBio(editedBio);
-        console.log(avatar);
 
         const formData = new FormData();
         formData.append("bio", editedBio);
         formData.append("avatar", avatar);
 
         try {
-            await fetch(`${API_URL}/users/update/profile/${uuid}/${user.id}`, {
+            await fetch(`${API_URL}/users/update/profile/${user.id}/${user.id}`, {
                 method: "POST",
                 body: formData
             })
@@ -95,10 +126,8 @@ export const Profile = ({}) => {
 
     const handleFollow = async (e) => {
 
-        console.log('Följ');
-
         try {
-            await fetch(`${API_URL}/profile/follow/${uuid}/${user.id}`, {
+            await fetch(`${API_URL}/profile/follow/${user.id}/${user.id}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -153,7 +182,7 @@ export const Profile = ({}) => {
                             <p>Following</p>
                         </div>
 
-                        {uuid !== user.id ? (
+                        {user.id !== user.id ? (
 
                             (follows ? (
                                 <button
@@ -211,20 +240,41 @@ export const Profile = ({}) => {
                             bioLength={bioLength}
                         />
                     ) : (
-                        <p>{bio || 'No bio yet'}</p>
+                        <p>{bio}</p>
                     )}
-
                 </div>
 
-            </header>
 
+                <div className="archive-container">
+                    <div className="button-container">
+                        <button ref={postsRef} onClick={() => setActive('posts')}>Posts</button>
+                        <button ref={archiveRef} onClick={() => setActive('archive')}>Archive</button>
+                    </div>
+
+                    <div className="active-slider-container">
+                        <div className="active-slider" ref={sliderRef}></div>
+                    </div>
+                </div>
+
+
+
+
+            </header>
 
             <section className="profile-content-grid">
 
                 {/* Snygga till och bryt ut till komponenter */}
 
                 {loading ? (
-                    <p>Loading...</p>
+                    <>
+                    <LoadingBox/>
+                    <LoadingBox/>
+                    <LoadingBox/>
+
+                    <LoadingBox/>
+                    <LoadingBox/>
+                    <LoadingBox/>
+                    </>
                 ) : (
                     (posts.length > 0 ? (
                             posts.map((post) => (
@@ -240,19 +290,16 @@ export const Profile = ({}) => {
                             ))
                         ) : (
                             <p
-
                                 style={{
                                     textAlign: "center",
                                     position: "relative",
                                     gridArea:  "1 / 2 / 2 / 2"
                                 }}
-
                             >No posts yet! Create one</p>
                         ))
                 )}
 
             </section>
-
 
             <NavigationBar/>
 

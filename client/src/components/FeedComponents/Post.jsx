@@ -8,6 +8,8 @@ import {UserAvatar} from "../UserAvatar.jsx";
 import {useNavigate} from "react-router-dom";
 import {CommentCard} from "../CommentSectionComponents/CommentCard.jsx";
 import {useEffect, useState} from "react";
+import {BottomMenu} from "../BottomMenu.jsx";
+import {Overlay} from "../Overlay.jsx";
 
 export const Post = ({
                          username = 'Unknown',
@@ -25,6 +27,8 @@ export const Post = ({
     const [liked, setLiked] = useState(false);
     const navigate = useNavigate();
     const [testLikes, setLikes] = useState(likes);
+    const [renderedIndex, setRenderedIndex] = useState(5);
+    const [showBottomMenu, setShowBottomMenu] = useState(false);
 
 
     useEffect(() => {
@@ -64,32 +68,10 @@ export const Post = ({
     };
 
 
-    const parseTimeStamp = (timestamp) => {
-
-
-        const now = new Date();
-        const created = new Date(timestamp);
-
-        const diffInMs = now - created;
-        const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-        const diffInHours = Math.floor(diffInMinutes / 60);
-        const diffInDays = Math.floor(diffInHours / 24);
-        const diffInWeeks = Math.floor(diffInDays / 7);
-
-        if (diffInMinutes < 60) {
-            return `${diffInMinutes} min`;
-        } else if (diffInHours < 24) {
-            return `${diffInHours} h`;
-        } else if (diffInDays <= 7) {
-            return `${diffInDays} d`;
-        } else {
-            return `${diffInWeeks} w`;
-        }
-    }
-
-
 
     return (
+
+        <>
 
         <article className="post">
 
@@ -110,12 +92,22 @@ export const Post = ({
                         flexDirection: 'row',
                         justifyContent: 'space-between',
                         width: '100%',
+                        alignItems: 'center',
                     }}
                 >
 
                     <h2>{post.poster?.username}</h2>
-                    <h2>{parseTimeStamp(post.created_at)}</h2>
 
+                    <svg
+                        style={{
+                            cursor: 'pointer',
+                        }}
+
+                        onClick={() => {
+                            setShowBottomMenu(true);
+                        }}
+
+                        xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z"/></svg>
                 </div>
 
             </div>
@@ -180,7 +172,6 @@ export const Post = ({
                             </svg>
                         )}
 
-
                     </div>
 
 
@@ -201,8 +192,17 @@ export const Post = ({
 
                 <p>{username}: {caption}</p>
 
-                {comments?.length > 0 && (
+                {comments?.length < renderedIndex ? (
                     (comments.map(comment => (
+                        <CommentCard
+                            key={comment.id}
+                            comment={comment.comment}
+                            timestamp={comment.created_at ? comment.created_at : undefined}
+                            user={comment.user || null}
+                        />
+                    )))
+                ) : (
+                    (comments.slice(0, renderedIndex).map(comment => (
                         <CommentCard
                             key={comment.id}
                             comment={comment.comment}
@@ -215,5 +215,44 @@ export const Post = ({
             </div>
 
         </article>
+
+            <BottomMenu
+                showBottomMenu={showBottomMenu}
+                setShowBottomMenu={setShowBottomMenu}
+                postID={id}
+            />
+
+            <Overlay
+                setShowOverlay={setShowBottomMenu}
+                clickToggle={true}
+                showOverlay={showBottomMenu}
+            />
+
+        </>
+
     )
+}
+
+
+export const parseTimeStamp = (timestamp) => {
+
+
+    const now = new Date();
+    const created = new Date(timestamp);
+
+    const diffInMs = now - created;
+    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    const diffInDays = Math.floor(diffInHours / 24);
+    const diffInWeeks = Math.floor(diffInDays / 7);
+
+    if (diffInMinutes < 60) {
+        return `${diffInMinutes} min`;
+    } else if (diffInHours < 24) {
+        return `${diffInHours} h`;
+    } else if (diffInDays <= 7) {
+        return `${diffInDays} d`;
+    } else {
+        return `${diffInWeeks} w`;
+    }
 }

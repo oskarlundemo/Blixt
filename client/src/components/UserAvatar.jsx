@@ -82,7 +82,6 @@ export const UserAvatar = ({ user, setEdit = false, setFile, file, size = '50px'
                 (loadingAvatar ? (
                     <div style={{height: size, width: size}} className="loading-avatar"></div>
                 ) : (
-
                     <div
                         style={{
                             backgroundImage: `url(${file || user?.avatar || '/default.jpg'})`,
@@ -90,7 +89,7 @@ export const UserAvatar = ({ user, setEdit = false, setFile, file, size = '50px'
                             width: size,
                         }}
 
-                        className="user-avatar-select-picture">
+                        className="user-avatar-select-picture-default">
                     <img
                         key={Date.now()}
                         className="user-avatar-select-picture-default"
