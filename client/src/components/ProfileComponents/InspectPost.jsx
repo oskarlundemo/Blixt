@@ -25,6 +25,7 @@ export const InspectPost = ({}) => {
             .then(res => res.json())
             .then(data => {
                 setPost(data);
+                console.log(data);
                 setLoading(false);
             })
             .catch((err) => {

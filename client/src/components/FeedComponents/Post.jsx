@@ -23,12 +23,13 @@ export const Post = ({
                       }) => {
 
 
-    const {user, API_URL} = useAuth();
+    const {user, API_URL, token} = useAuth();
     const [liked, setLiked] = useState(false);
     const navigate = useNavigate();
     const [testLikes, setLikes] = useState(likes);
     const [renderedIndex, setRenderedIndex] = useState(5);
     const [showBottomMenu, setShowBottomMenu] = useState(false);
+    const [archived, setArchived] = useState(false);
 
 
     useEffect(() => {
@@ -47,26 +48,26 @@ export const Post = ({
         }
 
         try {
-            const response = await fetch(`${API_URL}/posts/like/${postID}/${userID}`, {
+            const response = await fetch(`${API_URL}/posts/like/${postID}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
                 }
-            });
-
-            if (!response.ok) {
-                console.error("HTTP error", response.status, response.statusText);
-            } else {
-                const data = await response.json();
-                setLiked(data.liked);
-                setLikes(data.likes); // ✅ Updated likes array
-            }
+            })
+                .then(res => res.json())
+                .then((res) => {
+                    setLiked(data.liked);
+                    setLikes(data.likes);
+                })
+                .catch((err) => {
+                    console.error(err);
+                })
 
         } catch (err) {
             console.error("Network or fetch error:", err);
         }
     };
-
 
 
     return (
@@ -76,15 +77,12 @@ export const Post = ({
         <article className="post">
 
             <div
-
-
                 className='post-header'>
 
                 <UserAvatar
                     user={poster}
                     size={'30px'}
                 />
-
 
                 <div
                     style={{
@@ -98,16 +96,18 @@ export const Post = ({
 
                     <h2>{post.poster?.username}</h2>
 
-                    <svg
-                        style={{
-                            cursor: 'pointer',
-                        }}
 
-                        onClick={() => {
-                            setShowBottomMenu(true);
-                        }}
+                    {post.poster?.id === user.id && (
+                        <svg
+                            style={{
+                                cursor: 'pointer',
+                            }}
+                            onClick={() => {
+                                setShowBottomMenu(true);
+                            }}
+                            xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z"/></svg>
+                    )}
 
-                        xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z"/></svg>
                 </div>
 
             </div>
@@ -176,9 +176,7 @@ export const Post = ({
 
 
                     <div
-
                         onClick={() => navigate(`/${post.poster.username}/${post.id}/comments`)}
-
                         className='post-comments'>
                         <span>{comments.length || 0}</span>
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
@@ -216,20 +214,17 @@ export const Post = ({
 
         </article>
 
-            <BottomMenu
-                showBottomMenu={showBottomMenu}
-                setShowBottomMenu={setShowBottomMenu}
-                postID={id}
-            />
+            {post.poster?.id === user.id && (
+                <>
+                <BottomMenu
+                    archived={post.archived} showBottomMenu={showBottomMenu} setShowBottomMenu={setShowBottomMenu} postID={id}
+                />
 
-            <Overlay
-                setShowOverlay={setShowBottomMenu}
-                clickToggle={true}
-                showOverlay={showBottomMenu}
-            />
-
+                <Overlay
+                setShowOverlay={setShowBottomMenu} clickToggle={true} showOverlay={showBottomMenu}/>
+                </>
+            )}
         </>
-
     )
 }
 

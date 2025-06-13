@@ -12,4 +12,13 @@ const storage = new CloudinaryStorage({
     },
 });
 
+
+export const deleteResourceFromCloudinary = async (publicId) => {
+   try {
+       await cloudinary.uploader.destroy(publicId);
+   } catch (error) {
+       console.log(error);
+   }
+}
+
 export { cloudinary, storage };

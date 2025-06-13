@@ -6,20 +6,21 @@ import {Router} from 'express';
 import {
     fetchFollowers,
     fetchPosts,
-    fetchUser, follow,
-    InspectSinglePost, loadFeed, sendProfileData
+    follow,
+    inspectSinglePost, loadFeed, sendProfileData
 } from "../controllers/profileController.js";
+import {authenticateUser} from "../middleware/supabase.js";
 
 
 const profileRoute = Router();
 
-profileRoute.get('/fetch/data/:user_id', fetchPosts, fetchUser, fetchFollowers, sendProfileData);
+profileRoute.get('/fetch/data/:username', authenticateUser, fetchPosts, fetchFollowers, sendProfileData);
 
-profileRoute.get('/inspect/:post_id', InspectSinglePost)
+profileRoute.get('/inspect/:post_id', inspectSinglePost)
 
 profileRoute.get('/load/:feed/:user_id', loadFeed)
 
-profileRoute.post('/follow/:user_profile_id/:logged_in_user_id', follow);
+profileRoute.post('/follow/:profile_id', authenticateUser, follow);
 
 
 export default profileRoute

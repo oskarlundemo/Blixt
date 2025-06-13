@@ -40,8 +40,9 @@ model Post {
   created_at DateTime @default(now())
   caption    String?
 
-  user_id String
-  poster  User   @relation("UserPosts", fields: [user_id], references: [id])
+  user_id  String
+  poster   User     @relation("UserPosts", fields: [user_id], references: [id])
+  archived Boolean? @default(false)
 
   likes    Likes[]    @relation("PostLikes")
   comments Comments[] @relation("PostComments")
@@ -53,11 +54,12 @@ model Post {
 }
 
 model Images {
-  id      Int    @id @default(autoincrement())
-  url     String
-  post_id Int
-  post    Post   @relation("PostImages", fields: [post_id], references: [id], onDelete: Cascade)
-  index   Int
+  id        Int     @id @default(autoincrement())
+  url       String
+  post_id   Int
+  post      Post    @relation("PostImages", fields: [post_id], references: [id], onDelete: Cascade)
+  index     Int
+  file_name String?
 }
 
 model Likes {

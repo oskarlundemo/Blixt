@@ -1,40 +1,22 @@
 import {prisma} from "../prisma/index.js";
 
 
-export const fetchUser = async (req, res, next) => {
-
-
+export const follow = async (req, res) => {
     try {
 
-        const userId = req.params.user_id;
+        const userIDFromToken = req.user.id;
+        const {profile_id} = req.params;
 
-        const user = await prisma.user.findUnique({
-            where: {
-                id: userId,
-            }
-        })
+        if (userIDFromToken === profile_id) {
+            return res.status(400).json({ message: "You can't follow yourself." });
+        }
 
-        res.locals.user = user;
-        next();
-
-    } catch (err) {
-        console.log(err)
-        res.status(500).json({
-            message: 'Something went wrong', error: err
-        })
-    }
-}
-
-
-export const follow = async (req, res, next) => {
-    try {
-        const { user_profile_id, logged_in_user_id } = req.params;
         let follows = false;
 
         const alreadyFollowing = await prisma.follows.findFirst({
             where: {
-                follower_id: logged_in_user_id,
-                followed_id: user_profile_id,
+                follower_id: userIDFromToken,
+                followed_id: profile_id,
             }
         });
 
@@ -49,11 +31,10 @@ export const follow = async (req, res, next) => {
             });
         }
 
-        // Otherwise, follow the user
         await prisma.follows.create({
             data: {
-                follower_id: logged_in_user_id,
-                followed_id: user_profile_id,
+                follower_id: userIDFromToken,
+                followed_id: profile_id,
             }
         });
 
@@ -75,23 +56,21 @@ export const follow = async (req, res, next) => {
 
 
 
-
-
 export const fetchFollowers = async (req, res, next) => {
 
     try {
 
-        const userId = req.params.user_id;
+        const inspectedUserProfile = res.locals.inspectedUserProfile;
 
         const followers = await prisma.follows.findMany({
             where: {
-                followed_id: userId,
+                followed_id: inspectedUserProfile.id,
             }
         })
 
         const following = await prisma.follows.findMany({
             where: {
-                follower_id: userId,
+                follower_id: inspectedUserProfile.id,
             }
         })
 
@@ -106,17 +85,16 @@ export const fetchFollowers = async (req, res, next) => {
             message: 'Something went wrong', error: err,
         })
     }
-
-
 }
 
 
-export const sendProfileData = async (req, res, next) => {
+export const sendProfileData = async (req, res) => {
     res.status(200).json({
-        user: res.locals.user,
+        user: res.locals.inspectedUserProfile,
         posts: res.locals.posts,
         followers: res.locals.followers,
         following: res.locals.following,
+        archive: res.locals.archivedPosts
     });
 }
 
@@ -126,11 +104,22 @@ export const fetchPosts = async (req, res, next) => {
 
     try {
 
-        const userID = req.params.user_id;
+        const userIDFromToken = req.user.id;
+        const username = decodeURIComponent(req.params.username);
+        let archivedPosts;
+
+
+        const inspectedUserProfile = await prisma.user.findUnique({
+            where: {
+                username: username
+            }
+        })
+
 
         const posts = await prisma.post.findMany({
             where: {
-                user_id: userID,
+                user_id: inspectedUserProfile.id,
+                archived: false
             },
             include: {
                 images: true,
@@ -147,7 +136,30 @@ export const fetchPosts = async (req, res, next) => {
             }
         })
 
+        if (inspectedUserProfile.id === userIDFromToken) {
+            archivedPosts = await prisma.post.findMany({
+                where: {
+                    archived: true,
+                    user_id: userIDFromToken
+                },
+                include: {
+                    images: true,
+                    poster: true,
+                    comments: {
+                        include: {
+                            user: true,
+                        },
+                    },
+                    likes: true,
+                },
+                orderBy: {
+                    created_at: 'desc'
+                }
+            })
+        }
 
+        res.locals.inspectedUserProfile = inspectedUserProfile;
+        res.locals.archivedPosts = archivedPosts;
         res.locals.posts = posts;
         next();
 
@@ -157,11 +169,10 @@ export const fetchPosts = async (req, res, next) => {
             message: 'Something went wrong', error: err
         })
     }
-
 }
 
 
-export const InspectSinglePost = async (req, res) => {
+export const inspectSinglePost = async (req, res) => {
 
     try {
 

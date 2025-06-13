@@ -14,47 +14,36 @@ export const Notifications = () => {
     const [renderIndex, setRenderIndex] = useState(10);
     const [loading, setLoading] = useState(true);
 
-    const {API_URL, user} = useAuth();
-
+    const {API_URL, user, token} = useAuth();
 
     useEffect(() => {
 
-        fetch(`${API_URL}/notifications/load/${user.id}`, {
+        fetch(`${API_URL}/notifications/load`, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json'
+                Authorization: `Bearer ${token}`,
             }
         })
             .then(res => res.json())
             .then(data => {
                 setNotifications(data);
-                setLoading(false);
-                }
+                setLoading(false);}
             )
             .catch(err => console.log(err));
 
     }, [])
 
-
-
     return (
-        <main className={'notifications-wrapper'}>
-
-            <h1
-                style={{
-                    textAlign: 'left',
-                }}>Notifications</h1>
+        <main
+            className={'notifications-wrapper'}>
 
             <section
-
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '1rem'
                 }}
-
                 className={'notifications-section'}>
-
 
                 {loading ? (
                     <LoadingTitle />

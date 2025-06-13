@@ -26,22 +26,15 @@ export const enrichToken = async (req, res) => {
 export const updateBio = async (req, res, next) => {
     try {
 
-        const { user_id, uuid } = req.params;
+        const userFromToken = req.user;
         const { bio } = req.body;
 
-        console.log(user_id, uuid);
-
-
         console.log('Updating bio:', bio);
-
-        if (user_id !== uuid) {
-            return res.status(400).json({ message: 'Unauthorized' });
-        }
 
         if (!bio) return next(); // No bio to update
 
         await prisma.user.update({
-            where: { id: user_id },
+            where: { id: userFromToken.id },
             data: { bio },
         });
 
@@ -56,12 +49,8 @@ export const updateBio = async (req, res, next) => {
 
 export const updateAvatar = async (req, res) => {
     try {
-        const { user_id, uuid } = req.params;
 
-        if (user_id !== uuid) {
-            console.log('Crashar här');
-            return res.status(400).json({ message: 'Unauthorized' });
-        }
+        const userFromToken = req.user;
 
         const avatarFile = req.file;
         console.log('Updating avatar:', avatarFile);
@@ -70,14 +59,14 @@ export const updateAvatar = async (req, res) => {
             return res.status(200).json({ message: 'Profile updated.' });
         }
 
-        console.log('Updating avatar:', avatarFile);
-
         await prisma.user.update({
-            where: { id: user_id },
+            where: { id: userFromToken.id },
             data: {
                 avatar: avatarFile.path,
             },
         });
+
+        console.log('Updating avatar:', avatarFile);
 
         return res.status(200).json({ message: 'Profile updated with avatar.' });
     } catch (err) {
