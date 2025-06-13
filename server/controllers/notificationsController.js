@@ -5,11 +5,11 @@ export const loadNotifications = async (req, res) => {
 
     try {
 
-        const {user_id} = req.params
+        const userIdFromToken = req.user.id;
 
         const notifications = await prisma.notification.findMany({
             where: {
-                user_id: user_id,
+                user_id: userIdFromToken,
             },
             include: {
                 notifier: true,
@@ -20,8 +20,6 @@ export const loadNotifications = async (req, res) => {
                 },
             }
         });
-
-        console.log(notifications)
 
         res.status(200).json(notifications)
 
@@ -37,7 +35,10 @@ export const loadNotifications = async (req, res) => {
 export const createLikeNotification = async (req, res) => {
     try {
 
-        const { user_id, post_id } = req.params;
+
+        const userIdFromToken = req.user.id
+
+        const { post_id } = req.params;
 
         const post = await prisma.post.findUnique({
             where: {
@@ -53,12 +54,11 @@ export const createLikeNotification = async (req, res) => {
         }
 
 
-        if (user_id === post.user_id) {
+        if (userIdFromToken === post.user_id) {
             res.status(201).json({
                 liked: res.locals.liked,
                 likes: res.locals.likes
             });
-
             return
         }
 
@@ -67,7 +67,7 @@ export const createLikeNotification = async (req, res) => {
                 data: {
                     type: 'LIKE',
                     post_id: parseInt(post_id),
-                    notifier_id: user_id,
+                    notifier_id: userIdFromToken,
                     user_id: post.user_id,
                     like_id: res.locals.like.id
                 }

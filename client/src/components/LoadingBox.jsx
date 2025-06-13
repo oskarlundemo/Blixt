@@ -13,6 +13,7 @@ export const LoadingBox = ({size = '100%'}) => {
             style={{
                 height: size,
                 width: size,
+                borderRadius: '5px',
             }}
 
             className={'loading-box'}>

@@ -1,10 +1,9 @@
 import {useNavigate} from "react-router-dom";
 
 
-export const UserCard = ({avatar, username, id, size = '20px', inputFocus}) => {
+export const UserCard = ({avatar, username, size = '20px', inputFocus}) => {
 
     const navigate = useNavigate();
-
 
     return (
         <div
@@ -20,8 +19,7 @@ export const UserCard = ({avatar, username, id, size = '20px', inputFocus}) => {
             }}
 
             onClick={() => {
-                navigate(`/profile/${username}/${id}`)
-
+                navigate(`/${encodeURIComponent(username)}`)
             }}
         >
 

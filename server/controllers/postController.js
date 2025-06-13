@@ -1,5 +1,5 @@
 import {prisma} from "../prisma/index.js";
-import {cloudinary} from "../middleware/cloudinary.js";
+import {deleteResourceFromCloudinary} from "../middleware/cloudinary.js";
 
 
 
@@ -33,13 +33,13 @@ export const createNewPost = async (req, res) => {
         })
 
 
-        console.log(newPost);
-
         const imagesData = files.map((file, index) => ({
             post_id: newPost.id,
             url: file.path,
-            index: index
+            index: index,
+            file_name: file.filename,
         }));
+
 
         await prisma.images.createMany({ data: imagesData });
 
@@ -86,7 +86,9 @@ export const likePost = async (req, res, next) => {
 
     try {
 
-        const {user_id, post_id} = req.params;
+        const userIdFromToken = req.user.id
+
+        const {post_id} = req.params;
         let liked = true;
 
         let like;
@@ -94,14 +96,14 @@ export const likePost = async (req, res, next) => {
         const alreadyLiked = await prisma.likes.findFirst({
             where: {
                 post_id: parseInt(post_id),
-                user_id: user_id,
+                user_id: userIdFromToken,
             }
         })
 
         if (!alreadyLiked) {
             like = await prisma.likes.create({
                 data: {
-                    user_id: user_id,
+                    user_id: userIdFromToken,
                     post_id: parseInt(post_id),
                 }
             })
@@ -120,7 +122,6 @@ export const likePost = async (req, res, next) => {
 
             liked = false;
         }
-
 
         const likes = await prisma.likes.findMany({
             where: {
@@ -164,11 +165,61 @@ export const getComments = async (req, res) => {
 }
 
 
-function extractPublicIdFromUrl(url) {
-    const parts = url.split('/upload/');
-    if (parts.length < 2) return null;
-    const afterUpload = parts[1];
-    return afterUpload.replace(/\.[^/.]+$/, ''); // remove extension like .jpg
+
+export const archivePost = async (req, res) => {
+
+
+    try {
+
+        const userIdFromToken = req.user.id
+
+        const postID = parseInt(req.params.post_id);
+        let message;
+        let isPublic;
+
+
+        const post = await prisma.post.findFirst({
+            where: {
+                id: postID
+            }
+        })
+
+        if (!post) return res.status(404).json({ error: "Post not found" });
+
+        if (post.user_id !== userIdFromToken)
+            return res.status(403).json({ error: "Unauthorized action" });
+
+        if (post.archived) {
+            await prisma.post.update({
+                where: {
+                    id: postID
+                },
+                data: {
+                    archived: false,
+                }
+            })
+            isPublic = false;
+            message = 'Post made public successfully'
+            console.log(message)
+        } else {
+            await prisma.post.update({
+                where: {
+                    id: postID
+                },
+                data: {
+                    archived: true,
+                }
+            })
+            isPublic = true;
+            message = 'Post archived successfully'
+        }
+
+        return res.status(200).json({message, isPublic});
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Server error' });
+    }
 }
 
 
@@ -186,11 +237,10 @@ export const deletePost = async (req, res) => {
         if (post.user_id !== userIdFromToken)
             return res.status(403).json({ error: "Unauthorized action" });
 
-        const images = await prisma.images.findMany({ where: { id: parseInt(post_id) } });
+        const images = await prisma.images.findMany({ where: { post_id: parseInt(post_id) } });
 
         for (const image of images) {
-            const publicId = extractPublicIdFromUrl(image.url);
-            await cloudinary.v2.uploader.destroy(publicId);
+            await deleteResourceFromCloudinary(image.file_name);
         }
 
         await prisma.post.delete({ where: { id: parseInt(post_id) } });

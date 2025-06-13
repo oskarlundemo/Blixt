@@ -7,12 +7,12 @@ import {enrichToken, updateAvatar, updateBio} from "../controllers/userControlle
 
 const UserRoute = new Router();
 import upload from "../middleware/upload.js";
-
+import {authenticateUser} from "../middleware/supabase.js";
 
 
 UserRoute.get('/token/:user_id', enrichToken);
 
-UserRoute.post('/update/profile/:uuid/:user_id', upload.single('avatar'), updateBio, updateAvatar);
+UserRoute.post('/update/profile', authenticateUser, upload.single('avatar'), updateBio, updateAvatar);
 
 
 export default UserRoute;

@@ -3,13 +3,16 @@
 
 
 import {Router} from 'express';
-import {fetchMatchingUsers} from "../controllers/exploreController.js";
+import {fetchMatchingUsers, getAllPosts} from "../controllers/exploreController.js";
+import {authenticateUser} from "../middleware/supabase.js";
 
 
 const exploreRoute = new Router();
 
 
-exploreRoute.get('/search/:user_id', fetchMatchingUsers);
+exploreRoute.get('/search', authenticateUser, fetchMatchingUsers);
+
+exploreRoute.get('/load/posts', authenticateUser, getAllPosts);
 
 
 export default exploreRoute;

@@ -8,17 +8,65 @@
     margin: 2rem auto;
     display: flex;
     flex-direction: column;
-    height: 100vh; /* Use full viewport height */
-    position: relative; /* For positioning children if needed */
+    height: 100vh;
+    position: relative;
     gap: 1rem;
 }
 
+
+.explore-image-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 30vw);
+    aspect-ratio: 1 / 1;
+    gap: 0.5rem;
+}
 
 
 .explore-image-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    aspect-ratio: 1 / 1;
     gap: 0.2rem;
+    aspect-ratio: 1 / 1;
+    height: 30vw;
+    border-radius: 5px;
+}
 
+.explore-image-grid > * {
+    border-radius: 5px;
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+.explore-search-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.explore-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: var(--background-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+}
+
+.user-card {
+    padding: 0.2rem;
+
+
+    &:hover {
+
+        p {
+            color: var(--accent-color);
+        }
+    }
 }

@@ -66,7 +66,10 @@ export const Inputfield = ({ title, type, id, name, onChange, value, example, sv
                     )}
                 </div>
             </fieldset>
-            <p className="error-msg">{errorMessage}</p>
+
+            {errors && (
+                <p className="error-msg">{errorMessage}</p>
+            )}
         </div>
     );
 };

@@ -5,7 +5,7 @@ export const fetchMatchingUsers = async (req, res) => {
 
     try {
 
-        const {user_id} = req.params;
+        const userIdFromToken = req.user.id;
         const searchQuery = req.query.q;
 
         const matchingUsers = await prisma.user.findMany({
@@ -15,7 +15,7 @@ export const fetchMatchingUsers = async (req, res) => {
                     mode: 'insensitive'
                 },
                 id: {
-                    not: user_id
+                    not: userIdFromToken,
                 }
             },
             take: 10,
@@ -29,4 +29,35 @@ export const fetchMatchingUsers = async (req, res) => {
             message: err.message,
         })
     }
+}
+
+
+export const getAllPosts = async (req, res) => {
+
+    try {
+
+        const userIdFromToken = req.user.id;
+
+        const posts = await prisma.post.findMany({
+            where: {
+                user_id: {
+                    not: userIdFromToken,
+                }
+            },
+            include: {
+                images: true,
+                poster: true,
+            }
+        })
+
+        res.status(200).json(posts);
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            message: err.message,
+        })
+    }
+
+
 }

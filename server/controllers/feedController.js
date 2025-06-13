@@ -15,19 +15,15 @@ export const loadFeed = async (req, res) => {
             }
         })
 
-        console.log(following);
-
         const followingIds = following.map(f => f.followed_id);
         const userAndFollowingIds = [...followingIds, user_id]
-
-
-        console.log(userAndFollowingIds)
 
         const posts = await prisma.post.findMany({
             where: {
                 user_id: {
                     in: userAndFollowingIds
                 },
+                archived: false
             },
             include: {
                 images: true,
