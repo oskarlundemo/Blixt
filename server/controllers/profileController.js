@@ -6,6 +6,7 @@ export const follow = async (req, res) => {
 
         const userIDFromToken = req.user.id;
         const {profile_id} = req.params;
+        let unfollowed = true;
 
         if (userIDFromToken === profile_id) {
             return res.status(400).json({ message: "You can't follow yourself." });
@@ -27,9 +28,12 @@ export const follow = async (req, res) => {
 
             return res.status(200).json({
                 message: 'Unfollow',
-                follows
+                follows,
+                unfollowed
             });
         }
+
+        unfollowed = false;
 
         await prisma.follows.create({
             data: {
@@ -41,7 +45,8 @@ export const follow = async (req, res) => {
         follows = true;
 
         return res.status(200).json({
-            follows
+            follows,
+            unfollowed
         });
 
     } catch (err) {
@@ -178,9 +183,12 @@ export const inspectSinglePost = async (req, res) => {
 
         const postID = parseInt(req.params.post_id);
 
-        const post = await prisma.post.findUnique({
+        const userIdFromToken = req.user.id;
+
+        const usersOwnPost = await prisma.post.findUnique({
             where: {
-                id: postID
+                id: postID,
+                user_id: userIdFromToken,
             }, include: {
                 images: true,
                 poster: true,
@@ -193,7 +201,27 @@ export const inspectSinglePost = async (req, res) => {
             }
         })
 
-        res.status(200).json(post)
+        const post = await prisma.post.findUnique({
+            where: {
+                id: postID,
+                archived: false
+            }, include: {
+                images: true,
+                poster: true,
+                comments: {
+                    include: {
+                        user: true,
+                    },
+                },
+                likes: true,
+            }
+        })
+
+        if (usersOwnPost) {
+            return res.status(200).json(usersOwnPost)
+        } else {
+            return res.status(200).json(post)
+        }
 
     } catch (err) {
         console.log(err)

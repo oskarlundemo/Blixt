@@ -10,6 +10,8 @@
     height: 100vh;
     position: relative;
     gap: 1rem;
+
+    max-width: 1200px;
 }
 
 
@@ -248,4 +250,14 @@
     transition: left 0.3s ease, width 0.3s ease;
     top: 0;
     left: 0;
+}
+
+
+.follow-message-container {
+    grid-area: 2 / 1 / 2 / 6;
+    width: 100%;
+
+    button {
+        width: 50%;
+    }
 }

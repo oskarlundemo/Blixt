@@ -8,7 +8,7 @@ import {LoadingTitle} from "../LoadingTitle.jsx";
 
 export const InspectPost = ({}) => {
 
-    const {API_URL, user} = useAuth();
+    const {API_URL, token} = useAuth();
     const {username, postid} = useParams();
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -20,12 +20,12 @@ export const InspectPost = ({}) => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
             }
         })
             .then(res => res.json())
             .then(data => {
                 setPost(data);
-                console.log(data);
                 setLoading(false);
             })
             .catch((err) => {
@@ -51,7 +51,12 @@ export const InspectPost = ({}) => {
                     poster={post.poster}
                 />
             ) : (
-                <p>Post not found</p>
+                <p
+                    style={{
+                        textAlign: "center",
+                        margin: '2rem'
+                    }}
+                >Post could not be retrieved</p>
             )}
         </main>
     );

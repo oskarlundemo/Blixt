@@ -30,6 +30,9 @@ model User {
   sentNotifications     Notification[] @relation("NotificationNotifier")
   receivedNotifications Notification[] @relation("NotificationReceiver")
 
+  ConversationParticipant ConversationParticipant[]
+  Messages                Message[]                 @relation("SenderOfMessage")
+
   @@index([username])
   @@index([email])
   @@map("users")
@@ -82,7 +85,7 @@ model Comments {
   created_at   DateTime       @default(now())
   user         User           @relation("AuthorComment", fields: [user_id], references: [id])
   post         Post           @relation("PostComments", fields: [post_id], references: [id], onDelete: Cascade)
-  Notification Notification[]
+  Notification Notification[] @relation("CommentNotifications")
 }
 
 model Follows {
@@ -117,7 +120,7 @@ model Notification {
 
   post    Post?     @relation(fields: [post_id], references: [id])
   like    Likes?    @relation(fields: [like_id], references: [id], onDelete: Cascade)
-  comment Comments? @relation(fields: [comment_id], references: [id], onDelete: Cascade)
+  comment Comments? @relation("CommentNotifications", fields: [comment_id], references: [id], onDelete: Cascade) // <-- onDelete here
 }
 
 enum NotificationType {
@@ -125,4 +128,57 @@ enum NotificationType {
   COMMENT
   FOLLOW
   MENTION
+}
+
+model Conversation {
+  id         Int      @id @default(autoincrement())
+  name       String?
+  isGroup    Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  participants ConversationParticipant[]
+  messages     Message[]
+}
+
+model ConversationParticipant {
+  id             Int    @id @default(autoincrement())
+  conversationId Int
+  userId         String
+
+  user         User         @relation(fields: [userId], references: [id])
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+
+  @@unique([conversationId, userId])
+}
+
+model Attachments {
+  id         Int     @id @default(autoincrement())
+  message_id Int
+  message    Message @relation(fields: [message_id], references: [id], onDelete: Cascade)
+
+  size           Int
+  path           String
+  originalName   String
+  uniqueFileName String
+  created_at     DateTime @default(now())
+
+  @@index([message_id])
+}
+
+model Message {
+  id             Int          @id @default(autoincrement())
+  conversationId Int
+  sender_id      String
+  type           MessageTypes
+  content        String
+  created_at     DateTime     @default(now())
+
+  sender       User          @relation("SenderOfMessage", fields: [sender_id], references: [id])
+  conversation Conversation  @relation(fields: [conversationId], references: [id])
+  attachments  Attachments[]
+}
+
+enum MessageTypes {
+  PRIVATE
+  GROUP
 }

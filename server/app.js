@@ -12,6 +12,7 @@ import userRoute from "./routes/userRoute.js";
 import exploreRoute from "./routes/exploreRoute.js";
 import feedRoute from "./routes/feedRoute.js";
 import notificationsRoute from "./routes/notificationsRoute.js";
+import messagesRoute from "./routes/messagesRoute.js";
 
 
 
@@ -28,6 +29,8 @@ const PORT = process.env.PORT || 5002;
 app.use(cors());
 app.use(express.json());
 
+
+app.use('/messages', messagesRoute);
 app.use('/notifications', notificationsRoute)
 app.use('/explore', exploreRoute)
 app.use('/users', userRoute)

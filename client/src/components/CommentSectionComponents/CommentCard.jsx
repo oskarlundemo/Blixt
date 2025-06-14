@@ -1,16 +1,21 @@
 import {UserAvatar} from "../UserAvatar.jsx";
 import moment from "moment-timezone";
+import {useAuth} from "../../context/AuthContext.jsx";
+import {useParams} from "react-router-dom";
 
 
 export const CommentCard = ({
-
-    comment = '',
-    user = null,
-    timestamp,
-    feed = false,
+                                comment = '',
+                                author = null,
+                                timestamp,
+                                commentSection = false,
+                                id = 0,
+                                isUsersPost = false,
+                                setComments = [],
                             }) => {
 
-
+    const {user, API_URL, token} = useAuth();
+    const {postid} = useParams();
 
     const parseTimeStamp = (timestamp) => {
         const now = new Date();
@@ -22,6 +27,9 @@ export const CommentCard = ({
         const diffInDays = Math.floor(diffInHours / 24);
 
         if (diffInMinutes < 60) {
+            if (diffInMinutes <= 0) {
+                return 'Just now'
+            }
             return `${diffInMinutes} min`;
         } else if (diffInHours < 24) {
             return `${diffInHours} h`;
@@ -30,20 +38,65 @@ export const CommentCard = ({
         }
     };
 
+
+    const deleteCommentHandler = async (commentId) => {
+
+        console.log(commentId);
+
+        console.log(postid);
+
+        await fetch(`${API_URL}/posts/comments/delete/${commentId}/${postid}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                setComments((prevComments) => prevComments.filter(comment => comment.id !== commentId));
+            })
+            .catch(err => console.log(err));
+
+    }
+
+
+
+
     return (
         <div className="comment-card">
 
-
             <div className="comment-card__header">
 
-                {feed && (
-                    <UserAvatar/>
+                {commentSection && (
+                    <UserAvatar
+                        user={author}
+                        size={30}
+                    />
                 )}
 
-
                 <div className={'comment-info'}>
-                    <p>@{user?.username || 'No username'}</p>
-                    <p>{parseTimeStamp(timestamp)}</p>
+                    <p>@{author?.username || 'No username'}</p>
+
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                        }}>
+                        <p>{parseTimeStamp(timestamp)}</p>
+
+
+                        {(isUsersPost || author?.id === user?.id) && (
+                            <svg
+                                className={'delete-comment-icon'}
+                                onClick={() => deleteCommentHandler(id)}
+                                xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M200-440v-80h560v80H200Z"/></svg>)}
+
+                          </div>
+
                 </div>
 
             </div>
@@ -54,6 +107,10 @@ export const CommentCard = ({
                 <p>{comment}</p>
 
             </div>
+
+
+
+
 
         </div>
     )

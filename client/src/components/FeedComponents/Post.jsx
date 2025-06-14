@@ -20,6 +20,7 @@ export const Post = ({
                          id = 0,
                          post = null,
                          poster = null,
+                         setPosts = [],
                       }) => {
 
 
@@ -29,7 +30,6 @@ export const Post = ({
     const [testLikes, setLikes] = useState(likes);
     const [renderedIndex, setRenderedIndex] = useState(5);
     const [showBottomMenu, setShowBottomMenu] = useState(false);
-    const [archived, setArchived] = useState(false);
 
 
     useEffect(() => {
@@ -48,7 +48,7 @@ export const Post = ({
         }
 
         try {
-            const response = await fetch(`${API_URL}/posts/like/${postID}`, {
+           await fetch(`${API_URL}/posts/like/${postID}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -56,7 +56,7 @@ export const Post = ({
                 }
             })
                 .then(res => res.json())
-                .then((res) => {
+                .then((data) => {
                     setLiked(data.liked);
                     setLikes(data.likes);
                 })
@@ -94,7 +94,17 @@ export const Post = ({
                     }}
                 >
 
-                    <h2>{post.poster?.username}</h2>
+                    <h2
+                        onClick={() => {
+                            navigate(`/${encodeURIComponent(post.poster?.username)}`)
+                        }}
+
+                        className={'username-title'}
+
+                        style={{
+                            cursor: 'pointer',
+                        }}
+                    >{post.poster?.username}</h2>
 
 
                     {post.poster?.id === user.id && (
@@ -196,7 +206,7 @@ export const Post = ({
                             key={comment.id}
                             comment={comment.comment}
                             timestamp={comment.created_at ? comment.created_at : undefined}
-                            user={comment.user || null}
+                            author={comment.user || null}
                         />
                     )))
                 ) : (
@@ -217,7 +227,9 @@ export const Post = ({
             {post.poster?.id === user.id && (
                 <>
                 <BottomMenu
-                    archived={post.archived} showBottomMenu={showBottomMenu} setShowBottomMenu={setShowBottomMenu} postID={id}
+                    setPosts={setPosts} archived={post.archived}
+                    showBottomMenu={showBottomMenu} setShowBottomMenu={setShowBottomMenu}
+                    postID={id}
                 />
 
                 <Overlay

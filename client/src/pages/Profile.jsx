@@ -10,6 +10,7 @@ import {BioInput} from "../components/ProfileComponents/BioInput.jsx";
 import {ButtonContainer} from "../components/ProfileComponents/ButtonContainer.jsx";
 import {LoadingBox} from "../components/LoadingBox.jsx";
 import {LoadingTitle} from "../components/LoadingTitle.jsx";
+import {FollowMessageContainer} from "../components/ProfileComponents/FollowMessageContainer.jsx";
 
 
 
@@ -52,7 +53,6 @@ export const Profile = ({}) => {
             }
         };
 
-        // Delay the update to the next animation frame (DOM should be ready)
         requestAnimationFrame(updateSlider);
 
         window.addEventListener('resize', updateSlider);
@@ -64,7 +64,8 @@ export const Profile = ({}) => {
 
 
     const [editing, setEditing] = useState(false);
-    const {username } = useParams();
+    const { username } = useParams();
+    const decodedUsername = decodeURIComponent(username);
 
     const {API_URL, user, token} = useAuth();
 
@@ -72,7 +73,7 @@ export const Profile = ({}) => {
 
         setLoading(true);
 
-        fetch(`${API_URL}/profile/fetch/data/${encodeURIComponent(username)}`, {
+        fetch(`${API_URL}/profile/fetch/data/${encodeURIComponent(decodedUsername)}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -146,7 +147,8 @@ export const Profile = ({}) => {
             })
                 .then(res => res.json())
                 .then(data => {
-                setFollows(data.follows);
+                    setFollows(data.follows);
+                    setFollowers(data.unfollowed ? followers -1  : followers + 1)
                 })
                 .catch(err => console.log(err));
 
@@ -197,22 +199,10 @@ export const Profile = ({}) => {
                             </div>
 
                             {!isOwnProfile ? (
-                                (follows ? (
-                                    <button
-                                        onClick={() => {
-                                            handleFollow()
-                                        }}
-                                    >
-                                        Unfollow
-                                    </button>
-                                ) : (
-                                    <button
-                                        onClick={() => {
-                                            handleFollow()
-                                        }}
-                                    >Follow
-                                    </button>
-                                ))
+                                <FollowMessageContainer
+                                    username={profileUsername}
+                                    follows={follows}
+                                    handleFollow={handleFollow}/>
                             ) : (
                                 (editing ? (
                                     <ButtonContainer

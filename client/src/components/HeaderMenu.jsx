@@ -1,0 +1,25 @@
+import {CompanyLogo} from "./CompanyLogo.jsx";
+
+
+export const HeaderMenu = ({}) => {
+
+
+
+    return (
+        <header className={'header-menu'}>
+
+
+            <div className="header-menu__logo">
+                <h2>Blixt ⚡️</h2>
+            </div>
+
+
+            <svg
+
+                className={'dm-icon'}
+                xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/></svg>
+
+        </header>
+    )
+
+}

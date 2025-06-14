@@ -144,8 +144,26 @@ export const likePost = async (req, res, next) => {
 
 
 export const getComments = async (req, res) => {
-
     try {
+        const userIdFromToken = req.user.id;
+        let isUsersPost = false;
+
+        const post = await prisma.post.findUnique({
+            where: {
+                id: parseInt(req.params.post_id)
+            },
+            select: {
+                user_id: true
+            }
+        });
+
+        if (!post) {
+            return res.status(404).json({ error: 'Post not found' });
+        }
+
+        if (post.user_id === userIdFromToken) {
+            isUsersPost = true;
+        }
 
         const comments = await prisma.comments.findMany({
             where: {
@@ -153,16 +171,68 @@ export const getComments = async (req, res) => {
             },
             include: {
                 user: true
+            },
+            orderBy: {
+                created_at: 'desc'
             }
-        })
+        });
 
-        return res.status(200).json({comments})
+        return res.status(200).json({
+            isUsersPost,
+            comments
+        });
 
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: 'Server error' });
     }
 }
+
+
+
+export const deleteComment = async (req, res) => {
+    try {
+        const userIdFromToken = req.user.id;
+        const commentId = parseInt(req.params.comment_id);
+
+        const comment = await prisma.comments.findUnique({
+            where: { id: commentId },
+            select: { user_id: true },
+        });
+
+
+        const notification = await prisma.notification.findFirst({
+            where: {
+                type: 'COMMENT',
+                comment_id: commentId,
+            }
+        })
+
+        if (!comment) {
+            return res.status(404).json({ error: 'Comment not found' });
+        }
+
+        if (notification) {
+            await prisma.notification.delete({
+                where: {
+                    comment_id: commentId,
+                }
+            })
+        }
+
+        if (comment.user_id !== userIdFromToken) {
+            return res.status(403).json({ error: 'Unauthorized action' });
+        }
+
+        await prisma.comments.delete({ where: { id: commentId } });
+
+        return res.status(200).json({ message: 'Comment deleted' });
+
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+};
 
 
 
@@ -259,22 +329,27 @@ export const createComment = async (req, res, next) => {
 
     try {
 
-        const {user_id, post_id} = req.params;
+        const { post_id} = req.params;
         const {comment} = req.body;
+        const userIdFromToken = req.user.id;
 
         if (!comment) {
             return res.status(400).json({ error: "Comment is required" });
         }
 
-        const comment_id = await prisma.comments.create({
+        const newComment = await prisma.comments.create({
             data: {
-                user_id: user_id,
+                user_id: userIdFromToken,
                 post_id: parseInt(post_id),
                 comment: comment
+            },
+            include: {
+                user: true,
             }
         })
 
-        res.locals.comment_id = comment_id.id;
+        res.locals.comment_id = newComment.id;
+        res.locals.comment = newComment;
 
         next();
 

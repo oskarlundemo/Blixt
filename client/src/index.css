@@ -19,7 +19,8 @@
   --soft-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   --approved-color: green;
   --error-color: red;
-  --background-color: #ffffff
+  --background-color: #ffffff;
+  --light-grey: #e5e5e5;
 
 }
 

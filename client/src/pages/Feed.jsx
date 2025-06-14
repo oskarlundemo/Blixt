@@ -6,6 +6,7 @@ import {NavigationBar} from "../components/NavigationBar.jsx";
 import {useEffect, useState} from "react";
 import {useAuth} from "../context/AuthContext.jsx";
 import {LoadingTitle} from "../components/LoadingTitle.jsx";
+import {HeaderMenu} from "../components/HeaderMenu.jsx";
 
 export const Feed = ({}) => {
 
@@ -35,9 +36,15 @@ export const Feed = ({}) => {
     }, [])
 
 
+    useEffect(() => {
+        console.log(posts)
+    }, [posts])
+
 
     return (
         <main className={'feed-wrapper'}>
+
+            <HeaderMenu/>
 
             <section className={'feed'}>
 
@@ -57,6 +64,7 @@ export const Feed = ({}) => {
                                     post={post}
                                     poster={post.poster}
                                     id={post.id}
+                                    setPosts={setPosts}
                                 />
                             ))
                         ) : (
