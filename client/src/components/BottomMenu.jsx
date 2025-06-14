@@ -1,14 +1,20 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 
 import '../App.css'
 import {useAuth} from "../context/AuthContext.jsx";
 
-export const BottomMenu = ({showBottomMenu, setShowBottomMenu, archived, postID = 0}) => {
+export const BottomMenu = ({showBottomMenu, setShowBottomMenu, archived, setPosts, postID = 0}) => {
 
 
     const {API_URL, token} = useAuth();
     const [isPublic, setIsPublic] = useState(archived);
+
+    useEffect(() => {
+        setIsPublic(archived);
+    }, [archived]);
+
+
 
     const deletePostHandler = async (postID) => {
         try {
@@ -25,9 +31,7 @@ export const BottomMenu = ({showBottomMenu, setShowBottomMenu, archived, postID 
         }
     }
 
-
     const archivePostHandler = async (postID) => {
-
         try {
             setShowBottomMenu(false);
             await fetch(`${API_URL}/posts/archive/${postID}`, {
@@ -47,7 +51,6 @@ export const BottomMenu = ({showBottomMenu, setShowBottomMenu, archived, postID 
             console.log('Error while archiving post', postID);
         }
     }
-
 
     return (
         <div
@@ -96,7 +99,9 @@ export const BottomMenu = ({showBottomMenu, setShowBottomMenu, archived, postID 
                     }}>
                     <h2>Archive post</h2>
                     <svg
-                        onClick={() => archivePostHandler(postID)}
+                        onClick={() => {archivePostHandler(postID)
+                            setPosts(p => p.filter(post => post.id !== postID))
+                        }}
                         xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M200-80q-33 0-56.5-23.5T120-160v-451q-18-11-29-28.5T80-680v-120q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v120q0 23-11 40.5T840-611v451q0 33-23.5 56.5T760-80H200Zm0-520v440h560v-440H200Zm-40-80h640v-120H160v120Zm200 280h240v-80H360v80Zm120 20Z"/></svg>
                 </div>
             )}

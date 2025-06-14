@@ -21,6 +21,14 @@
     }
 }
 
+.username-title {
+    transition: var(--default-transition);
+    &:hover {
+        text-decoration: underline;
+        cursor: pointer;
+    }
+}
+
 
 .post-body {
 

@@ -9,6 +9,7 @@ import {InspectPost} from "./components/ProfileComponents/InspectPost.jsx";
 import {CommentSection} from "./pages/CommentSection.jsx";
 import {Notifications} from "./pages/Notifications.jsx";
 import {Explore} from "./pages/Explore.jsx";
+import {Conversation} from "./pages/Conversation.jsx";
 function App() {
 
   const PRODUCTION_URL = import.meta.env.VITE_API_BASE_URL;
@@ -95,6 +96,11 @@ function App() {
                 }
             />
 
+            <Route
+                path="/messages/:username"
+                element={
+                <Conversation/>}
+            />
 
             <Route
               path="*"

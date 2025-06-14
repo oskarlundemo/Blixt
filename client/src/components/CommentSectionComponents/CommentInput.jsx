@@ -3,12 +3,11 @@ import {useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 
 
-export const CommentInput = ({postId}) => {
+export const CommentInput = ({postId, setComments}) => {
 
     const [comment, setComment] = useState('');
 
-    const {API_URL, user} = useAuth();
-
+    const {API_URL, token} = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -17,24 +16,25 @@ export const CommentInput = ({postId}) => {
             return;
         }
 
-        const response = await fetch(`${API_URL}/posts/comment/new/${postId}/${user.sub}`, {
+        await fetch(`${API_URL}/posts/comment/new/${postId}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
             },
             body: JSON.stringify({
                 comment,
             })
         })
 
-        if (!response.ok) {
-            const text = await response.text();
-            throw new Error(`Server Error: ${response.status} - ${text}`);
-        }
+            .then(res => res.json())
+            .then(data => {
+                setComments((prevComments) => [...prevComments, data.comment]);
+            })
+            .catch(err => console.log(err));
 
         setComment('');
     }
-
 
     return (
 
@@ -53,7 +53,5 @@ export const CommentInput = ({postId}) => {
         </form>
 
     )
-
-
 
 }

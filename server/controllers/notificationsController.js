@@ -105,7 +105,8 @@ export const createCommentNotification = async (req, res) => {
 
     try {
 
-        const { user_id, post_id } = req.params;
+        const user_id = req.user.id;
+        const { post_id } = req.params;
 
         const post = await prisma.post.findUnique({
             where: {
@@ -121,7 +122,10 @@ export const createCommentNotification = async (req, res) => {
         }
 
         if (user_id === post.user_id) {
-            return res.status(200).json({ message: "Comment created!" });
+            return res.status(200).json({
+                comment: res.locals.comment,
+                message: "Comment created!"
+            });
         }
 
         await prisma.notification.create({
@@ -134,7 +138,10 @@ export const createCommentNotification = async (req, res) => {
             }
         });
 
-        return res.status(200).json({ message: "Comment created!" });
+        return res.status(200).json({
+            comment: res.locals.comment,
+            message: "Comment created!"
+        });
 
     } catch (err) {
         console.log(err.message);

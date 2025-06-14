@@ -1,9 +1,13 @@
 
 
+.App {
+    height: 100vh;
+    overflow-y: auto;
+}
 
 .comment-section {
     width: 80%;
-    margin: 0 auto;
+    margin: 2rem auto;
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -33,23 +37,29 @@
 
 
 .comment-input {
-    position: fixed;
-    left: 50%;
+    position: sticky;
+    margin-top: auto;
     bottom: 0;
-    transform: translate(-50%, -20%);
-    width: 80%;
+    width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
     z-index: 1000;
-    background-color: #ffffff;
-    padding: 1rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
     border-radius: 8px;
+    padding-bottom: 60px;
 }
 
 
 .input-field {
     width: 100%;
+}
+
+.delete-comment-icon {
+
+    &:hover {
+        fill: var(--error-color);
+        cursor: pointer;
+    }
 }

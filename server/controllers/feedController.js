@@ -47,5 +47,4 @@ export const loadFeed = async (req, res) => {
         res.status(500).json({err: err, message: "Server error"});
     }
 
-
 }

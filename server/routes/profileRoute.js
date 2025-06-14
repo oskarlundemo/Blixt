@@ -16,7 +16,7 @@ const profileRoute = Router();
 
 profileRoute.get('/fetch/data/:username', authenticateUser, fetchPosts, fetchFollowers, sendProfileData);
 
-profileRoute.get('/inspect/:post_id', inspectSinglePost)
+profileRoute.get('/inspect/:post_id', authenticateUser, inspectSinglePost)
 
 profileRoute.get('/load/:feed/:user_id', loadFeed)
 
