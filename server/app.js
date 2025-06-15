@@ -13,6 +13,7 @@ import exploreRoute from "./routes/exploreRoute.js";
 import feedRoute from "./routes/feedRoute.js";
 import notificationsRoute from "./routes/notificationsRoute.js";
 import messagesRoute from "./routes/messagesRoute.js";
+import conversationRoute from "./routes/conversationRoute.js";
 
 
 
@@ -30,6 +31,7 @@ app.use(cors());
 app.use(express.json());
 
 
+app.use('/conversations', conversationRoute)
 app.use('/messages', messagesRoute);
 app.use('/notifications', notificationsRoute)
 app.use('/explore', exploreRoute)

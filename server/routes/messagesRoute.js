@@ -6,7 +6,7 @@
 import {Router} from 'express'
 import {
     createGroupMessage,
-    createPrivateMessage,
+    createPrivateMessage, fetchEnrichedMessage,
     fetchMessagesByConversation,
     fetchPrivateMessages
 } from "../controllers/messagesController.js";
@@ -23,5 +23,6 @@ messagesRoute.post('/create/by-user/:username', authenticateUser, createPrivateM
 
 messagesRoute.post('/create/by-conversation/:conversation_id', authenticateUser, createGroupMessage);
 
+messagesRoute.post('/fetch/new/enriched', authenticateUser, fetchEnrichedMessage);
 
 export default messagesRoute;

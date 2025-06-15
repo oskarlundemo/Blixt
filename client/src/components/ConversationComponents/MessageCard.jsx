@@ -57,7 +57,9 @@ export const MessageCard = ({sender, content, timestamp}) => {
                 style={{
                     ...(isSender ? {
                         background: 'var(--accent-color)',
-                        color: 'white'
+                        color: 'white',
+                        alignSelf: "flex-end",
+
                     } : {
                         alignSelf: "flex-start",
                         background: 'var(--light-grey)',

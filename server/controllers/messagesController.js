@@ -153,6 +153,51 @@ export const createPrivateMessage = async (req, res) => {
 };
 
 
+export const fetchEnrichedMessage = async (req, res) => {
+
+
+    try {
+
+        console.log('BODY:', req.body);
+
+        const messageId = req.body.messageData.id;
+        const conversationId = req.body.messageData.conversationId;
+
+        const conversation = await prisma.message.findFirst({
+            where: {
+                conversationId: conversationId,
+                id: messageId
+            }
+        })
+
+        if (!conversation) {
+            return res.status(404).json({ message: "Conversation not found" });
+        }
+
+
+        const newMessage = await prisma.message.findUnique({
+            where: {
+                id: messageId
+            },
+            include: {
+                sender: true,
+                attachments: true,
+
+            }
+        })
+
+        res.status(200).json(newMessage);
+
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Failed to fetch enriched messages" });
+    }
+}
+
+
+
+
 export const createGroupMessage = async (req, res) => {
 
     try {
@@ -162,6 +207,4 @@ export const createGroupMessage = async (req, res) => {
     } catch (err) {
         console.error(err);
     }
-
-
 }

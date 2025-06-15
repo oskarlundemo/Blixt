@@ -10,6 +10,7 @@ import {CommentSection} from "./pages/CommentSection.jsx";
 import {Notifications} from "./pages/Notifications.jsx";
 import {Explore} from "./pages/Explore.jsx";
 import {Conversation} from "./pages/Conversation.jsx";
+import {DirectMessages} from "./pages/DirectMessages.jsx";
 function App() {
 
   const PRODUCTION_URL = import.meta.env.VITE_API_BASE_URL;
@@ -93,6 +94,14 @@ function App() {
                 path="/:username"
                 element={
                 <Profile/>
+                }
+            />
+
+
+            <Route
+                path="/messages"
+                element={
+                    <DirectMessages/>
                 }
             />
 
