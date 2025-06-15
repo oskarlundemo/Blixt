@@ -193,6 +193,17 @@
   grid-template-columns: 1fr 1fr 1fr;
   align-items: center;
   padding: 0 1rem;
+
+
+  svg {
+    transition: var(--default-transition);
+  }
+
+  svg:hover {
+    fill: var(--accent-color);
+    opacity: 0.8;
+    cursor: pointer;
+  }
 }
 
 .header-menu__logo {
@@ -210,12 +221,6 @@
   grid-column: 3;
   justify-self: end;
   align-self: center;
-  cursor: pointer;
-  rotate: -25deg;
-
-  &:hover {
-    fill: var(--accent-color);
-  }
 }
 
 @keyframes bounce {
