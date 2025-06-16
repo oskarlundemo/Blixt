@@ -2,13 +2,17 @@
 
 
 .new-post-container {
-    width: 80%;
+    width: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    height: 100vh; /* Use full viewport height */
-    position: relative; /* For positioning children if needed */
+    height: 100vh;
+    position: relative;
     gap: 1rem;
+    section {
+        width: 80%;
+        margin: 0 auto;
+    }
 }
 
 

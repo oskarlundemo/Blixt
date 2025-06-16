@@ -13,7 +13,7 @@ import {useAuth} from "../../context/AuthContext.jsx";
 export const CreateForm = ({setShowLogin}) => {
 
 
-    const {login, API_URL} = useAuth();
+    const {login, user, API_URL} = useAuth();
     const navigate = useNavigate();  // Used to navigate to chats after creation is successful
     const [errors, setErrors] = useState([]);
     const [disabled, setDisabled] = useState(true);
@@ -25,6 +25,13 @@ export const CreateForm = ({setShowLogin}) => {
     const [acceptedPassword, setAcceptedPassword] = useState(false); // State to check if password meets requirements
     const [acceptedUsername, setAcceptedUsername] = useState(false); // State to check if username meets requirements
     const [acceptedEmail, setAcceptedEmail] = useState(false);  // State to check if email meets requirements
+
+
+    useEffect(() => {
+        if (user) {
+            navigate("/feed");
+        }
+    }, [user]);
 
 
     useEffect(() => {
@@ -58,7 +65,7 @@ export const CreateForm = ({setShowLogin}) => {
 
         const { email, password, username } = formData;
 
-        const { data, error } = await supabase.auth.signUp({
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             email,
             password,
             options: {
@@ -68,9 +75,8 @@ export const CreateForm = ({setShowLogin}) => {
             },
         });
 
-
-        if (error) {
-            setErrors([error.message]);
+        if (signUpError) {
+            setErrors([signUpError.message]);
             return;
         }
 
@@ -84,31 +90,27 @@ export const CreateForm = ({setShowLogin}) => {
             return;
         }
 
-        if (signInData.session) {
+        const user = signInData.user;
 
-            const user = signInData.user;
+        const response = await fetch(`${API_URL}/auth/signup/supabase`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                id: user.id,
+                email: user.email,
+                username: user.user_metadata.username || username,
+            }),
+        });
 
-            const response = await fetch(`${API_URL}/auth/signup/supabase`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    id: user.id,
-                    email: user.email,
-                    username: user.user_metadata.username || username,
-                }),
-            });
-
-            if (!response.ok) {
-                const err = await response.json();
-                setErrors([err.error || 'Failed to create user']);
-                return;
-            }
-
-            login(signInData.session.access_token);
-            navigate("/feed");
+        if (!response.ok) {
+            const err = await response.json();
+            setErrors([err.error || 'Failed to create user']);
+            return;
         }
+
+        await login(signInData.session);
     };
 
 

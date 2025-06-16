@@ -15,7 +15,6 @@ export const DirectMessages = ({}) => {
 
     const {token, user, API_URL} = useAuth();
 
-
     useEffect(() => {
 
         fetch(`${API_URL}/conversations/fetch`, {
@@ -32,11 +31,7 @@ export const DirectMessages = ({}) => {
                 setLoading(false);
             })
             .catch(err => console.log(err));
-
     }, [token])
-
-
-
 
     return (
         <main className={'direct-messages-container'}>
@@ -56,14 +51,13 @@ export const DirectMessages = ({}) => {
                                 loggedInUserId={user.id}
                                 key={conversation.id}
                                 latestMessage={conversation.latestMessage}
-                                user={conversation?.participants[0].user}
+                                user={conversation.otherUser}
                             />
                         )))
                         ) : (
                             <p>No conversations yet....</p>
                         ))
                 )}
-
             </div>
 
         </main>

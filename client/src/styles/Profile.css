@@ -64,23 +64,25 @@
 
 .profile-content-grid article {
     aspect-ratio: 1 / 1;
-    overflow: hidden;
     position: relative;
-    border-radius: 0.5rem;
     cursor: pointer;
     transition: var(--default-transition);
+    overflow: hidden;
+    border-radius: 5px;
 }
 
 .profile-content-grid img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
+    border-radius: 5px;
     transition: var(--default-transition);
 }
 
 .profile-content-grid article:hover img {
-    scale: 1.02;
+    transform: scale(1.1);
+    cursor: pointer;
+    box-shadow: var(--soft-box-shadow);
 }
 
 
@@ -204,6 +206,7 @@
         fill: var(--error-color)
     }
 }
+
 .archive-container {
     display: flex;
     flex-direction: column;

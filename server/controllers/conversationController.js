@@ -5,61 +5,53 @@ export const loadConversations = async (req, res) => {
     try {
         const userIdFromToken = req.user.id;
 
-        const conversationParticipants = await prisma.conversationParticipant.findMany({
+        const conversations = await prisma.privateConversation.findMany({
             where: {
-                userId: userIdFromToken,
+                OR: [
+                    { user1_id: userIdFromToken },
+                    { user2_id: userIdFromToken },
+                ],
             },
             include: {
-                conversation: {
-                    include: {
-                        participants: {
-                            include: {
-                                user: true, // Get all user data
-                            },
-                        },
-                        messages: {
-                            orderBy: {
-                                created_at: 'desc',
-                            },
-                            include: {
-                                sender: true
-                            },
-                            take: 1,
-                        },
-                    },
-                },
+                user1: true,
+                user2: true,
             },
         });
 
-        const conversations = conversationParticipants.map((cp) => {
-            const { conversation } = cp;
-            const otherParticipants = conversation.participants.filter(
-                (p) => p.userId !== userIdFromToken
-            );
+        const enrichedConversations = await Promise.all(
+            conversations.map(async (conversation) => {
+                const latestMessage = await prisma.privateMessages.findFirst({
+                    where: {
+                        conversation_id: conversation.id,
+                    },
+                    orderBy: {
+                        created_at: 'desc',
+                    },
+                    include: {
+                        sender: true,
+                    },
+                });
 
-            return {
-                ...conversation,
-                participants: otherParticipants,
-                latestMessage: conversation.messages[0]
-            };
-        });
+                const otherUser =
+                    conversation.user1_id === userIdFromToken
+                        ? conversation.user2
+                        : conversation.user1;
 
-        if (conversations.length === 0) {
-            return res.status(404).json({
-                status: 404,
-                message: 'No conversations found.',
-            });
-        }
+                return {
+                    id: conversation.id,
+                    latestMessage,
+                    otherUser,
+                };
+            })
+        );
 
-        res.status(200).json(conversations);
-
+        res.status(200).json(enrichedConversations);
     } catch (err) {
         console.error(err);
         res.status(500).json({
-            error: 'Internal server error',
+            error: "Internal server error",
             details: err.message,
         });
     }
 };
-
 

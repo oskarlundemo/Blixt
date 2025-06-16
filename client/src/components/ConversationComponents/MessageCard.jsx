@@ -3,10 +3,10 @@ import moment from 'moment-timezone';
 import {useAuth} from "../../context/AuthContext.jsx";
 
 
-export const MessageCard = ({sender, content, timestamp}) => {
+export const MessageCard = ({sender = null, content = '' , timestamp}) => {
 
     const {user} = useAuth();
-    const isSender = user.id === sender.id;
+    const isSender = user?.id === sender?.id;
 
     const formatTimestamp = (isoTime) => {
         return moment(isoTime)

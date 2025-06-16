@@ -8,6 +8,7 @@ import {arrayMove, SortableContext} from "@dnd-kit/sortable";
 import {Overlay} from "../components/Overlay.jsx";
 import {PopUpModule} from "../components/PopUpModule.jsx";
 import {useAuth} from "../context/AuthContext.jsx";
+import {HeaderMenu} from "../components/HeaderMenu.jsx";
 
 
 export const NewPost = ({}) => {
@@ -92,6 +93,7 @@ export const NewPost = ({}) => {
     return (
         <main className="new-post-container">
 
+            <HeaderMenu/>
 
             <section className={'new-post-images-container'}>
 
