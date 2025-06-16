@@ -2,6 +2,7 @@ import {UserAvatar} from "../UserAvatar.jsx";
 import moment from "moment-timezone";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {useParams} from "react-router-dom";
+import {useEffect} from "react";
 
 
 export const CommentCard = ({
@@ -39,12 +40,8 @@ export const CommentCard = ({
     };
 
 
+
     const deleteCommentHandler = async (commentId) => {
-
-        console.log(commentId);
-
-        console.log(postid);
-
         await fetch(`${API_URL}/posts/comments/delete/${commentId}/${postid}`, {
             method: "DELETE",
             headers: {
@@ -54,11 +51,9 @@ export const CommentCard = ({
         })
             .then(res => res.json())
             .then(data => {
-                console.log(data)
                 setComments((prevComments) => prevComments.filter(comment => comment.id !== commentId));
             })
             .catch(err => console.log(err));
-
     }
 
 
@@ -103,9 +98,7 @@ export const CommentCard = ({
 
 
             <div className="comment-card__body">
-
                 <p>{comment}</p>
-
             </div>
 
 

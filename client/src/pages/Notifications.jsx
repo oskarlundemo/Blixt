@@ -6,6 +6,7 @@ import {useEffect, useState} from "react";
 import {useAuth} from "../context/AuthContext.jsx";
 import {NotificationCard} from "../components/NotificationsComponents/NotificationCards.jsx";
 import {LoadingTitle} from "../components/LoadingTitle.jsx";
+import {HeaderMenu} from "../components/HeaderMenu.jsx";
 
 
 export const Notifications = () => {
@@ -14,7 +15,7 @@ export const Notifications = () => {
     const [renderIndex, setRenderIndex] = useState(10);
     const [loading, setLoading] = useState(true);
 
-    const {API_URL, user, token} = useAuth();
+    const {API_URL, token} = useAuth();
 
     useEffect(() => {
 
@@ -36,6 +37,10 @@ export const Notifications = () => {
     return (
         <main
             className={'notifications-wrapper'}>
+
+
+            <HeaderMenu/>
+
 
             <section
                 style={{

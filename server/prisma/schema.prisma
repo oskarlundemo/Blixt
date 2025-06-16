@@ -15,11 +15,12 @@ datasource db {
 }
 
 model User {
-  id       String     @id @default(uuid()) @map("id")
-  email    String     @unique
-  username String     @unique
+  id       String  @id @default(uuid()) @map("id")
+  email    String  @unique
+  username String  @unique
   bio      String?
   avatar   String?
+
   posts    Post[]     @relation("UserPosts")
   Likes    Likes[]    @relation("UserLikes")
   Comments Comments[] @relation("AuthorComment")
@@ -30,8 +31,15 @@ model User {
   sentNotifications     Notification[] @relation("NotificationNotifier")
   receivedNotifications Notification[] @relation("NotificationReceiver")
 
-  ConversationParticipant ConversationParticipant[]
-  Messages                Message[]                 @relation("SenderOfMessage")
+  sentMessages     PrivateMessages[] @relation("PrivateSenderMessages")
+  receivedMessages PrivateMessages[] @relation("ReceiverMessages")
+
+  groupMessages    GroupMessage[] @relation("GroupSenderMessages")
+  groupChats       GroupChats[]
+  groupParticipant GroupMember[]
+
+  conversationsAsUser1 PrivateConversation[] @relation("User1Conversations")
+  conversationsAsUser2 PrivateConversation[] @relation("User2Conversations")
 
   @@index([username])
   @@index([email])
@@ -130,55 +138,105 @@ enum NotificationType {
   MENTION
 }
 
-model Conversation {
-  id         Int      @id @default(autoincrement())
-  name       String?
-  isGroup    Boolean  @default(false)
+model PrivateMessages {
+  id              Int           @id @default(autoincrement())
+  sender_id       String
+  receiver_id     String
+  content         String
+  status          MessageStatus @default(SENT)
+  conversation_id Int?
+
   created_at DateTime @default(now())
 
-  participants ConversationParticipant[]
-  messages     Message[]
+  conversation PrivateConversation? @relation(fields: [conversation_id], references: [id])
+  sender       User                 @relation("PrivateSenderMessages", fields: [sender_id], references: [id])
+  receiver     User                 @relation("ReceiverMessages", fields: [receiver_id], references: [id])
+
+  attachments PrivateMessagesAttachment[]
 }
 
-model ConversationParticipant {
-  id             Int    @id @default(autoincrement())
-  conversationId Int
-  userId         String
+model PrivateMessagesAttachment {
+  id             Int             @id @default(autoincrement())
+  message_id     Int
+  privateMessage PrivateMessages @relation(fields: [message_id], references: [id], onDelete: Cascade)
 
-  user         User         @relation(fields: [userId], references: [id])
-  conversation Conversation @relation(fields: [conversationId], references: [id])
-
-  @@unique([conversationId, userId])
-}
-
-model Attachments {
-  id         Int     @id @default(autoincrement())
-  message_id Int
-  message    Message @relation(fields: [message_id], references: [id], onDelete: Cascade)
-
-  size           Int
-  path           String
-  originalName   String
-  uniqueFileName String
-  created_at     DateTime @default(now())
+  size         Int
+  path         String
+  originalName String
+  created_at   DateTime @default(now())
 
   @@index([message_id])
 }
 
-model Message {
-  id             Int          @id @default(autoincrement())
-  conversationId Int
-  sender_id      String
-  type           MessageTypes
-  content        String
-  created_at     DateTime     @default(now())
+model PrivateConversation {
+  id       Int    @id @default(autoincrement())
+  user1_id String
+  user2_id String
 
-  sender       User          @relation("SenderOfMessage", fields: [sender_id], references: [id])
-  conversation Conversation  @relation(fields: [conversationId], references: [id])
-  attachments  Attachments[]
+  user1 User @relation("User1Conversations", fields: [user1_id], references: [id])
+  user2 User @relation("User2Conversations", fields: [user2_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  messages PrivateMessages[]
+
+  @@unique([user1_id, user2_id])
 }
 
-enum MessageTypes {
-  PRIVATE
-  GROUP
+model GroupMessage {
+  id        Int           @id @default(autoincrement())
+  sender_id String
+  group_id  Int
+  content   String
+  status    MessageStatus @default(SENT)
+
+  created_at DateTime   @default(now())
+  group      GroupChats @relation(fields: [group_id], references: [id], onDelete: Cascade)
+  sender     User       @relation("GroupSenderMessages", fields: [sender_id], references: [id])
+
+  attachments GroupMessagesAttachment[]
+}
+
+model GroupMessagesAttachment {
+  id           Int          @id @default(autoincrement())
+  message_id   Int
+  groupMessage GroupMessage @relation(fields: [message_id], references: [id], onDelete: Cascade)
+
+  size         Int
+  path         String
+  originalName String
+  created_at   DateTime @default(now())
+
+  @@index([message_id])
+}
+
+model GroupChats {
+  id       Int     @id @default(autoincrement())
+  admin_id String
+  Admin    User    @relation(fields: [admin_id], references: [id])
+  name     String?
+
+  description String?
+  avatar      String?
+
+  GroupMembers  GroupMember[]
+  GroupMessages GroupMessage[]
+}
+
+model GroupMember {
+  group_id  Int
+  member_id String
+
+  Member User       @relation(fields: [member_id], references: [id])
+  Group  GroupChats @relation(fields: [group_id], references: [id], onDelete: Cascade)
+
+  @@id([group_id, member_id])
+  @@unique([member_id, group_id])
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
 }

@@ -113,6 +113,7 @@ export const signUpUser = async(req, res) => {
     try {
         const { username, password, email} = req.body;
         const hashedPassword = await bcryptjs.hash(password, 12);
+
         const user  = await prisma.users.create({
             data: {
                 username: username,
@@ -134,8 +135,6 @@ export const signUpUser = async(req, res) => {
         res.status(500).send({error: 'Error while signing up'});
     }
 }
-
-
 
 export const addUser = async (req, res) => {
 

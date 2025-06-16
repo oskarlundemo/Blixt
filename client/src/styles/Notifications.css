@@ -2,8 +2,7 @@
 
 
 .notifications-wrapper {
-    padding-top: 1rem;
-    width: 80%;
+    width: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -11,4 +10,9 @@
     position: relative;
     gap: 1rem;
     padding-bottom: 60px;
+
+    section {
+        width: 80%;
+        margin: 0 auto;
+    }
 }

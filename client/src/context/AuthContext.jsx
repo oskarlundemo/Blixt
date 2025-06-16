@@ -107,6 +107,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem("token");
     };
 
+
     return (
         <AuthContext.Provider value={{ user, API_URL, logout, token: localStorage.getItem("token"), loading }}>
             {children}

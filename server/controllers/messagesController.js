@@ -15,36 +15,24 @@ export const fetchPrivateMessages = async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        const conversation = await prisma.conversation.findFirst({
+        const messages = await prisma.privateMessages.findMany({
             where: {
-                isGroup: false,
-                AND: [
-                    {
-                        participants: {
-                            some: {
-                                userId: userId
-                            }
-                        }
-                    },
-                    {
-                        participants: {
-                            some: {
-                                userId: otherUser.id
-                            }
-                        }
-                    }
+                OR: [
+                    {sender_id: userId, receiver_id: otherUser.id,},
+                    {sender_id: otherUser.id, receiver_id: userId,}
                 ]
             },
+            orderBy: {
+                created_at: 'asc',
+            },
             include: {
-                messages: {
-                    where: { type: 'PRIVATE' },
-                    orderBy: { created_at: 'asc' },
-                    include: { sender: true, attachments: true }
-                }
+                attachments: true,
+                sender: true,
+                receiver: true,
             }
-        });
+        })
 
-        return res.status(200).json({conversation, otherUser});
+        return res.status(200).json({messages, otherUser});
 
     } catch (error) {
         console.error(error);
@@ -84,7 +72,7 @@ export const fetchMessagesByConversation = async (req, res) => {
 export const createPrivateMessage = async (req, res) => {
     try {
         const username = decodeURIComponent(req.params.username);
-        const userId = req.user.id;
+        const senderId = req.user.id;
         const {message} = req.body;
 
         const otherUser = await prisma.user.findUnique({
@@ -95,54 +83,33 @@ export const createPrivateMessage = async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // Find existing private conversation
-        let conversation = await prisma.conversation.findFirst({
+        const [user1_id, user2_id] = [senderId, otherUser.id].sort();
+
+        let conversation = await prisma.privateConversation.findFirst({
             where: {
-                isGroup: false,
-                participants: {
-                    some: { userId: userId },
-                    // NOTE: 'AND' inside 'participants' doesn't work — combine with outer 'AND'
-                },
-                AND: {
-                    participants: {
-                        some: { userId: otherUser.id }
-                    }
-                }
-            },
-            include: {
-                messages: {
-                    where: { type: 'PRIVATE' },
-                    orderBy: { created_at: 'asc' },
-                    include: { sender: true, attachments: true }
-                }
+                user1_id,
+                user2_id
             }
         });
 
-
         if (!conversation) {
-            conversation = await prisma.conversation.create({
+            conversation = await prisma.privateConversation.create({
                 data: {
-                    isGroup: false,
-                    participants: {
-                        createMany: {
-                            data: [
-                                { userId: userId },
-                                { userId: otherUser.id }
-                            ]
-                        }
-                    }
+                    user1_id,
+                    user2_id
                 }
             });
         }
 
-        await prisma.message.create({
+
+        await prisma.privateMessages.create({
             data: {
-                conversationId: conversation.id,
-                sender_id: userId,
-                type: 'PRIVATE',
-                content: message
-            }
-        });
+                sender_id: senderId,
+                receiver_id: otherUser.id,
+                content: message,
+                conversation_id: conversation.id
+            },
+        })
 
         return res.status(200).json({ message: 'Message successfully created' });
 
@@ -153,41 +120,31 @@ export const createPrivateMessage = async (req, res) => {
 };
 
 
-export const fetchEnrichedMessage = async (req, res) => {
+export const fetchEnrichedPrivateMessage = async (req, res) => {
 
 
     try {
 
-        console.log('BODY:', req.body);
+        const userIdFromToken = req.user.id;
+        const messageId = parseInt(req.body.message.id)
 
-        const messageId = req.body.messageData.id;
-        const conversationId = req.body.messageData.conversationId;
-
-        const conversation = await prisma.message.findFirst({
-            where: {
-                conversationId: conversationId,
-                id: messageId
-            }
-        })
-
-        if (!conversation) {
-            return res.status(404).json({ message: "Conversation not found" });
-        }
-
-
-        const newMessage = await prisma.message.findUnique({
-            where: {
-                id: messageId
-            },
+        const newMessage = await prisma.privateMessages.findUnique({
+            where: { id: messageId },
             include: {
                 sender: true,
                 attachments: true,
-
             }
         })
 
-        res.status(200).json(newMessage);
+        if (!newMessage) {
+            return res.status(404).json({ message: "Message not found" });
+        }
 
+        if (newMessage.sender_id !== userIdFromToken && newMessage.receiver_id !== userIdFromToken) {
+            return res.status(403).json({ message: "Unauthorized action" });
+        }
+
+        return res.status(200).json(newMessage);
 
     } catch (err) {
         console.error(err);

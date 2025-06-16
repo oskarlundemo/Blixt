@@ -11,11 +11,6 @@ export const ConversationCard = ({
 
     const navigate = useNavigate();
 
-    useEffect(() => {
-        console.log(loggedInUserId);
-        console.log(latestMessage.sender.id);
-    }, [])
-
     return (
         <article
 
@@ -34,18 +29,18 @@ export const ConversationCard = ({
                 }}
             >
                 <UserAvatar size={30} user={user} />
-                <h2>{user.username}</h2>
+                <h2>{user?.username}</h2>
             </div>
 
             <div className="direct-messages-card-body">
                 <p>
-                    {latestMessage.sender.id === loggedInUserId ? (
+                    {latestMessage?.sender.id === loggedInUserId ? (
                         <>
                             <span>You: </span>
-                            {latestMessage.content}
+                            {latestMessage?.content}
                         </>
                     ) : (
-                        latestMessage.content
+                        latestMessage?.content
                     )}
                 </p>
             </div>

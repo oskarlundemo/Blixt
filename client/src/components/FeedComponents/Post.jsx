@@ -158,7 +158,6 @@ export const Post = ({
 
                         {liked ? (
                             <svg
-
                                 style={{
                                     fill: "red",
                                     transition: '200ms ease-in-ease-out',

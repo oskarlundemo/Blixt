@@ -15,10 +15,10 @@ export const Conversation = ({}) => {
     const navigate = useNavigate();
     const {username, conversationId} = useParams();
     const [insepctedConversation, setInseptedConversation] = useState(null);
-    const {token, API_URL} = useAuth();
+
+    const {token, user, API_URL} = useAuth();
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(true);
-    const [activeConversationId, setActiveConversationId] = useState(null);
     const bottomRef = useRef(null);
 
     const [messages, setMessages] = useState([]);
@@ -43,11 +43,7 @@ export const Conversation = ({}) => {
             })
                 .then(response => response.json())
                 .then(data => {
-
-                    console.log(data);
-
-                    setMessages(data.conversation.messages);
-                    setActiveConversationId(data.conversation.id);
+                    setMessages(data.messages);
                     setInseptedConversation(data.otherUser);
                     setLoading(false);
                 })
@@ -71,7 +67,6 @@ export const Conversation = ({}) => {
      *
      */
 
-
     const playNotificationSound = () => {
         const audio = new Audio('/notification.mp3');
         audio.play();
@@ -79,52 +74,42 @@ export const Conversation = ({}) => {
 
     useEffect(() => {
 
-        if (!activeConversationId) return;
-
         const channel = supabase
             .channel('messages-channel')
             .on(
                 'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'Message' },
+                { event: 'INSERT', schema: 'public', table: 'PrivateMessages' },
                 async (payload) => {
-                    const messageData = payload.new;
+                    const message = payload.new;
+                    if (message.sender_id === user.id || message.receiver_id === user.id) {
 
+                        try {
+                            await fetch(`${API_URL}/messages/fetch/private/new/enriched`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    Authorization: `Bearer ${token}`
+                                },
+                                body: JSON.stringify({message})
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    console.log(data);
+                                    setMessages(prev => [...prev, data]);
+                                })
 
-                    if (messageData.conversationId !== activeConversationId) return;
+                            playNotificationSound();
 
-                    try {
-                        const response = await fetch(`${API_URL}/messages/fetch/new/enriched/`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                Authorization: `Bearer ${token}`,
-                            },
-                            body: JSON.stringify({ messageData }),
-                        });
-
-                        if (!response.ok) throw new Error('Failed to fetch enriched message');
-                        const data = await response.json();
-                        setMessages(prevMessages => [...prevMessages, data]);
-                        playNotificationSound();
-
-                    } catch (err) {
-                        console.error('Error fetching realtime message:', err);
+                        } catch (err) {
+                            console.error('Error fetching enriched message');
+                        }
                     }
                 }
-            )
-            .on('error', (e) => {
-                console.error('Realtime error:', e);
-            })
-            .on('subscription', (status) => {
-                console.log('Subscription status:', status);
-            })
-            .subscribe();
-
+            ).subscribe();
         return () => {
             channel.unsubscribe();
         };
-
-    }, [activeConversationId]);
+    }, [user?.id, user?.token]);
 
     return (
         <main className="conversation-wrapper">
@@ -190,7 +175,6 @@ export const Conversation = ({}) => {
                                     }}
                                 >No messages yet! Initiate a conversation</p>
                             )}
-
 
                             <div ref={bottomRef} />
 

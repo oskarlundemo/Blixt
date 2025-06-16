@@ -21,7 +21,7 @@ export const MessageInput = ({message, setMessage}) => {
         if (conversationId) {
             endpoint = `${API_URL}/messages/create/by-conversation/${conversationId}`;
         } else if (username) {
-            endpoint = `${API_URL}/messages/create/by-user/${encodeURIComponent(username)}`;
+            endpoint = `${API_URL}/messages/create/private/${encodeURIComponent(username)}`;
         }
 
         try {
@@ -38,11 +38,8 @@ export const MessageInput = ({message, setMessage}) => {
         } catch (error) {
             console.error(error);
         }
-
         setMessage('')
     }
-
-
 
 
     return (
