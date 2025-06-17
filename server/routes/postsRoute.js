@@ -16,7 +16,7 @@ import {authenticateUser} from "../middleware/supabase.js";
 
 const PostRoute = new Router();
 
-PostRoute.post('/new/:user_id', upload.array('images', 10), createNewPost);
+PostRoute.post('/create/new', upload.array('images', 10), authenticateUser, createNewPost);
 
 PostRoute.post('/like/:post_id', authenticateUser, likePost, createLikeNotification);
 

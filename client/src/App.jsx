@@ -11,6 +11,7 @@ import {Notifications} from "./pages/Notifications.jsx";
 import {Explore} from "./pages/Explore.jsx";
 import {Conversation} from "./pages/Conversation.jsx";
 import {DirectMessages} from "./pages/DirectMessages.jsx";
+import {CreateChat} from "./pages/CreateChat.jsx";
 function App() {
 
   const PRODUCTION_URL = import.meta.env.VITE_API_BASE_URL;
@@ -109,6 +110,17 @@ function App() {
                 path="/messages/:username"
                 element={
                 <Conversation/>}
+            />
+
+            <Route
+                path="/messages/group/:group_id"
+                element={
+                    <Conversation/>}
+            />
+
+
+            <Route path='/messages/new'
+                   element={<CreateChat/>}
             />
 
             <Route

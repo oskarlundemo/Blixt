@@ -1,12 +1,11 @@
 import {useAuth} from "../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 import {useUI} from "../context/UIContext.jsx";
-import {useEffect} from "react";
 
 
 export const NavigationBar = ({searchHasFocus}) => {
 
-    const navigate = useNavigate();  // Used to navigate to chats after creation is successful
+    const navigate = useNavigate();
 
     const {user} = useAuth();
 
@@ -18,7 +17,7 @@ export const NavigationBar = ({searchHasFocus}) => {
         <nav
 
             style={{
-                zIndex: searchHasFocus ? 5 : 9999,
+                zIndex: searchHasFocus ? 5 : 100,
             }}
 
             className={'feed-footer'}>

@@ -9,15 +9,8 @@ export const CompanyLogo = ({height, width = 'auto'}) => {
 
     return (
         <div className="company-logo">
-
-            <img
-                style={{
-                    width: `${width}px`,
-                    height: `${height}px`,
-                }}
-                src={
-                'blixt-logo.png'
-                }/>
+            <h1>Blixt ⚡️</h1>
+            <h2>Save moments in a flash</h2>
         </div>
     )
 

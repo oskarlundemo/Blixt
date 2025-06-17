@@ -6,7 +6,8 @@ import {HeaderMenu} from "../components/HeaderMenu.jsx";
 
 import '../styles/DirectMessages.css'
 import {LoadingTitle} from "../components/LoadingTitle.jsx";
-import {ConversationCard} from "../components/DirectMessagesComponents/ConversationCard.jsx";
+import {PrivateConversationCard} from "../components/DirectMessagesComponents/PrivateConversationCard.jsx";
+import {GroupConversationCard} from "../components/DirectMessagesComponents/GroupConversationCard.jsx";
 
 export const DirectMessages = ({}) => {
 
@@ -16,7 +17,6 @@ export const DirectMessages = ({}) => {
     const {token, user, API_URL} = useAuth();
 
     useEffect(() => {
-
         fetch(`${API_URL}/conversations/fetch`, {
             method: "GET",
             headers: {
@@ -38,6 +38,7 @@ export const DirectMessages = ({}) => {
 
             <HeaderMenu
                 backArrow={true}
+                newMessage={true}
             />
 
             <div className="direct-messages">
@@ -47,16 +48,24 @@ export const DirectMessages = ({}) => {
                 ) : (
                     (conversations.length > 0 ? (
                         (conversations.map((conversation) => (
-                            <ConversationCard
-                                loggedInUserId={user.id}
-                                key={conversation.id}
-                                latestMessage={conversation.latestMessage}
-                                user={conversation.otherUser}
-                            />
+                            (conversation.group ? (
+                                <GroupConversationCard
+                                    group={conversation.group}
+                                    latestMessage={conversation.latestMessage}
+                                    members={conversation.members}
+                                />
+                    ) : (
+                                <PrivateConversationCard
+                                    loggedInUserId={user.id}
+                                    key={conversation.id}
+                                    latestMessage={conversation.latestMessage}
+                                    user={conversation.otherUser}
+                                />
+                            ))
                         )))
                         ) : (
                             <p>No conversations yet....</p>
-                        ))
+                    ))
                 )}
             </div>
 

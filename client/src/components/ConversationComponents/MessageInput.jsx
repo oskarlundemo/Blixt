@@ -3,11 +3,11 @@ import {useRef} from "react";
 import {useParams} from "react-router-dom";
 
 
-export const MessageInput = ({message, setMessage}) => {
+export const MessageInput = ({message, setMessage, group}) => {
 
 
     const {token, API_URL} = useAuth();
-    const {username, conversationId} = useParams();
+    const {username, group_id} = useParams();
 
     const handleSubmit = async (e) => {
 
@@ -16,13 +16,9 @@ export const MessageInput = ({message, setMessage}) => {
         if (message.trim().length === 0)
             return;
 
-        let endpoint = "";
-
-        if (conversationId) {
-            endpoint = `${API_URL}/messages/create/by-conversation/${conversationId}`;
-        } else if (username) {
-            endpoint = `${API_URL}/messages/create/private/${encodeURIComponent(username)}`;
-        }
+        const endpointType = group_id ? 'group' : 'private';
+        const identifier = group_id || encodeURIComponent(username);
+        const endpoint = `${API_URL}/messages/create/${endpointType}/${identifier}`;
 
         try {
             await fetch(endpoint, {

@@ -53,31 +53,17 @@ export const Carousel = ({ children: slides }) => {
                 }} className={'indicators'}>
 
                     {slides.map((_, index) => (
-                        (currentIndex === index ? (
-
-                            <div
-                                style={{
-                                    width: '5px',
-                                    height: '5px',
-                                    backgroundColor: '#e3e3e3',
-                                    padding: '1px',
-                                    borderRadius: '50%',
-                                    transition: '200ms ease-in-and-out',
-                                }}
-                            ></div>
-
-
-                        ) : (
-                            <div
-                                style={{
-                                    width: '5px',
-                                    height: '5px',
-                                    backgroundColor: '#e3e3e3',
-                                    borderRadius: '50%',
-                                    transition: '200ms ease-in-and-out',
-                                }}
-                            ></div>
-                        ))
+                        <div
+                            key={index}
+                            style={{
+                                width: '5px',
+                                height: '5px',
+                                backgroundColor: '#e3e3e3',
+                                padding: currentIndex === index ? '1px' : 0,
+                                borderRadius: '50%',
+                                transition: '200ms ease-in-out',
+                            }}
+                        />
                     ))}
                 </div>
             </div>

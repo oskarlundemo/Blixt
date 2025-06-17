@@ -107,9 +107,16 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem("token");
     };
 
+    const login = async ({ email, password }) => {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+        if (error) throw error;
+        return data;
+    };
+
 
     return (
-        <AuthContext.Provider value={{ user, API_URL, logout, token: localStorage.getItem("token"), loading }}>
+        <AuthContext.Provider value={{ user, API_URL, logout, login, token: localStorage.getItem("token"), loading }}>
             {children}
         </AuthContext.Provider>
     );

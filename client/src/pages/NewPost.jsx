@@ -13,12 +13,12 @@ import {HeaderMenu} from "../components/HeaderMenu.jsx";
 
 export const NewPost = ({}) => {
 
-
-    const {API_URL} = useAuth();
+    const {API_URL, token} = useAuth();
     const {user} = useAuth();
     const [caption, setCaption] = useState('');
     const [images, setImages] = useState([])
     const [numberOfImages, setNumberOfImages] = useState(0);
+    const [uploading, setUploading] = useState(false);
 
     const [showPopup, setShowPopup] = useState(false);
     const [showOverlay, setShowOverlay] = useState(false);
@@ -27,7 +27,6 @@ export const NewPost = ({}) => {
 
     useEffect(() => {
         setNumberOfImages(images.length)
-        console.log(images)
     }, [images])
 
     const removeImage = (id) => {
@@ -36,7 +35,6 @@ export const NewPost = ({}) => {
 
 
     const inspectImage = (image) => {
-        console.log('Image clicked:', image);
         setSelectedImage(image);
         setShowPopup(true);
         setShowOverlay(true);
@@ -52,14 +50,29 @@ export const NewPost = ({}) => {
             formData.append('images', image.file);
         });
 
+        setUploading(true);
+
         try {
-            const response = await fetch(`${API_URL}/posts/new/${user.sub}`, {
+            const response = await fetch(`${API_URL}/posts/create/new`, {
                 method: 'POST',
                 body: formData,
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             });
-            const data = await response.json();
+
+
+            if (response.ok) {
+                console.log('Post created successfully');
+                setCaption('');
+                setImages([]);
+                setUploading(false);
+            } else {
+                console.error('Failed to submit post');
+            }
 
         } catch (err) {
+            setUploading(false);
             console.error('Error submitting post:', err);
         }
     };
@@ -93,6 +106,14 @@ export const NewPost = ({}) => {
     return (
         <main className="new-post-container">
 
+
+            {uploading && (
+                <div className="uploading-overlay">
+                    <div className="uploading-spinner"></div>
+                </div>
+            )}
+
+
             <HeaderMenu/>
 
             <section className={'new-post-images-container'}>
@@ -105,7 +126,9 @@ export const NewPost = ({}) => {
                             inspectImage={inspectImage}
                             images={images}
                             removeImage={removeImage}
-                            setImages={setImages}/>
+                            setImages={setImages}
+                            uploading={uploading}
+                        />
                 </DndContext>
 
                 <span>{numberOfImages} / 10</span>
@@ -117,7 +140,7 @@ export const NewPost = ({}) => {
 
 
                 <form onSubmit={handleSubmit}>
-                    <fieldset>
+                    <fieldset disabled={uploading}>
                         <legend>Caption</legend>
                         <textarea
                             name="caption"
