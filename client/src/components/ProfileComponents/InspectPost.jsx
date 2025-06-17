@@ -5,6 +5,7 @@ import {Post} from "../FeedComponents/Post.jsx";
 
 import '../../styles/InspectPost.css'
 import {LoadingTitle} from "../LoadingTitle.jsx";
+import {HeaderMenu} from "../HeaderMenu.jsx";
 
 export const InspectPost = ({}) => {
 
@@ -37,6 +38,11 @@ export const InspectPost = ({}) => {
 
     return (
         <main className="single-post">
+
+            <HeaderMenu
+                backArrow={true}
+            />
+
             {loading ? (
                 <LoadingTitle/>
             ) : post ? (

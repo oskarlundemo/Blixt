@@ -63,7 +63,6 @@ export const Post = ({
                 .catch((err) => {
                     console.error(err);
                 })
-
         } catch (err) {
             console.error("Network or fetch error:", err);
         }
@@ -73,7 +72,6 @@ export const Post = ({
     return (
 
         <>
-
         <article className="post">
 
             <div

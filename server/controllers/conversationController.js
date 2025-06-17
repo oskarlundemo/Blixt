@@ -45,7 +45,70 @@ export const loadConversations = async (req, res) => {
             })
         );
 
-        res.status(200).json(enrichedConversations);
+        const usersGroups = await prisma.groupMember.findMany({
+            where: {
+                member_id: userIdFromToken,
+            }
+        })
+
+        const groupIds = usersGroups.map(gm => gm.group_id);
+
+        const groupChats = await prisma.groupChats.findMany({
+            where: {
+                id: {
+                    in: groupIds
+                }
+            },
+            include: {
+                GroupMessages: {
+                    include: {
+                        sender: true,
+                    },
+                    orderBy: {
+                        created_at: 'desc',
+                    },
+                    take: 1
+                },
+                GroupMembers: {
+                    include: {
+                        Member: true,
+                    }
+                }
+            },
+        });
+
+        const formattedGroupChats = groupChats.map(gm => {
+            const latestMessage = gm.GroupMessages[0] || null;
+            return {
+                group: {
+                    id: gm.id,
+                    name: gm.name,
+                    avatar: gm.avatar,
+                },
+                latestMessage: latestMessage
+                    ? {
+                        id: latestMessage.id,
+                        content: latestMessage.content,
+                        created_at: latestMessage.created_at,
+                        sender: {
+                            id: latestMessage.sender.id,
+                            username: latestMessage.sender.username,
+                            avatar: latestMessage.sender.avatar,
+                        }
+                    }
+                    : null,
+                members: gm.GroupMembers.map(gmMember => ({
+                    id: gmMember.Member.id,
+                    username: gmMember.Member.username,
+                    avatar: gmMember.Member.avatar,
+                })),
+            };
+        });
+
+
+        const allConversations = [...enrichedConversations, ...formattedGroupChats];
+
+        res.status(200).json(allConversations);
     } catch (err) {
         console.error(err);
         res.status(500).json({

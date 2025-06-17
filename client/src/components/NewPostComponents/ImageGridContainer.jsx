@@ -3,12 +3,11 @@ import {ImageSelectBox} from "./ImageSelectBox.jsx";
 import {rectSortingStrategy, SortableContext} from "@dnd-kit/sortable";
 
 
-export const ImageGridContainer = ({ images, inspectImage, removeImage, setImages }) => {
+export const ImageGridContainer = ({ images, uploading, inspectImage, removeImage, setImages }) => {
     return (
         <SortableContext
             items={images.map(image => image.id)}
-            strategy={rectSortingStrategy}
-        >
+            strategy={rectSortingStrategy}>
             <div className="image-grid-container">
                 {images.map((image, i) => (
                     <ImageBox
@@ -21,7 +20,7 @@ export const ImageGridContainer = ({ images, inspectImage, removeImage, setImage
                     />
                 ))}
 
-                {images.length < 10 && (
+                {(images.length < 10 && !uploading) && (
                     <ImageSelectBox
                         images={images}
                         setImages={setImages}

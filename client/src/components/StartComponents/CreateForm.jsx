@@ -28,13 +28,6 @@ export const CreateForm = ({setShowLogin}) => {
 
 
     useEffect(() => {
-        if (user) {
-            navigate("/feed");
-        }
-    }, [user]);
-
-
-    useEffect(() => {
         setDisabled(!(acceptedEmail && acceptedPassword && acceptedUsername));
     }, [acceptedEmail, acceptedPassword, acceptedUsername]);
 
@@ -80,17 +73,7 @@ export const CreateForm = ({setShowLogin}) => {
             return;
         }
 
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
-
-        if (signInError) {
-            setErrors([signInError.message]);
-            return;
-        }
-
-        const user = signInData.user;
+        const newUser = signUpData.user;
 
         const response = await fetch(`${API_URL}/auth/signup/supabase`, {
             method: "POST",
@@ -98,19 +81,23 @@ export const CreateForm = ({setShowLogin}) => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                id: user.id,
-                email: user.email,
-                username: user.user_metadata.username || username,
+                id: newUser.id,
+                email: newUser.email,
+                username: newUser.user_metadata.username || username,
             }),
         });
 
         if (!response.ok) {
             const err = await response.json();
-            setErrors([err.error || 'Failed to create user']);
+            setErrors([err.error || "Failed to create user"]);
             return;
         }
 
-        await login(signInData.session);
+        if (signUpData.session) {
+            navigate("/feed");
+        } else {
+            setErrors(["Check your inbox to confirm your email before logging in."]);
+        }
     };
 
 

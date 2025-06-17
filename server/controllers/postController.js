@@ -10,11 +10,10 @@ export const createNewPost = async (req, res) => {
             return res.status(400).json({ error: 'Missing files' });
         }
 
+
         const files = req.files;
         const caption = req.body.caption;
-        const userId = req.params.user_id
-
-        console.log(userId);
+        const userId = req.user.id
 
         const user = await prisma.user.findFirst({
             where: {
@@ -23,7 +22,8 @@ export const createNewPost = async (req, res) => {
         })
 
         if (!user)
-            console.log('No user' + user)
+            return res.status(404).json({ error: 'User does not exist' });
+
 
         const newPost = await prisma.post.create({
             data: {
@@ -32,7 +32,6 @@ export const createNewPost = async (req, res) => {
             }
         })
 
-
         const imagesData = files.map((file, index) => ({
             post_id: newPost.id,
             url: file.path,
@@ -40,10 +39,9 @@ export const createNewPost = async (req, res) => {
             file_name: file.filename,
         }));
 
-
         await prisma.images.createMany({ data: imagesData });
 
-        res.status(200).json({ message: 'Post succuesfully created!'});
+        res.status(200).json({ message: 'Post successfully created!'});
 
     } catch (err) {
         console.log(err);

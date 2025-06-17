@@ -1,4 +1,5 @@
 import {prisma} from "../prisma/index.js";
+import {parse} from "dotenv";
 
 
 export const fetchPrivateMessages = async (req, res) => {
@@ -43,25 +44,53 @@ export const fetchPrivateMessages = async (req, res) => {
 
 export const fetchMessagesByConversation = async (req, res) => {
 
-    const conversationId = Number(req.params.conversationId);
+    const group_id = parseInt(req.params.group_id);
+    const userIdFromToken = req.user.id;
 
     try {
-        const conversation = await prisma.conversation.findUnique({
-            where: { id: conversationId },
+
+        const groupExists = await prisma.groupChats.findUnique({
+            where: {
+                id: group_id,
+            },
             include: {
-                messages: {
-                    where: {type: 'GROUP'},
-                    orderBy: { created_at: 'asc' },
-                    include: { sender: true, attachments: true }
+                GroupMembers: {
+                    include: {
+                        Member: true
+                    }
                 }
             }
-        });
+        })
 
-        if (!conversation) {
-            return res.status(404).json({ message: "Conversation not found" });
+        if (!groupExists) {
+            return res.status(404).json({ message: "Group not found" });
         }
 
-        return res.json(conversation.messages);
+        const isGroupMember = await prisma.groupMember.findMany({
+            where: {
+                group_id: group_id,
+                member_id: userIdFromToken,
+            }
+        })
+
+        if (!isGroupMember) {
+            return res.status(403).json({ message: 'User is not allowed' });
+        }
+
+        const groupMessages = await prisma.groupMessage.findMany({
+            where: {
+                group_id: group_id,
+            },
+            orderBy: {
+                created_at: 'asc',
+            },
+            include: {
+                attachments: true,
+                sender: true,
+            }
+        })
+
+        return res.json({messages: groupMessages, group: groupExists});
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: "Failed to fetch conversation messages" });
@@ -153,15 +182,76 @@ export const fetchEnrichedPrivateMessage = async (req, res) => {
 }
 
 
+export const fetchEnrichedGroupMessage = async (req, res) => {
+
+    try {
+
+        const messageId = parseInt(req.body.message.id)
+
+        const newMessage = await prisma.groupMessage.findUnique({
+            where: {id: messageId},
+            include: {
+                sender: true,
+                attachments: true,
+            }
+        })
+
+        if (!newMessage) {
+            return res.status(404).json({ message: "Message not found" });
+        }
+
+        return res.status(200).json(newMessage);
+
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: "Failed to fetch enriched group messages" });
+    }
+}
+
+
 
 
 export const createGroupMessage = async (req, res) => {
 
     try {
 
+        const userId = req.user.id;
+        const groupId = parseInt(req.params.group_id);
+        const message = req.body.message
 
+        const group = await prisma.groupChats.findUnique({
+            where: {
+                id: groupId,
+            }
+        })
+
+        if (!group) {
+            return res.status(404).json({ message: "Group not found" });
+        }
+
+        const isGroupMember = await prisma.groupMember.findMany({
+            where: {
+                group_id: groupId,
+                member_id: userId
+            }
+        })
+
+        if (!isGroupMember) {
+            return res.status(403).json({ message: "Unathorized action" });
+        }
+
+        await prisma.groupMessage.create({
+            data: {
+                group_id: groupId,
+                sender_id: userId,
+                content: message,
+            }
+        })
+
+        return res.status(200).json({ message: 'Message successfully created' });
 
     } catch (err) {
         console.error(err);
+        res.status(500).json({ error: "Failed to create group message" });
     }
 }

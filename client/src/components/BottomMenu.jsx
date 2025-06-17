@@ -115,7 +115,6 @@ export const BottomMenu = ({showBottomMenu, setShowBottomMenu, archived, setPost
                     alignItems: "center",
                     width: "90%",
                 }}
-
             >
                 <h2>Delete post</h2>
                 <svg
