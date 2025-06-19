@@ -12,9 +12,7 @@ export const Start = ({}) => {
     return (
         <main className="start">
 
-            <CompanyLogo
-                height={200}
-            />
+            <CompanyLogo/>
 
             <div className='start-container'>
 

@@ -255,3 +255,76 @@ export const createGroupMessage = async (req, res) => {
         res.status(500).json({ error: "Failed to create group message" });
     }
 }
+
+
+export const sendGifPrivateChat = async (req, res) => {
+    try {
+
+        const userIdFromToken = req.user.id;
+        const username = decodeURIComponent(req.params.username);
+        const gif = req.body.gif;
+
+        const recipient = await prisma.user.findUnique({
+            where: {
+                username: username,
+            }
+        })
+
+        if (!recipient) {
+            return res.status(404).json({ message: "Receipiant not found" });
+        }
+
+        await prisma.privateMessages.create({
+            data: {
+                receiver_id: recipient.id,
+                sender_id: userIdFromToken,
+                content: gif.url,
+            }
+        })
+
+        return res.status(200).json({ message: 'Gif successfully sent' });
+
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: "Failed to send gif private chat" });
+    }
+}
+
+
+export const sendGifGroupChat = async (req, res) => {
+
+    try {
+
+        const userIdFromToken = req.user.id;
+        const groupId = parseInt(req.params.group_id);
+        const gif = req.body.gif;
+
+        const isMember = await prisma.groupMember.findUnique({
+            where: {
+                group_id_member_id: {
+                    group_id: groupId,
+                    member_id: userIdFromToken,
+                }
+            }
+        });
+
+        if (!isMember) {
+            return res.status(403).json({ message: "Unathorized action" });
+        }
+
+        await prisma.groupMessage.create({
+            data: {
+                group_id: groupId,
+                sender_id: userIdFromToken,
+                content: gif.url,
+            }
+        })
+
+        return res.status(200).json({ message: 'Gif successfully sent' });
+
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: "Failed to send gif in group chat" });
+    }
+
+}

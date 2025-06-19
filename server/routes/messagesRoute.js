@@ -8,7 +8,7 @@ import {
     createGroupMessage,
     createPrivateMessage, fetchEnrichedGroupMessage, fetchEnrichedPrivateMessage,
     fetchMessagesByConversation,
-    fetchPrivateMessages
+    fetchPrivateMessages, sendGifGroupChat, sendGifPrivateChat
 } from "../controllers/messagesController.js";
 import {authenticateUser} from "../middleware/supabase.js";
 
@@ -26,6 +26,10 @@ messagesRoute.post('/create/group/:group_id', authenticateUser, createGroupMessa
 messagesRoute.post('/fetch/private/new/enriched', authenticateUser, fetchEnrichedPrivateMessage);
 
 messagesRoute.post('/fetch/group/new/enriched', authenticateUser, fetchEnrichedGroupMessage);
+
+messagesRoute.post('/send/gif/private/:username', authenticateUser, sendGifPrivateChat);
+
+messagesRoute.post('/send/gif/group/:group_id', authenticateUser, sendGifGroupChat);
 
 
 

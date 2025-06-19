@@ -12,6 +12,7 @@ export const CommentCard = ({
                                 commentSection = false,
                                 id = 0,
                                 isUsersPost = false,
+                                feed = false,
                                 setComments = [],
                             }) => {
 
@@ -72,7 +73,31 @@ export const CommentCard = ({
                 )}
 
                 <div className={'comment-info'}>
-                    <p>@{author?.username || 'No username'}</p>
+
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            flexGrow: '1',
+                        }}
+
+                        className="content-body">
+                        <p
+                            style={{
+                                textWrap: 'break-word',
+                            }}>
+
+
+                        <span
+                            style={{
+                                fontWeight: 'bold',
+                            }}>
+                            {author?.username}:
+                        </span>
+                            {' ' + comment}
+                        </p>
+                    </div>
+
 
                     <div
                         style={{
@@ -80,11 +105,14 @@ export const CommentCard = ({
                             flexDirection: 'row',
                             alignItems: 'center',
                             gap: '0.5rem',
+                            alignSelf: 'flex-start',
                         }}>
-                        <p>{parseTimeStamp(timestamp)}</p>
 
+                        {!feed && (
+                            <p>{parseTimeStamp(timestamp)}</p>
+                        )}
 
-                        {(isUsersPost || author?.id === user?.id) && (
+                        {((isUsersPost || author?.id === user?.id) && !feed) && (
                             <svg
                                 className={'delete-comment-icon'}
                                 onClick={() => deleteCommentHandler(id)}
@@ -95,15 +123,6 @@ export const CommentCard = ({
                 </div>
 
             </div>
-
-
-            <div className="comment-card__body">
-                <p>{comment}</p>
-            </div>
-
-
-
-
 
         </div>
     )

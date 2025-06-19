@@ -1,13 +1,10 @@
 import {useEffect, useState} from "react";
 import {useAuth} from "../context/AuthContext.jsx";
-import {NavigationBar} from "../components/NavigationBar.jsx";
 import {HeaderMenu} from "../components/HeaderMenu.jsx";
-
 
 import '../styles/DirectMessages.css'
 import {LoadingTitle} from "../components/LoadingTitle.jsx";
-import {PrivateConversationCard} from "../components/DirectMessagesComponents/PrivateConversationCard.jsx";
-import {GroupConversationCard} from "../components/DirectMessagesComponents/GroupConversationCard.jsx";
+import {ConversationCard} from "../components/DirectMessagesComponents/ConversationCard.jsx";
 
 export const DirectMessages = ({}) => {
 
@@ -47,24 +44,19 @@ export const DirectMessages = ({}) => {
                     <LoadingTitle/>
                 ) : (
                     (conversations.length > 0 ? (
-                        (conversations.map((conversation) => (
-                            (conversation.group ? (
-                                <GroupConversationCard
-                                    group={conversation.group}
-                                    latestMessage={conversation.latestMessage}
-                                    members={conversation.members}
-                                />
+                        conversations.map((conversation) => (
+                            <ConversationCard
+                                key={conversation.id}
+                                user={conversation.otherUser || null}
+                                group={conversation.group || null}
+                                chatname={conversation.group?.name || conversation.otherUser?.username || 'Unknown'}
+                                latestMessage={conversation.latestMessage}
+                                members={conversation.members || []}
+                                loggedInUserId={user?.id}
+                            />
+                        ))
                     ) : (
-                                <PrivateConversationCard
-                                    loggedInUserId={user.id}
-                                    key={conversation.id}
-                                    latestMessage={conversation.latestMessage}
-                                    user={conversation.otherUser}
-                                />
-                            ))
-                        )))
-                        ) : (
-                            <p>No conversations yet....</p>
+                        <p>No conversations yet....</p>
                     ))
                 )}
             </div>

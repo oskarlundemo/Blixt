@@ -11,6 +11,10 @@ import {ButtonContainer} from "../components/ProfileComponents/ButtonContainer.j
 import {LoadingBox} from "../components/LoadingBox.jsx";
 import {LoadingTitle} from "../components/LoadingTitle.jsx";
 import {FollowMessageContainer} from "../components/ProfileComponents/FollowMessageContainer.jsx";
+import {HeaderMenu} from "../components/HeaderMenu.jsx";
+import {Overlay} from "../components/Overlay.jsx";
+import {BottomSheet} from "../components/BottomSheet.jsx";
+import {BottomSheetItem} from "../components/ConversationComponents/BottomSheetItem.jsx";
 
 
 
@@ -22,6 +26,7 @@ export const Profile = ({}) => {
     const [archive, setArchive] = useState([]);
     const [loading, setLoading] = useState(true);
     const [profileUser, setProfileUser] = useState([]);
+    const [showMore, setShowMore] = useState(false);
 
     const [following, setFollowing] = useState(0);
     const [followers, setFollowers] = useState(0);
@@ -67,7 +72,7 @@ export const Profile = ({}) => {
     const { username } = useParams();
     const decodedUsername = decodeURIComponent(username);
 
-    const {API_URL, user, token} = useAuth();
+    const {API_URL, user, token, logout} = useAuth();
 
     useEffect(() => {
 
@@ -161,10 +166,16 @@ export const Profile = ({}) => {
     return (
         <main className="profile">
 
+            <HeaderMenu
+                newMessage={false}
+                more={true}
+                setShowMore={setShowMore}
+            />
+
             {loading ? (
                 <LoadingTitle/>
             ) : (
-                <>
+                <section className="profile-wrapper">
                 <header>
 
                     <section className={'profile-header'}>
@@ -317,8 +328,38 @@ export const Profile = ({}) => {
                     ))
                 )}
                 </section>
-                </>
+                </section>
             )}
+
+            <BottomSheet
+                showMenu={showMore}
+                setShowMenu={setShowMore}
+                clickMore={() => setShowMore(true)}
+
+
+                childrenElements={
+
+
+                <BottomSheetItem
+                    title={'Logout'}
+                    svg={
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/></svg>
+                    }
+
+                    showDropDown={() => {
+                        logout();
+                        navigate('/');
+                    }}
+
+                />
+                }
+            />
+
+            <Overlay
+                showOverlay={showMore}
+                setShowOverlay={setShowMore}
+                clickToggle={true}
+            />
 
             <NavigationBar/>
 

@@ -26,7 +26,6 @@ export const Feed = ({}) => {
             .then(res => res.json())
             .then(data => {
                 setPosts(data);
-                console.log(data);
                 setLoading(false);
             })
             .catch(err => {
@@ -65,6 +64,7 @@ export const Feed = ({}) => {
                                     poster={post.poster}
                                     id={post.id}
                                     setPosts={setPosts}
+                                    inFeed={true}
                                 />
                             ))
                         ) : (

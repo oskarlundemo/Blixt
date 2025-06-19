@@ -4,6 +4,7 @@ import {use, useEffect, useState} from "react";
 import {CreateChatHeader} from "../components/CreateChatComponents/CreateChatHeader.jsx";
 import {ParticipantsSection} from "../components/CreateChatComponents/ParticipantsSection.jsx";
 import {useAuth} from "../context/AuthContext.jsx";
+import {LoadingTitle} from "../components/LoadingTitle.jsx";
 
 export const CreateChat = ({}) => {
 
@@ -14,6 +15,7 @@ export const CreateChat = ({}) => {
     const [search, setSearch] = useState("");
     const [showBottomMenu, setShowBottomMenu] = useState(true);
     const [creating, setCreating] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         participants.length > 0 ? setShowBottomMenu(true) : setShowBottomMenu(false);
@@ -30,6 +32,7 @@ export const CreateChat = ({}) => {
             .then(res => res.json())
             .then(data => {
                 setFollowing(data.following);
+                setLoading(false);
             })
             .catch(err => console.log(err));
     }, [])
@@ -66,7 +69,9 @@ export const CreateChat = ({}) => {
                         console.log(data)
                         setSearchResults(data.searchResults);
                     })
-                    .catch(err => console.log(err));
+                    .catch(err => {
+                        console.log(err)
+                    });
             } else {
                 setSearchResults([]);
             }
@@ -99,70 +104,93 @@ export const CreateChat = ({}) => {
                 .then(res => res.json())
                 .then(data => {
                     setFollowing(data.following);
+                    setLoading(false);
                 })
-                .catch(err => console.log(err));
-
+                .catch(err => {
+                    console.log(err)
+                    setLoading(false);
+                });
         } catch (err) {
             console.log('Error creating chat', err);
+        } finally {
+            setLoading(false);
+            setCreating(false);
         }
     }
 
 
     const addParticipant = (participant) => {
 
+        if (participants.length >= 5)
+            return;
+
         setParticipants((prev) => {
-            if (prev.some(p => p.id === participant.id)) {
-                return prev.filter(p => p.id !== participant.id);
-            } else {
+            const alreadyExists = prev.some(p => p.id === participant.id);
+            if (!alreadyExists) {
                 return [...prev, participant];
             }
+            return prev;
         });
     };
 
+    const removeParticipant = (participant) => {
+        setParticipants((prev) => {
+            if (prev.some(p => p.id === participant.id)) {
+                return prev.filter(p => p.id !== participant.id);
+            }
+        })
+    }
+
     return (
         <main className={'create-chat'}>
-
-            {creating && (
-                <div className="uploading-overlay">
-                    <div className="uploading-spinner"></div>
-                </div>
-            )}
 
             <HeaderMenu
                 backArrow={true}
             />
 
-            <CreateChatHeader
-                search={search}
-                setSearch={setSearch}
-                participants={participants}
-                addParticipant={addParticipant}
-            />
+            {loading ? (
+                <LoadingTitle/>
+            ) : (
+                <>
+                    {creating && (
+                        <div className="uploading-overlay">
+                            <div className="uploading-spinner"></div>
+                        </div>
+                    )}
 
-            <ParticipantsSection
-                addParticipant={addParticipant}
-                participants={participants}
-                search={search}
-                following={following}
-                searchResults={searchResults}
-            />
+                    <CreateChatHeader
+                        search={search}
+                        setSearch={setSearch}
+                        participants={participants}
+                        removeParticipant={removeParticipant}
+                    />
 
-            <div
-                className={`bottom-menu ${showBottomMenu ? "active" : ""}`}>
-                <button
-                    style={{
-                        backgroundColor: "var(--accent-color)",
-                        color: 'white',
-                        margin: '1rem',
-                        fontSize: '1.5rem'
-                    }}
+                    <ParticipantsSection
+                        addParticipant={addParticipant}
+                        participants={participants}
+                        search={search}
+                        following={following}
+                        searchResults={searchResults}
+                        removeParticipant={removeParticipant}
+                    />
 
-                    onClick={(e) => {
-                        handleSubmit(e);
-                    }}
-                >Create chat</button>
-            </div>
+                    <div
+                        className={`bottom-menu ${showBottomMenu ? "active" : ""}`}>
+                        <button
+                            style={{
+                                backgroundColor: "var(--accent-color)",
+                                color: 'white',
+                                margin: '1rem',
+                                fontSize: '1.5rem'
+                            }}
 
+                            onClick={(e) => {
+                                handleSubmit(e);
+                            }}
+                        >Create chat</button>
+                    </div>
+                </>
+            )}
         </main>
     )
 

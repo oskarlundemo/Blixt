@@ -2,7 +2,6 @@
 
 import '../../styles/Post.css'
 import {Carousel} from "../Carousel.jsx";
-import {likePost} from "../../services/helperFunctions.js";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {UserAvatar} from "../UserAvatar.jsx";
 import {useNavigate} from "react-router-dom";
@@ -21,8 +20,8 @@ export const Post = ({
                          post = null,
                          poster = null,
                          setPosts = [],
+                         inFeed = false,
                       }) => {
-
 
     const {user, API_URL, token} = useAuth();
     const [liked, setLiked] = useState(false);
@@ -195,7 +194,7 @@ export const Post = ({
 
                 </div>
 
-                <p>{username}: {caption}</p>
+                <p>{caption}</p>
 
                 {comments?.length < renderedIndex ? (
                     (comments.map(comment => (
@@ -204,6 +203,7 @@ export const Post = ({
                             comment={comment.comment}
                             timestamp={comment.created_at ? comment.created_at : undefined}
                             author={comment.user || null}
+                            feed={inFeed}
                         />
                     )))
                 ) : (
@@ -213,6 +213,7 @@ export const Post = ({
                             comment={comment.comment}
                             timestamp={comment.created_at ? comment.created_at : undefined}
                             user={comment.user || null}
+                            feed={inFeed}
                         />
                     )))
                 )}

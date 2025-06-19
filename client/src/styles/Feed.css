@@ -7,8 +7,6 @@ html, body {
     overflow: hidden;
 }
 
-
-
 .feed-wrapper {
     width: 100%;
     margin: 0 auto;
@@ -29,8 +27,7 @@ html, body {
     justify-content: space-around;
     align-items: center;
 
-    background-color: #ffffff;
-    box-shadow: 0 -5px 5px rgba(0, 0, 0, 0.2);
+    background-color: var(--background-color);
 
     svg {
         &:hover {

@@ -9,11 +9,7 @@ export const Overlay = ({showOverlay, setShowOverlay = false,  clickToggle = fal
 
 
     return <div
-
-
         onClick={() => clickToggle && setShowOverlay(false) }
-
         className={`overlay ${showOverlay ? '' : 'hide'}`}>
-
     </div>
 }
