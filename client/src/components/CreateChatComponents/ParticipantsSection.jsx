@@ -1,7 +1,7 @@
 import {SelectableUserCard} from "./SelectableUserCard.jsx";
 
 
-export const ParticipantsSection = ({searchResults, addParticipant, following, participants}) => {
+export const ParticipantsSection = ({searchResults, addParticipant, removeParticipant, following, participants}) => {
 
     return (
         <section className={'participants-section'}>
@@ -14,6 +14,7 @@ export const ParticipantsSection = ({searchResults, addParticipant, following, p
                         username={user.username}
                         addParticipant={addParticipant}
                         id={user.id}
+                        removeParticipant={removeParticipant}
                         isSelected={participants.some(p => p.id === user.id)}
                     />
                 ))
@@ -27,6 +28,7 @@ export const ParticipantsSection = ({searchResults, addParticipant, following, p
                             user={entry.followed}
                             addParticipant={addParticipant}
                             id={entry.followed.id}
+                            removeParticipant={removeParticipant}
                             isSelected={participants.some(p => p.id === entry.followed.id)}
                         />
                     ))

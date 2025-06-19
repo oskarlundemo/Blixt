@@ -108,6 +108,13 @@ export const loadConversations = async (req, res) => {
 
         const allConversations = [...enrichedConversations, ...formattedGroupChats];
 
+        allConversations.sort((a, b) => {
+            const aDate = new Date(a.latestMessage?.created_at || 0);
+            const bDate = new Date(b.latestMessage?.created_at || 0);
+            return bDate - aDate;
+        });
+
+
         res.status(200).json(allConversations);
     } catch (err) {
         console.error(err);

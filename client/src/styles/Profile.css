@@ -3,15 +3,19 @@
 
 
 .profile {
-    width: 80%;
-    margin: 0 auto;
+    width: 100%;
     display: flex;
     flex-direction: column;
     height: 100vh;
     position: relative;
-    gap: 1rem;
 
-    max-width: 1200px;
+}
+
+.profile-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    align-self: center;
 }
 
 
@@ -213,6 +217,7 @@
     align-items: center;
     width: 100%;
     overflow-x: hidden;
+    margin-bottom: 1rem;
 }
 
 .button-container {
@@ -262,5 +267,11 @@
 
     button {
         width: 50%;
+    }
+}
+
+@media only screen and (max-width: 500px) {
+    .profile-followers {
+        margin: 0;
     }
 }

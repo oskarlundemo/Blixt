@@ -1,12 +1,19 @@
 import {UserAvatar} from "../UserAvatar.jsx";
 import moment from 'moment-timezone';
 import {useAuth} from "../../context/AuthContext.jsx";
+import {useEffect, useState} from "react";
 
 
 export const MessageCard = ({sender = null, content = '' , timestamp}) => {
 
     const {user} = useAuth();
     const isSender = user?.id === sender?.id;
+    const [isGif, setIsGif] = useState(false);
+
+
+    useEffect(() => {
+        content?.endsWith(".gif") || content.includes('media.giphy.com') ? setIsGif(true) : setIsGif(false);
+    }, [])
 
     const formatTimestamp = (isoTime) => {
         return moment(isoTime)
@@ -30,7 +37,6 @@ export const MessageCard = ({sender = null, content = '' , timestamp}) => {
             className="message-card">
 
             <div
-
                 style={{
                     display: "flex",
                     flexDirection: "row",
@@ -44,7 +50,6 @@ export const MessageCard = ({sender = null, content = '' , timestamp}) => {
                         flexDirection: "row-reverse",
                     })
                 }}
-
                 className={'card-header'}>
 
                 <p>{formatTimestamp(timestamp)}</p>
@@ -53,13 +58,11 @@ export const MessageCard = ({sender = null, content = '' , timestamp}) => {
             </div>
 
             <div
-
                 style={{
                     ...(isSender ? {
                         background: 'var(--accent-color)',
                         color: 'white',
                         alignSelf: "flex-end",
-
                     } : {
                         alignSelf: "flex-start",
                         background: 'var(--light-grey)',
@@ -67,8 +70,17 @@ export const MessageCard = ({sender = null, content = '' , timestamp}) => {
                     })
                 }}
 
-                className={'card-body'}>
-                <p>{content}</p>
+                className={`card-body ${isGif ? 'is-gif' : ''}`}>
+
+                {isGif ? (
+                    <img
+                        draggable={false}
+                        src={content}
+                        alt="GIF" style={{ maxWidth: '300px', borderRadius: '6px' }} />
+                ) : (
+                    <p>{content}</p>
+                )}
+
             </div>
 
         </div>

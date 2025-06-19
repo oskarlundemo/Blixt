@@ -49,6 +49,13 @@
 }
 
 
+
+
+.carousel-wrapper .carousel-container {
+  
+}
+
+
 .carousel-wrapper {
   position: relative;
   overflow: hidden;
@@ -244,8 +251,6 @@
 }
 
 
-
-
 @keyframes bounce {
   0%, 100% {
     transform: translateY(0);
@@ -253,4 +258,35 @@
   50% {
     transform: translateY(-4px);
   }
+}
+
+
+
+.drop-container .sub-menu {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: var(--default-transition);
+  padding: 0;
+  margin: 0;
+  width: 100%;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+}
+
+.drop-container .sub-menu.show {
+  grid-template-rows: 1fr;
+  transition: var(--default-transition);
+}
+
+.drop-down-item {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  padding: 5px;
 }
