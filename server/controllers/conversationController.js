@@ -114,7 +114,6 @@ export const loadConversations = async (req, res) => {
             return bDate - aDate;
         });
 
-
         res.status(200).json(allConversations);
     } catch (err) {
         console.error(err);

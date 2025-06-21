@@ -1,4 +1,4 @@
-import {DropDownMenu} from "../DropDownMenu.jsx";
+import {DropDownUsers} from "../DropDownUsers.jsx";
 
 
 export const BottomSheetItem = ({title = '',
@@ -7,25 +7,24 @@ export const BottomSheetItem = ({title = '',
                                     groupMembers = [],
                                     showGroupUsers = false,
                                     showDropDown = false,
+                                    admin = ''
                                 }) => {
-
-
 
     return (
 
-
         <div
-
-            onClick={showDropDown}
             className={'bottom-sheet-item'}>
 
-            <div className={'bottom-sheet-item-header'}>
+            <div
+                onClick={showDropDown}
+                className={'bottom-sheet-item-header'}>
                 <h2>{title}</h2>
                 {svg}
             </div>
 
             {(dropDown && groupMembers.length > 0) && (
-                <DropDownMenu
+                <DropDownUsers
+                    admin={admin}
                     items={groupMembers}
                     openMenu={showGroupUsers}
                 />

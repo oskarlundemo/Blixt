@@ -15,6 +15,4 @@ export const SmartphoneFrame = ({height = '0'}) => {
                 width: `auto`,}}
             />
     )
-
-
 }

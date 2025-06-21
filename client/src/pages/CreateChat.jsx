@@ -53,10 +53,8 @@ export const CreateChat = ({}) => {
             .catch(err => console.log(err));
     }, [])
 
-
     useEffect(() => {
         const delayBouncing = setTimeout(() => {
-
             if (search.trim().length > 0) {
                 fetch(`${API_URL}/chat/search/?q=${search}`, {
                     method: "GET",
@@ -76,9 +74,7 @@ export const CreateChat = ({}) => {
                 setSearchResults([]);
             }
         }, 300)
-
         return () => clearTimeout(delayBouncing);
-
     }, [search]);
 
 
@@ -90,7 +86,6 @@ export const CreateChat = ({}) => {
         try {
 
             setCreating(true);
-
             let endPoint = participants.length > 1 ? 'group' : 'private'
 
             fetch(`${API_URL}/chat/create/${endPoint}`, {
@@ -193,5 +188,28 @@ export const CreateChat = ({}) => {
             )}
         </main>
     )
+}
 
+
+export const realtimeSearch = (search) => {
+    setTimeout(() => {
+        if (search.trim().length > 0) {
+            fetch(`${API_URL}/chat/search/?q=${search}`, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data)
+                    setSearchResults(data.searchResults);
+                })
+                .catch(err => {
+                    console.log(err)
+                });
+        } else {
+            setSearchResults([]);
+        }
+    }, 300)
 }

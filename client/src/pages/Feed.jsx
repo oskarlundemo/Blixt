@@ -12,15 +12,16 @@ export const Feed = ({}) => {
 
 
     const [loading, setLoading] = useState(true);
-    const {user, API_URL} = useAuth();
+    const {API_URL, token} = useAuth();
     const [posts, setPosts] = useState([]);
 
     useEffect(() => {
 
-        fetch(`${API_URL}/feed/load/${user.sub}`, {
+        fetch(`${API_URL}/feed/load`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
             }
         })
             .then(res => res.json())
@@ -33,11 +34,6 @@ export const Feed = ({}) => {
                 setLoading(false);
             });
     }, [])
-
-
-    useEffect(() => {
-        console.log(posts)
-    }, [posts])
 
 
     return (

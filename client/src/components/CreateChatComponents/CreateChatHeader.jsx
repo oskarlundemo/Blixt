@@ -2,11 +2,9 @@ import {useEffect, useState} from "react";
 
 import '../../styles/CreateChat.css'
 
-export const CreateChatHeader = ({participants, search, removeParticipant, setSearch}) => {
-
+export const CreateChatHeader = ({participants = [], add = false, search = '', removeParticipant = null, setSearch = ''}) => {
 
     const [numberOfParticipants, setNumberOfParticipants] = useState(0);
-
 
     useEffect(() => {
         setNumberOfParticipants(participants.length);
@@ -27,7 +25,9 @@ export const CreateChatHeader = ({participants, search, removeParticipant, setSe
                         width: 'fit-content',
                         margin: '0 1rem'
                     }}
-                >To:</h2>
+                >
+                    {add ? 'Add:' : 'To:'}
+                </h2>
 
                 {participants && (
                     <div
@@ -38,10 +38,12 @@ export const CreateChatHeader = ({participants, search, removeParticipant, setSe
                         className={'participants-container'}>
                         {participants.map((participant) => (
                             <div key={participant.id}>
-                                <p key={participant.id}>{participant.username}</p>
+                                <p>{participant.username}</p>
+
                                 <svg
                                     onClick={() => removeParticipant(participant)}
-                                    xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+                                    xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+                                </svg>
                             </div>
                         ))}
 
@@ -55,15 +57,15 @@ export const CreateChatHeader = ({participants, search, removeParticipant, setSe
                     onChange={e => setSearch(e.target.value)}
                 />
 
-
             </div>
 
-
-            <p
-                style={{
-                    display: 'block',
-                    textAlign: 'right',
-                }}>{numberOfParticipants} / 5</p>
+            {!add && (
+                <p
+                    style={{
+                        display: 'block',
+                        textAlign: 'right',
+                    }}>{numberOfParticipants} / 5</p>
+            )}
 
         </section>
     )

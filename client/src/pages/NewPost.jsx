@@ -69,6 +69,7 @@ export const NewPost = ({}) => {
                 setUploading(false);
             } else {
                 console.error('Failed to submit post');
+                setUploading(false);
             }
 
         } catch (err) {

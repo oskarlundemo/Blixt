@@ -9,29 +9,38 @@
     display: flex;
     flex-direction: column;
     position: relative;
+    overflow: hidden;
 }
 
 
 .conversation-header {
-    height: 5%;
+    flex-shrink: 0;
+    height: 60px;
     display: flex;
-    flex-direction: row;
     align-items: center;
-    box-shadow: var(--soft-box-shadow);
-    h2 {
-        margin: 0 0 0 5px;
-    }
+    background-color: var(--background-color);
+    border-bottom: 1px solid var(--light-grey);
+    z-index: 10;
+}
+
+
+.chat-window {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 
 .conversation-content {
-    padding: 10px 0;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    height: 90%;
-    width: 100%;
-    gap: 10px;
-    overflow-y: scroll;
+    padding: 1rem;
+    box-sizing: border-box;
 }
 
 
@@ -49,6 +58,7 @@
         width: 60%;
 
         textarea {
+            background-color: transparent;
             width: 100%;
             border: none;
             outline: none;
@@ -108,11 +118,17 @@
 }
 
 .card-body.is-gif {
-    background: transparent !important;
+
+    overflow: hidden;
+    background-color: transparent !important;
+    padding: 0 !important;
+
+    img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+    }
 }
-
-
-
 
 .message-splitter {
 
@@ -161,17 +177,11 @@
 
 
 .gifContainer-wrapper {
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-0.5rem);
-
-    background-color: var(--background-color);
-    border-radius: var(--border-radius);
-    box-shadow: var(--soft-box-shadow);
-    z-index: 4;
-    display: none;
+    background-color: transparent;
     flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+    display: flex;
 }
 
 .gifContainer-search {
@@ -187,24 +197,27 @@
     input {
         border: none;
         width: 100%;
-        font-size: inherit;
+        font-size: 1.5rem;
         font-family: inherit;
         height: fit-content;
         outline: none;
+        border-bottom: 2px solid var(--light-grey);
+        transition: var(--default-transition);
     }
 
     input:focus {
-        border-bottom: 1px solid var(--accent-color);
+        border-bottom: 2px solid var(--accent-color);
     }
 }
 
 .gifContainer-search-result {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-template-columns: repeat(3, minmax(100px, 1fr));
     gap: 0.5rem;
-    max-height: 300px;
-    overflow-y: auto;
+    max-height: 320px;
+    min-height: 320px;
     padding: 0.5rem;
+    height: fit-content;
 }
 
 
@@ -223,6 +236,7 @@
     border-radius: 8px;
     transition: transform 0.2s ease-in-out;
     cursor: pointer;
+    overflow-y: auto;
 }
 
 .gifContainer-search-result img:hover {
@@ -246,10 +260,11 @@
 
 .bottom-sheet-item {
     display: flex;
-    width: 100%;
+    width: 90%;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
+    align-self: center;
 
     > div {
         width: 100%;
@@ -276,4 +291,85 @@
 
 .delete-icon:hover {
     fill: var(--error-color) !important;
+}
+
+.inspect-conversation {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    gap: 1rem;
+}
+
+.configure-back {
+    margin: 0 !important;
+    padding: 1rem;
+    align-self: flex-start;
+}
+
+
+@media screen and (max-width: 768px) {
+
+    .chat-window {
+        height: 100vh;
+        width: 100vw;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .conversation-header {
+        height: 60px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        box-shadow: var(--soft-box-shadow);
+        background-color: var(--background-color);
+        z-index: 10;
+    }
+
+    .conversation-content {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 1rem;
+        box-sizing: border-box;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .conversation-footer {
+        height: 60px;
+        padding: 0.5rem 1rem;
+        width: 100%;
+    }
+
+    .message-card {
+        width: 100%;
+    }
+
+    .card-body {
+        max-width: 80%;
+        word-break: break-word;
+    }
+
+    .gifContainer-wrapper {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .bottom-sheet-item {
+        padding: 0.5rem;
+    }
+
+    .back-icon {
+        height: 24px;
+        width: 24px;
+    }
+
+    h2 {
+        font-size: 1rem;
+        margin-left: 0.5rem;
+    }
 }
