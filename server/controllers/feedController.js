@@ -4,41 +4,39 @@ import {prisma} from "../prisma/index.js";
 export const loadFeed = async (req, res) => {
 
     try {
-        const {user_id} = req.params;
+        const userIdFromToken = req.user.id;
 
         const following = await prisma.follows.findMany({
             where: {
-                follower_id: user_id,
-            },
-            select: {
-                followed_id: true,
-            }
-        })
-
-        const followingIds = following.map(f => f.followed_id);
-        const userAndFollowingIds = [...followingIds, user_id]
-
-        const posts = await prisma.post.findMany({
-            where: {
-                user_id: {
-                    in: userAndFollowingIds
-                },
-                archived: false
+                follower_id: userIdFromToken,
             },
             include: {
-                images: true,
-                poster: true,
-                comments: {
+                followed: {
                     include: {
-                        user: true,
-                    },
-                },
-                likes: true,
-            },
-            orderBy: {
-                created_at: 'desc',
+                        posts: {
+                            include: {
+                                images: true,
+                                likes: true,
+                                comments: {
+                                    include: {
+                                        user: true,
+                                    }
+                                },
+                                poster: true,
+                            }
+                        },
+                    }
+                }
             }
         })
+
+        let posts = [];
+        following.forEach(follow => {
+            posts.push(...follow.followed.posts);
+        });
+
+        posts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        console.log(posts);
 
         res.status(200).json(posts)
 

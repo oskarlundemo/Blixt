@@ -165,6 +165,8 @@
 .close-icon:hover {
   fill: var(--error-color);
   transition: var(--default-transition);
+  opacity: 0.8;
+  cursor: pointer;
 }
 
 
@@ -194,6 +196,7 @@
 
 
 .header-menu {
+  height: 60px;
   background-color: var(--background-color);
   box-shadow: var(--soft-box-shadow);
 

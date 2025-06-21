@@ -1,7 +1,7 @@
 import {UserAvatar} from "../UserAvatar.jsx";
 import {CustomCheckBox} from "../CustomCheckBox.jsx";
 
-export const SelectableUserCard = ({username = '', user, addParticipant, removeParticipant, isSelected, avatar}) => {
+export const SelectableUserCard = ({username = '', user, addNewGroupMember = null, add = false, addParticipant, removeParticipant, isSelected, avatar}) => {
 
 
     return (
@@ -16,16 +16,24 @@ export const SelectableUserCard = ({username = '', user, addParticipant, removeP
                 <h2>{username}</h2>
             </div>
 
-            <CustomCheckBox
-                checked={isSelected}
-                onChange={() => {
-                    if (isSelected) {
-                        removeParticipant(user);
-                    } else {
-                        addParticipant(user);
-                    }
-                }}
-            />
+            {add ? (
+                <button
+                    onClick={() => {
+                        addNewGroupMember(user)
+                    }}
+                >Invite</button>
+            ) : (
+                <CustomCheckBox
+                    checked={isSelected}
+                    onChange={() => {
+                        if (isSelected) {
+                            removeParticipant(user);
+                        } else {
+                            addParticipant(user);
+                        }
+                    }}
+                />
+            )}
 
         </article>
     )

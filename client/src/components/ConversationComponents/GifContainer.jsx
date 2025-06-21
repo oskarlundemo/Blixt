@@ -1,8 +1,5 @@
 
 
-
-
-
 import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {LoadingTitle} from "../LoadingTitle.jsx";
@@ -35,7 +32,7 @@ export const GifContainer = ({ showGifs, setShowGifs}) => {
     const {username, group_id} = useParams();
 
     const apiKey = import.meta.env.VITE_GIPHY_KEY;  // Get API key from .env
-    const limit = 10;  // Limit the gifs to 10
+    const limit = 9;  // Limit the gifs to 10
 
     // This hook is triggered on mount, popularising the gif array with some trending gifs
     useEffect( () => {
@@ -123,16 +120,11 @@ export const GifContainer = ({ showGifs, setShowGifs}) => {
                         type='text'
                         value={gifSearch}
                         onChange={e => setGifSearch(e.target.value)}
-                        placeholder='Search for a GIF!'
+                        placeholder='Send something funny...'
                     />
                 </form>
 
-                {/* Click on X icon then close */}
-                <svg onClick={() => setShowGifs(false)}
-                     xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960"
-                     width="24px" fill="#e3e3e3">
-                    <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
-            </div>
+              </div>
 
             <div className="gifContainer-search-result">
 

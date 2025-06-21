@@ -12,6 +12,8 @@ import {Explore} from "./pages/Explore.jsx";
 import {Conversation} from "./pages/Conversation.jsx";
 import {DirectMessages} from "./pages/DirectMessages.jsx";
 import {CreateChat} from "./pages/CreateChat.jsx";
+import {ToastContainer} from "react-toastify";
+import {ChatProvider} from "./context/GroupChatContext.jsx";
 function App() {
 
   const PRODUCTION_URL = import.meta.env.VITE_API_BASE_URL;
@@ -106,18 +108,24 @@ function App() {
                 }
             />
 
+
             <Route
                 path="/messages/:username"
                 element={
-                <Conversation/>}
+                    <ChatProvider>
+                        <Conversation />
+                    </ChatProvider>
+                }
             />
 
             <Route
                 path="/messages/group/:group_id"
                 element={
-                    <Conversation/>}
+                    <ChatProvider>
+                        <Conversation />
+                    </ChatProvider>
+                }
             />
-
 
             <Route path='/messages/new'
                    element={<CreateChat/>}
@@ -131,6 +139,9 @@ function App() {
             />
 
         </Routes>
+
+          <ToastContainer position="bottom-right" autoClose={3000} />
+
       </div>
   )
 }

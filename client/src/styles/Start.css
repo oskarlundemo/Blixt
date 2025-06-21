@@ -176,3 +176,13 @@
 .approved svg {
     fill: var(--approved-color) !important;
 }
+
+@media screen and (max-width: 800px) {
+
+
+    .mock-iphone {
+        display: none;
+        opacity: 0;
+        visibility: hidden;
+    }
+}
