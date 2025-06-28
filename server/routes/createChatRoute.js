@@ -7,7 +7,6 @@ import {authenticateUser} from "../middleware/supabase.js";
 import {
     createGroupChat,
     createPrivateChat,
-    fetchFollowing,
     searchForUsers
 } from "../controllers/createChatController.js";
 
@@ -15,7 +14,6 @@ import {
 
 const createChatRoute = Router();
 
-createChatRoute.get('/fetch/following', authenticateUser, fetchFollowing)
 
 createChatRoute.get('/search', authenticateUser, searchForUsers)
 

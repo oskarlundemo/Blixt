@@ -7,16 +7,17 @@ export const BottomSheetItem = ({title = '',
                                     groupMembers = [],
                                     showGroupUsers = false,
                                     showDropDown = false,
-                                    admin = ''
+                                    admin = '',
                                 }) => {
 
     return (
 
         <div
             className={'bottom-sheet-item'}>
-
             <div
-                onClick={showDropDown}
+                onClick={() => {
+                    showDropDown();
+                }}
                 className={'bottom-sheet-item-header'}>
                 <h2>{title}</h2>
                 {svg}

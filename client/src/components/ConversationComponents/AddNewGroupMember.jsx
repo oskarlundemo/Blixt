@@ -5,31 +5,31 @@ import {ParticipantsSection} from "../CreateChatComponents/ParticipantsSection.j
 import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {useParams} from "react-router-dom";
-import {toast} from "react-toastify";
 import {Spinner} from "../Spinner.jsx";
 import {useChatContext} from "../../context/GroupChatContext.jsx";
+import toast from 'react-hot-toast';
 
 
-
-export const AddNewGroupMember = ({setAddNewGroupMember, setInspectedConversation}) => {
+export const AddNewGroupMember = ({}) => {
 
     const {group_id} = useParams();
     const [searchResults, setSearchResults] = useState([]);
     const [search, setSearch] = useState("");
     const {token, API_URL} = useAuth();
-    const [participants, setParticipants] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [errorMsg, setErrorMsg] = useState(null);
 
-    const {groupMembers} = useChatContext();
+    const {groupMembers, setGroupMembers} = useChatContext();
+
     useEffect(() => {
-        console.log(groupMembers)
+        console.log(groupMembers);
     }, [])
 
     const addNewGroupMember = async (user) => {
         setLoading(true);
         setError(false);
+
+        console.log(user);
 
         await fetch(`${API_URL}/group/add/member/${group_id}`, {
             method: "POST",
@@ -45,6 +45,8 @@ export const AddNewGroupMember = ({setAddNewGroupMember, setInspectedConversatio
                     throw new Error(data.message || "Failed to add user");
                 }
                 toast.success(data.message);
+                setGroupMembers(prev => [...prev, data.member]);
+                setSearchResults(prev => prev.filter(u => u.id !== user.id));
             })
             .catch(err => {
                 toast.error(err.message || "Something went wrong");
@@ -112,7 +114,7 @@ export const AddNewGroupMember = ({setAddNewGroupMember, setInspectedConversatio
                         searchResults={searchResults}
                         search={search}
                         add={true}
-                        participants={groupMembers.GroupMembers}
+                        participants={groupMembers}
                         addMember={addNewGroupMember}
                     />
                 </>

@@ -3,6 +3,7 @@ import {prisma} from "../prisma/index.js";
 
 export const loadConversations = async (req, res) => {
     try {
+
         const userIdFromToken = req.user.id;
 
         const conversations = await prisma.privateConversation.findMany({
@@ -114,7 +115,20 @@ export const loadConversations = async (req, res) => {
             return bDate - aDate;
         });
 
-        res.status(200).json(allConversations);
+        const following = await prisma.follows.findMany({
+            where: {
+                follower_id: userIdFromToken,
+            },
+            include: {
+                followed: true
+            }
+        })
+
+        res.status(200).json({
+            conversations: allConversations,
+            message: 'Conversations have been successfully fetched',
+            following: following
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({

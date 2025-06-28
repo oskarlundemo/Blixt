@@ -15,8 +15,6 @@ export const ConversationCard = ({
 
     const navigate = useNavigate();
 
-
-
      const parseMessage = (content) => {
 
          if (content?.endsWith(".gif") || content.includes('media.giphy.com'))
@@ -52,13 +50,13 @@ export const ConversationCard = ({
                         flexDirection: "row",
                         height: "fit-content",
                     }}
-
                     className="direct-messages-card-title">
 
                     {group ? (
                         (members.length > 0 && (
                                 members.map((member, index) => (
                                     <div
+                                        key={member.id}
                                         style={{
                                             marginLeft: index === 0 ? 0 : -8,
                                             zIndex: members.length - index,
@@ -68,7 +66,6 @@ export const ConversationCard = ({
                                     >
                                         <UserAvatar
                                             user={member}
-                                            key={member.id}
                                             size={25}
                                         />
                                     </div>
@@ -83,7 +80,7 @@ export const ConversationCard = ({
                 <h2>{chatname}</h2>
 
                 <h2 style={{ margin: '0 0 0 auto' }}>
-                    {moment(latestMessage.created_at)
+                    {moment(latestMessage?.created_at)
                         .tz("Europe/Stockholm")
                         .format("D MMM HH:mm")}
                 </h2>

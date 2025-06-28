@@ -9,12 +9,12 @@ import {Overlay} from "../components/Overlay.jsx";
 import {PopUpModule} from "../components/PopUpModule.jsx";
 import {useAuth} from "../context/AuthContext.jsx";
 import {HeaderMenu} from "../components/HeaderMenu.jsx";
+import toast from "react-hot-toast";
 
 
 export const NewPost = ({}) => {
 
     const {API_URL, token} = useAuth();
-    const {user} = useAuth();
     const [caption, setCaption] = useState('');
     const [images, setImages] = useState([])
     const [numberOfImages, setNumberOfImages] = useState(0);
@@ -24,7 +24,6 @@ export const NewPost = ({}) => {
     const [showOverlay, setShowOverlay] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
 
-
     useEffect(() => {
         setNumberOfImages(images.length)
     }, [images])
@@ -32,7 +31,6 @@ export const NewPost = ({}) => {
     const removeImage = (id) => {
         setImages(prev => prev.filter(image => image.id !== id));
     };
-
 
     const inspectImage = (image) => {
         setSelectedImage(image);
@@ -61,13 +59,14 @@ export const NewPost = ({}) => {
                 }
             });
 
-
             if (response.ok) {
                 console.log('Post created successfully');
                 setCaption('');
                 setImages([]);
                 setUploading(false);
+                toast.success('Post created');
             } else {
+                toast.error('Failed to create post');
                 console.error('Failed to submit post');
                 setUploading(false);
             }
@@ -82,9 +81,7 @@ export const NewPost = ({}) => {
 
     const handleDragEnd = (e) => {
         const {active, over} = e;
-
         if (active.id === over.id) return;
-
         setImages(images => {
             const originalPos = getImagePos(active.id)
             const newPos = getImagePos(over.id)
@@ -113,7 +110,6 @@ export const NewPost = ({}) => {
                     <div className="uploading-spinner"></div>
                 </div>
             )}
-
 
             <HeaderMenu/>
 

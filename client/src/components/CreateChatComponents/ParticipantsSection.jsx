@@ -1,9 +1,15 @@
-import {SelectableUserCard} from "./SelectableUserCard.jsx";
+import { SelectableUserCard } from "./SelectableUserCard.jsx";
 
-
-export const ParticipantsSection = ({searchResults = [], addMember = null, addParticipant = null, removeParticipant = null,
-                                        following = [], participants = [], add = false, search = ''}) => {
-
+export const ParticipantsSection = ({
+                                        searchResults = [],
+                                        addMember = null,
+                                        addParticipant = null,
+                                        removeParticipant = null,
+                                        following = [],
+                                        participants = [],
+                                        add = false,
+                                        search = ''
+                                    }) => {
     return (
         <section className={'participants-section'}>
             {searchResults.length > 0 ? (
@@ -17,37 +23,38 @@ export const ParticipantsSection = ({searchResults = [], addMember = null, addPa
                         id={user.id}
                         removeParticipant={removeParticipant}
                         isSelected={participants.some(p => p.id === user.id)}
-                        add={true}
+                        add={add}
                         addNewGroupMember={addMember}
                     />
                 ))
             ) : (
-                (!add ? (
-                    (following.length > 0 ? (
-                        following.map((entry) => (
-                            <SelectableUserCard
-                                key={entry.followed.id}
-                                username={entry.followed.username}
-                                avatar={entry.followed}
-                                user={entry.followed}
-                                addParticipant={addParticipant}
-                                id={entry.followed.id}
-                                removeParticipant={removeParticipant}
-                                isSelected={participants.some(p => p.id === entry.followed.id)}
-                            />
-                        ))
+                !add ? (
+                    following.length > 0 ? (
+                        <>
+                            <p style={{ fontWeight: 'bold', marginBottom: '0.5rem', color: 'var(--light-grey)' }}>Suggested:</p>
+                            {following.map((entry) => (
+                                <SelectableUserCard
+                                    key={entry.followed.id}
+                                    username={entry.followed.username}
+                                    avatar={entry.followed}
+                                    user={entry.followed}
+                                    addParticipant={addParticipant}
+                                    id={entry.followed.id}
+                                    removeParticipant={removeParticipant}
+                                    isSelected={participants.some(p => p.id === entry.followed.id)}
+                                />
+                            ))}
+                        </>
                     ) : (
                         <p>No following</p>
-                    ))
+                    )
                 ) : (
-                    (search.length > 0 && (
-                        <p
-                            style={{
-                                textAlign: "center",
-                            }}
-                        >No results with: "{search}"</p>
-                    ))
-                ))
+                    search.length > 0 && (
+                        <p style={{ textAlign: "center" }}>
+                            No results with: "{search}"
+                        </p>
+                    )
+                )
             )}
         </section>
     );

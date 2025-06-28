@@ -7,16 +7,17 @@ import {useEffect, useRef, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import {useChatContext} from "../../context/GroupChatContext.jsx";
+import {GroupAvatar} from "../GroupAvatar.jsx";
 
 
 
-export const ChatWindow = ({inspectedConversation, messages, renderedMessages, setConfigureChat, loading}) => {
+export const ChatWindow = ({messages, renderedMessages, loading}) => {
 
     const navigate = useNavigate();
     const bottomRef = useRef(null);
     const [message, setMessage] = useState('');
     const [showGif, setShowGif] = useState(false);
-    const {group_id} = useParams();
+    const {activeChatRecipient, groupMembers, isGroup, setConfigureUI} = useChatContext();
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -39,46 +40,46 @@ export const ChatWindow = ({inspectedConversation, messages, renderedMessages, s
             }}
             className="chat-window"
         >
-        <div
-            onClick={() => {
-                setConfigureChat(true);
-            }}
 
+        <div
             className="conversation-header">
 
             <svg
                 className={'back-icon'}
                 onClick={() => {
                     navigate('/messages');
+                    setConfigureUI(false);
                 }}
                 xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M640-80 240-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
 
-            {group_id && !loading ? (
-                <div style={{ display: "flex" }}>
-                    {inspectedConversation?.GroupMembers?.map((groupMember, i) => (
-                        <div
-                            key={groupMember.Member.id}
-                            style={{
-                                marginLeft: i === 0 ? 0 : -8,
-                                zIndex: inspectedConversation.GroupMembers.length - i,
-                                border: '2px solid white',
-                                borderRadius: '50%',
-                            }}>
-                            <UserAvatar
-                                user={groupMember.Member}
+            {!loading && (
+                <div
+                    onClick={() => {
+                        setConfigureUI(true);
+                    }}
+
+                    style={{ display: "flex", alignItems: "center" }}>
+                    {isGroup ? (
+                        <>
+                            <GroupAvatar
+                                groupMembers={groupMembers}
                                 size={25}
                             />
-                        </div>
-                    ))}
-                </div>
-            ) : (
-                <UserAvatar
-                    size={25}
-                    user={inspectedConversation}
-                />
-            )}
+                            <h2>{activeChatRecipient?.username || activeChatRecipient?.name}</h2>
+                        </>
 
-            <h2>{inspectedConversation?.username || inspectedConversation?.name}</h2>
+                    ) : (
+                        <>
+                            <UserAvatar
+                                user={activeChatRecipient}
+                                size={25}
+                            />
+                            <h2>{activeChatRecipient?.username || activeChatRecipient?.name}</h2>
+                        </>
+
+                    )}
+                </div>
+            )}
 
         </div>
 
@@ -86,7 +87,6 @@ export const ChatWindow = ({inspectedConversation, messages, renderedMessages, s
         className="conversation-content">
 
         <div>
-
             {messages?.length > 0 ? (
                 <>
                     {renderedMessages}

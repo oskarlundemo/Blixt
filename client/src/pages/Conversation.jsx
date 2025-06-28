@@ -9,24 +9,20 @@ import moment from "moment-timezone";
 import {MessageSplitter} from "../components/MessasgeSplitter.jsx";
 import {ConfigureChat} from "../components/ConversationComponents/ConfigureChat.jsx";
 import {ChatWindow} from "../components/ConversationComponents/ChatWindow.jsx";
-import {ChatProvider, useChatContext} from "../context/GroupChatContext.jsx";
+import { useChatContext} from "../context/GroupChatContext.jsx";
 
 
 export const Conversation = ({}) => {
 
     const {username} = useParams();
-    const [inspectedConversation, setInspectedConversation] = useState(null);
-    const [configureChat, setConfigureChat] = useState(false);
-
     const {token, user, API_URL} = useAuth();
     const [loading, setLoading] = useState(true);
     const {group_id} = useParams();
 
-    const {setGroupMembers} = useChatContext();
+    const {setGroupMembers, setActiveChatRecipient, setIsGroup, configureUI} = useChatContext();
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
-
 
         let endpoint = "";
 
@@ -46,9 +42,9 @@ export const Conversation = ({}) => {
             })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
                     setMessages(data.messages);
-                    setInspectedConversation(data.otherUser || data.group);
+                    setIsGroup(!!data.group);
+                    setActiveChatRecipient(data.otherUser || data.group);
                     setGroupMembers(data.group.GroupMembers)
                     setLoading(false);
                 })
@@ -144,28 +140,20 @@ export const Conversation = ({}) => {
 
 
     return (
-        <ChatProvider>
             <main className="conversation-wrapper">
             {loading ? (
                 <LoadingTitle/>
             ) : (
-                (configureChat ? (
-                        <ConfigureChat
-                            inspectedConversation={inspectedConversation}
-                            setConfigureChat={setConfigureChat}
-                            setInspectedConversation={setInspectedConversation}
-                        />
+                (configureUI ? (
+                        <ConfigureChat/>
                 ) : (
                     <ChatWindow
-                        inspectedConversation={inspectedConversation}
                         messages={messages}
                         renderedMessages={renderedMessages}
                         loading={loading}
-                        setConfigureChat={setConfigureChat}
                     />
                 ))
             )}
             </main>
-        </ChatProvider>
     )
 }

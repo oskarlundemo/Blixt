@@ -45,8 +45,6 @@
     }
 
     input {
-
-        font-size: 1.5rem;
         font-family: inherit;
         border: none;
         outline: none;
@@ -57,9 +55,9 @@
 .participants-container {
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
     gap: 1rem;
-
+    height: fit-content;
+    flex-wrap: wrap;
 
     > div {
         width: fit-content;
@@ -68,10 +66,11 @@
         align-items: center;
         background-color: var(--accent-color);
         color: white;
-        padding: 0.2rem;
+        padding: 0.1rem;
         border-radius: 5px;
         height: fit-content;
         align-self: center;
+        font-size: inherit;
 
 
         svg:hover {

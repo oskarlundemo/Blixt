@@ -194,9 +194,8 @@
   }
 }
 
-
 .header-menu {
-  height: 60px;
+  min-height: 60px;
   background-color: var(--background-color);
   box-shadow: var(--soft-box-shadow);
 
