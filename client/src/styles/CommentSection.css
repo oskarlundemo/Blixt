@@ -1,24 +1,19 @@
 
 
-.App {
-    height: 100vh;
-    overflow-y: auto;
-}
+
 
 .comment-section {
-    width: 80%;
-    margin: 2rem auto;
+    width: 100%;
     display: flex;
     flex-direction: column;
-    height: 100vh;
     position: relative;
-    gap: 1rem;
 }
 
 
 .comment-card {
     display: flex;
     flex-direction: column;
+    padding: 0.5rem 1rem;
 }
 
 
@@ -36,28 +31,70 @@
 }
 
 
+.comment-section-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+}
+
 .comment-input {
-    position: sticky;
+    padding: 1rem 2rem;
+    align-items: center;
     margin-top: auto;
     bottom: 0;
     width: 100%;
+    box-shadow: 0 0 6px 5px rgba(0, 0, 0, 0.02);
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
+    justify-content: space-between;
+    justify-items: center;
     z-index: 1000;
-
-    border-radius: 8px;
-    padding-bottom: 60px;
+    gap: 1rem;
 }
 
 
-.input-field {
+.input-comment-container {
+    display: flex;
+    flex-direction: row;
     width: 100%;
+    transition: var(--default-transition);
+    border-radius: 5px;
+    padding: 2px 5px;
+    border: 1px solid var(--light-grey);
+
+    p {
+        color: var(--light-grey);
+        transition: var(--default-transition);
+        cursor: pointer;
+    }
+
+    &:has(textarea:focus-within) {
+        border: 1px solid var(--accent-color);
+    }
+}
+
+p.active {
+    color: var(--accent-color);
+}
+
+.text-area-input {
+    width: 100%;
+    font-size: inherit;
+    font-family: inherit;
+    resize: none;
+    border-radius: 5px;
+    transition: var(--default-transition);
+    overflow-y: scroll;
+    border: none;
+
+    &:focus {
+        outline: none;
+        transition: var(--default-transition);
+    }
 }
 
 .delete-comment-icon {
-
     &:hover {
         fill: var(--error-color);
         cursor: pointer;

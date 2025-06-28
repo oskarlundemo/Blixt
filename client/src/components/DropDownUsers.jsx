@@ -1,14 +1,24 @@
 import {UserAvatar} from "./UserAvatar.jsx";
 import {useAuth} from "../context/AuthContext.jsx";
 import {useParams} from "react-router-dom";
-import {toast} from "react-toastify";
+import {useChatContext} from "../context/GroupChatContext.jsx";
+import {useEffect} from "react";
+import toast from 'react-hot-toast';
 
 export const DropDownUsers = ({items, openMenu, admin}) => {
 
     const {user, token, API_URL} = useAuth();
     const {group_id} = useParams();
+    const {setGroupMembers, groupMembers} = useChatContext()
+
+    useEffect(() => {
+        console.log(groupMembers);
+    }, [])
 
     const handleKickUser = async (user) => {
+
+        console.log(user)
+
         await fetch(`${API_URL}/group/kick/${group_id}`, {
             method: "DELETE",
             headers: {
@@ -21,8 +31,10 @@ export const DropDownUsers = ({items, openMenu, admin}) => {
         })
             .then(res => res.json())
             .then(data => {
-                console.log(data);
                 toast.success(data.message);
+                setGroupMembers(prev =>
+                    prev.filter(member => member.Member.id !== user.id)
+                );
             })
             .catch(err => console.log(err));
     };

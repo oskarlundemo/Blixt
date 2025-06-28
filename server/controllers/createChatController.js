@@ -1,42 +1,7 @@
 import {prisma} from "../prisma/index.js";
 
 
-export const fetchFollowing = async (req, res) => {
-
-    try {
-
-        const userId = req.user.id;
-
-        const following = await prisma.follows.findMany({
-            where: {
-                follower_id: userId,
-            },
-            include: {
-                followed: true
-            }
-        })
-
-        if (!following) {
-            return res.status(404).send({
-                error: 'No followers found',
-            })
-        }
-
-        return res.status(200).json({
-            following
-        })
-
-    } catch (err) {
-        console.log(err)
-        return res.status(500).send({
-            error: 'Server error occured while fetching following',
-        })
-    }
-}
-
-
 export const searchForUsers = async (req, res) => {
-
 
     try {
 
@@ -107,7 +72,8 @@ export const createGroupChat = async (req, res) => {
         })
 
         res.status(200).json({
-            groupId: newGroup.id
+            groupId: newGroup.id,
+            message: 'Group created successfully.'
         })
 
     } catch (err) {

@@ -3,18 +3,19 @@ import {useEffect, useRef, useState} from "react";
 
 import '../styles/CommentSection.css'
 import {CommentInput} from "../components/CommentSectionComponents/CommentInput.jsx";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {useAuth} from "../context/AuthContext.jsx";
 import {CommentCard} from "../components/CommentSectionComponents/CommentCard.jsx";
-import {supabase} from "../services/SupabaseClient.js";
 import {LoadingTitle} from "../components/LoadingTitle.jsx";
-import {NavigationBar} from "../components/NavigationBar.jsx";
 
 export const CommentSection = ({}) => {
 
     const {token} = useAuth();
     const [comments, setComments] = useState([]);
     const {postid} = useParams();
+    const {API_URL} = useAuth();
+    const navigate = useNavigate();
+
     const bottomRef = useRef(null);
     const [loading, setLoading] = useState(true);
     const [isUsersPost, setIsUsersPost] = useState(false);
@@ -22,10 +23,6 @@ export const CommentSection = ({}) => {
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [comments])
-
-
-    const {API_URL} = useAuth();
-
 
     useEffect(() => {
 
@@ -51,8 +48,6 @@ export const CommentSection = ({}) => {
     }, [postid]);
 
 
-
-
     return (
         <main className="comment-section">
 
@@ -60,6 +55,15 @@ export const CommentSection = ({}) => {
                 <LoadingTitle/>
             ) : (
                 <>
+
+                    <svg
+                        onClick={() => navigate(-1)}
+                        className={'back-icon'}
+                        xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M640-80 240-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+
+
+
+                    <section className="comment-section-container">
                     {comments.length > 0 ? (
                         (comments.map(comment => (
                             <CommentCard
@@ -73,11 +77,11 @@ export const CommentSection = ({}) => {
                                 setComments={setComments}
                             />
                         )))
-                    ) : (
+                      ) : (
                         <p>No comments yet!</p>
-                    )}
-
-                    <div ref={bottomRef} />
+                     )}
+                        <div ref={bottomRef} />
+                    </section>
 
                     <CommentInput
                         setComments={setComments}
@@ -85,13 +89,6 @@ export const CommentSection = ({}) => {
                     />
                 </>
             )}
-
-
-            <NavigationBar
-
-
-
-            />
 
         </main>
     )

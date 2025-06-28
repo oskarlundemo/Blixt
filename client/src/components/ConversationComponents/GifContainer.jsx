@@ -143,7 +143,12 @@ export const GifContainer = ({ showGifs, setShowGifs}) => {
                             />
                         ))
                     ) : (
-                        <p>No gifs found</p>
+                        <p
+                            style={{
+                                textAlign: "center",
+                                gridArea: '1 / 2 / 2 / 2'
+                            }}
+                        >No gifs found</p>
                     ))
                 )}
             </div>
