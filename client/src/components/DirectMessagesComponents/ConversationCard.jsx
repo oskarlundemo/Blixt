@@ -2,24 +2,40 @@ import {useNavigate} from "react-router-dom";
 import {UserAvatar} from "../UserAvatar.jsx";
 import moment from "moment-timezone";
 import 'moment/locale/sv';
+import {useEffect, useState} from "react";
 
 export const ConversationCard = ({
-
                                             user = null,
                                             group = null,
                                             latestMessage = null,
                                             chatname = '',
                                             loggedInUserId = "",
                                             members = [],
+                                            realtimeUpdated = null,
                                         }) => {
 
     const navigate = useNavigate();
 
-     const parseMessage = (content) => {
+    const [message, setMessage] = useState(latestMessage);
 
+
+    useEffect(() => {
+        if (!realtimeUpdated) return;
+
+        const isGroupMessage = group && realtimeUpdated.group_id === group.id;
+        const isPrivateMessage =
+            !group &&
+            realtimeUpdated.conversation_id === latestMessage?.conversation_id;
+
+        if (isGroupMessage || isPrivateMessage) {
+            setMessage(realtimeUpdated);
+        }
+    }, [realtimeUpdated, group, latestMessage]);
+
+
+    const parseMessage = (content) => {
          if (content?.endsWith(".gif") || content.includes('media.giphy.com'))
              return 'Sent a Gif'
-
          return content
      }
 
@@ -80,7 +96,7 @@ export const ConversationCard = ({
                 <h2>{chatname}</h2>
 
                 <h2 style={{ margin: '0 0 0 auto' }}>
-                    {moment(latestMessage?.created_at)
+                    {moment(message?.created_at)
                         .tz("Europe/Stockholm")
                         .format("D MMM HH:mm")}
                 </h2>
@@ -88,17 +104,17 @@ export const ConversationCard = ({
             </div>
 
             <div className="direct-messages-card-body">
-                {latestMessage ? (
+                {message ? (
                     <p>
-                        {latestMessage?.sender.id === loggedInUserId ? (
+                        {message?.sender.id === loggedInUserId ? (
                             <>
                                 <span>You: </span>
-                                {parseMessage(latestMessage?.content)}
+                                {parseMessage(message?.content)}
                             </>
                         ) : (
                             <>
-                                <span>{latestMessage.sender.username}: </span>
-                                {parseMessage(latestMessage?.content)}
+                                <span>{message.sender.username}: </span>
+                                {parseMessage(message?.content)}
                             </>
                         )}
                     </p>

@@ -136,7 +136,7 @@ export const Conversation = ({}) => {
         return () => {
             channel.unsubscribe();
         };
-    }, [user?.id, user?.token, group_id, API_URL, token]);
+    }, [user?.id, group_id, token]);
 
 
     return (
