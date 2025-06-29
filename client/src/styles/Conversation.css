@@ -312,7 +312,7 @@
 }
 
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 1700px) {
 
     .chat-window {
         height: 100vh;

@@ -3,9 +3,10 @@ import {HeaderMenu} from "../HeaderMenu.jsx";
 import {useAuth} from "../../context/AuthContext.jsx";
 
 
-export const Conversations = ({conversations, setCreateChatUI}) => {
+export const Conversations = ({conversations, realtimeUpdated, setCreateChatUI}) => {
 
     const {user} = useAuth();
+
 
     return (
 
@@ -19,6 +20,7 @@ export const Conversations = ({conversations, setCreateChatUI}) => {
             {conversations.length > 0 ? (
                 conversations.map((conversation) => (
                     <ConversationCard
+                        realtimeUpdated={realtimeUpdated}
                         key={conversation.id}
                         user={conversation.otherUser || null}
                         group={conversation.group || null}

@@ -89,7 +89,7 @@ export const Profile = ({}) => {
             .then(data => {
 
                 setProfileUser(data.user);
-                setBio(data.user?.bio || 'No bio');
+                setBio(data.user?.bio || '');
                 setEditedBio(data.user.bio);
                 setProfileUsername(data.user.username || data.user.user_metadata.username);
                 setPosts(data.posts);
@@ -302,7 +302,7 @@ export const Profile = ({}) => {
                                 position: "relative",
                                 gridArea:  "1 / 2 / 2 / 2"
                             }}
-                        >No posts yet! Create one</p>
+                        >No posts</p>
                     ))
                 ) : (
                     (archive.length > 0 ? (
