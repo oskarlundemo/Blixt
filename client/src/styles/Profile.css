@@ -6,7 +6,6 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    height: 100vh;
     position: relative;
 
 }
@@ -14,17 +13,22 @@
 .profile-wrapper {
     display: flex;
     flex-direction: column;
-    width: 80%;
+    width: 100%;
     align-self: center;
+    overflow-y: scroll;
+    align-items: center;
 }
 
+
+.profile-header-container {
+    width: 80%;
+}
 
 .profile-header {
     padding: 1rem 0;
     display: flex;
     flex-direction: row;
     gap: 2rem;
-
 }
 
 .profile-avatar {
@@ -63,6 +67,7 @@
     gap: 1rem;
     align-items: flex-start;
     justify-content: center;
+    width: 80%;
 }
 
 

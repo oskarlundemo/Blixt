@@ -7,6 +7,7 @@ export const HeaderMenu = ({backArrow = false,
                                newMessage = false,
                                setShowMore = false,
                                setCreateChatUI = false,
+                                absolutePath = "/"
 }) => {
 
     const navigate = useNavigate();
@@ -17,10 +18,20 @@ export const HeaderMenu = ({backArrow = false,
             {backArrow && (
                 <svg
                     onClick={() => {
-                        navigate(-1);
+                        if (absolutePath) {
+                            navigate(absolutePath);
+                        } else {
+                            navigate(-1);
+                        }
                     }}
-                    xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M640-80 240-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
-
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="24px"
+                    viewBox="0 -960 960 960"
+                    width="24px"
+                    fill="#e3e3e3"
+                >
+                    <path d="M640-80 240-480l400-400 71 71-329 329 329 329-71 71Z" />
+                </svg>
             )}
 
             <div className="header-menu__logo">

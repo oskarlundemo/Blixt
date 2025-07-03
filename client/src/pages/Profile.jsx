@@ -59,7 +59,6 @@ export const Profile = ({}) => {
         };
 
         requestAnimationFrame(updateSlider);
-
         window.addEventListener('resize', updateSlider);
 
         return () => {
@@ -176,7 +175,7 @@ export const Profile = ({}) => {
                 <LoadingTitle/>
             ) : (
                 <section className="profile-wrapper">
-                <header>
+                    <section className="profile-header-container">
 
                     <section className={'profile-header'}>
 
@@ -230,14 +229,10 @@ export const Profile = ({}) => {
                                     </button>
                                 ))
                             )}
-
                         </div>
-
                     </section>
 
                     <div className="profile-bio">
-
-
                         {loading ? (
                             <p>Loading...</p>
                         ) : (
@@ -276,7 +271,7 @@ export const Profile = ({}) => {
                         </div>
                     )}
 
-                </header>
+                </section>
 
                 <section className="profile-content-grid">
 
@@ -335,35 +330,26 @@ export const Profile = ({}) => {
                 showMenu={showMore}
                 setShowMenu={setShowMore}
                 clickMore={() => setShowMore(true)}
-
-
                 childrenElements={
-
 
                 <BottomSheetItem
                     title={'Logout'}
                     svg={
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/></svg>
                     }
-
                     showDropDown={() => {
                         logout();
                         navigate('/');
                     }}
-
                 />
-                }
-            />
+            }/>
 
             <Overlay
                 showOverlay={showMore}
                 setShowOverlay={setShowMore}
-                clickToggle={true}
-            />
+                clickToggle={true}/>
 
             <NavigationBar/>
-
         </main>
-
     )
 }
