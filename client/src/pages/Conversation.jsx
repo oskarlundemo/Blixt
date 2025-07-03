@@ -45,7 +45,7 @@ export const Conversation = ({}) => {
                     setMessages(data.messages);
                     setIsGroup(!!data.group);
                     setActiveChatRecipient(data.otherUser || data.group);
-                    setGroupMembers(data.group.GroupMembers)
+                    setGroupMembers(data.group?.GroupMembers || null)
                     setLoading(false);
                 })
                 .catch(error =>  {
@@ -98,22 +98,19 @@ export const Conversation = ({}) => {
     useEffect(() => {
         if (!user?.id || !token) return;
 
-        const table = group_id ? 'GroupMessage' : 'PrivateMessages';
-        const fetchUrl = group_id
-            ? `${API_URL}/messages/fetch/group/new/enriched`
-            : `${API_URL}/messages/fetch/private/new/enriched`;
-
-        const channel = supabase
-            .channel('messages-channel')
+        const privateChannel = supabase
+            .channel(`private-messages-${user.id}`)
             .on(
                 'postgres_changes',
-                { event: 'INSERT', schema: 'public', table },
+                { event: 'INSERT', schema: 'public', table: 'PrivateMessages' },
                 async (payload) => {
-                    const message = payload.new;
 
-                    if (message.sender_id === user.id || message.receiver_id === user.id || group_id) {
+                    const message = payload.new;
+                    console.log(message);
+
+                    if (message.sender_id === user.id || message.receiver_id === user.id) {
                         try {
-                            const response = await fetch(fetchUrl, {
+                            const response = await fetch(`${API_URL}/messages/fetch/private/new/enriched`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -123,6 +120,7 @@ export const Conversation = ({}) => {
                             });
 
                             const data = await response.json();
+                            console.log(data);
                             setMessages((prev) => [...prev, data]);
                             playNotificationSound();
                         } catch (err) {
@@ -134,10 +132,51 @@ export const Conversation = ({}) => {
             .subscribe();
 
         return () => {
-            channel.unsubscribe();
+            privateChannel.unsubscribe();
         };
+
     }, [user?.id, group_id, token]);
 
+
+    useEffect(() => {
+        if (!group_id) return
+
+        const groupChannel = supabase
+            .channel(`group-messages-${group_id || 'global'}`)
+            .on(
+                'postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'GroupMessage' },
+                async (payload) => {
+                    const message = payload.new;
+                    console.log(message);
+                    if (message.group_id === group_id) {
+                        try {
+                            const response = await fetch(`${API_URL}/messages/fetch/group/new/enriched`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    Authorization: `Bearer ${token}`,
+                                },
+                                body: JSON.stringify({ message }),
+                            });
+
+                            const data = await response.json();
+                            console.log(data);
+                            setMessages((prev) => [...prev, data]);
+                            playNotificationSound();
+                        } catch (err) {
+                            console.error('Error fetching enriched message', err);
+                        }
+                    }
+                }
+            )
+            .subscribe();
+
+        return () => {
+            groupChannel.unsubscribe();
+        };
+
+    }, [group_id, user?.id]);
 
     return (
             <main className="conversation-wrapper">

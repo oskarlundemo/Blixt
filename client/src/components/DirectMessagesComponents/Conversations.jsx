@@ -7,13 +7,12 @@ export const Conversations = ({conversations, realtimeUpdated, setCreateChatUI})
 
     const {user} = useAuth();
 
-
     return (
-
         <>
             <HeaderMenu backArrow={true}
                         newMessage={true}
                         setCreateChatUI={setCreateChatUI}
+                        absolutePath={'/feed'}
             />
 
             <section className="direct-messages">

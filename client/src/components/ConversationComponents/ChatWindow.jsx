@@ -4,8 +4,8 @@ import {BottomSheet} from "../BottomSheet.jsx";
 import {GifContainer} from "./GifContainer.jsx";
 import {Overlay} from "../Overlay.jsx";
 import {useEffect, useRef, useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import {useNavigate} from "react-router-dom";
+import { motion } from "framer-motion";
 import {useChatContext} from "../../context/GroupChatContext.jsx";
 import {GroupAvatar} from "../GroupAvatar.jsx";
 

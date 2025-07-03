@@ -128,7 +128,7 @@ model Notification {
 
   post    Post?     @relation(fields: [post_id], references: [id])
   like    Likes?    @relation(fields: [like_id], references: [id], onDelete: Cascade)
-  comment Comments? @relation("CommentNotifications", fields: [comment_id], references: [id], onDelete: Cascade) // <-- onDelete here
+  comment Comments? @relation("CommentNotifications", fields: [comment_id], references: [id], onDelete: Cascade)
 }
 
 enum NotificationType {
