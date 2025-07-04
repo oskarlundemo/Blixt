@@ -1,10 +1,15 @@
 import {prisma} from "../prisma/index.js";
 
 
+/**
+ * Flytta denna
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
+
 export const searchForUsers = async (req, res) => {
-
     try {
-
         const userId = req.user.id;
         const searchQuery = req.query.q;
 
@@ -39,6 +44,13 @@ export const searchForUsers = async (req, res) => {
     }
 }
 
+
+/**
+ * Kan raderas
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
 
 export const createGroupChat = async (req, res) => {
 
@@ -84,18 +96,3 @@ export const createGroupChat = async (req, res) => {
     }
 }
 
-
-export const createPrivateChat = async (req, res) => {
-
-    try {
-
-        console.log('Create private chat')
-        console.log(req.body)
-
-    } catch (err) {
-        console.log(err)
-        return res.status(500).send({
-            error: 'Server error occured while creating group',
-        })
-    }
-}

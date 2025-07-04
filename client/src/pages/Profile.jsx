@@ -297,7 +297,7 @@ export const Profile = ({}) => {
                                 position: "relative",
                                 gridArea:  "1 / 2 / 2 / 2"
                             }}
-                        >No posts</p>
+                        >No public posts</p>
                     ))
                 ) : (
                     (archive.length > 0 ? (

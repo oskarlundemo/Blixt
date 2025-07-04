@@ -31,15 +31,9 @@ model User {
   sentNotifications     Notification[] @relation("NotificationNotifier")
   receivedNotifications Notification[] @relation("NotificationReceiver")
 
-  sentMessages     PrivateMessages[] @relation("PrivateSenderMessages")
-  receivedMessages PrivateMessages[] @relation("ReceiverMessages")
-
-  groupMessages    GroupMessage[] @relation("GroupSenderMessages")
-  groupChats       GroupChats[]
-  groupParticipant GroupMember[]
-
-  conversationsAsUser1 PrivateConversation[] @relation("User1Conversations")
-  conversationsAsUser2 PrivateConversation[] @relation("User2Conversations")
+  ConversationMember ConversationMember[]
+  Message            Message[]
+  Conversation       Conversation[]
 
   @@index([username])
   @@index([email])
@@ -138,101 +132,60 @@ enum NotificationType {
   MENTION
 }
 
-model PrivateMessages {
-  id              Int           @id @default(autoincrement())
-  sender_id       String
-  receiver_id     String
-  content         String
-  status          MessageStatus @default(SENT)
-  conversation_id Int?
+model Conversation {
+  id       String  @id @default(uuid())
+  is_group Boolean @default(false)
 
-  created_at DateTime @default(now())
-
-  conversation PrivateConversation? @relation(fields: [conversation_id], references: [id])
-  sender       User                 @relation("PrivateSenderMessages", fields: [sender_id], references: [id])
-  receiver     User                 @relation("ReceiverMessages", fields: [receiver_id], references: [id])
-
-  attachments PrivateMessagesAttachment[]
-}
-
-model PrivateMessagesAttachment {
-  id             Int             @id @default(autoincrement())
-  message_id     Int
-  privateMessage PrivateMessages @relation(fields: [message_id], references: [id], onDelete: Cascade)
-
-  size         Int
-  path         String
-  originalName String
-  created_at   DateTime @default(now())
-
-  @@index([message_id])
-}
-
-model PrivateConversation {
-  id       Int    @id @default(autoincrement())
-  user1_id String
-  user2_id String
-
-  user1 User @relation("User1Conversations", fields: [user1_id], references: [id])
-  user2 User @relation("User2Conversations", fields: [user2_id], references: [id])
+  name        String?
+  avatar      String?
+  description String?
+  admin_id    String?
+  admin       User?   @relation(fields: [admin_id], references: [id])
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  messages PrivateMessages[]
-
-  @@unique([user1_id, user2_id])
+  messages Message[]
+  members  ConversationMember[]
 }
 
-model GroupMessage {
-  id        Int           @id @default(autoincrement())
-  sender_id String
-  group_id  Int
-  content   String
-  status    MessageStatus @default(SENT)
+model ConversationMember {
+  conversation_id String
+  user_id         String
 
-  created_at DateTime   @default(now())
-  group      GroupChats @relation(fields: [group_id], references: [id], onDelete: Cascade)
-  sender     User       @relation("GroupSenderMessages", fields: [sender_id], references: [id])
+  user         User         @relation(fields: [user_id], references: [id])
+  conversation Conversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
 
-  attachments GroupMessagesAttachment[]
+  @@id([conversation_id, user_id])
 }
 
-model GroupMessagesAttachment {
-  id           Int          @id @default(autoincrement())
-  message_id   Int
-  groupMessage GroupMessage @relation(fields: [message_id], references: [id], onDelete: Cascade)
+model Message {
+  id              Int           @id @default(autoincrement())
+  sender_id       String
+  conversation_id String
+  content         String
+  status          MessageStatus @default(SENT)
+  created_at      DateTime      @default(now())
+
+  sender       User                @relation(fields: [sender_id], references: [id])
+  conversation Conversation        @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  attachments  MessageAttachment[]
+
+  @@index([conversation_id])
+}
+
+model MessageAttachment {
+  id         Int @id @default(autoincrement())
+  message_id Int
 
   size         Int
   path         String
   originalName String
   created_at   DateTime @default(now())
 
+  message Message @relation(fields: [message_id], references: [id], onDelete: Cascade)
+
   @@index([message_id])
-}
-
-model GroupChats {
-  id       Int     @id @default(autoincrement())
-  admin_id String
-  Admin    User    @relation(fields: [admin_id], references: [id])
-  name     String?
-
-  description String?
-  avatar      String?
-
-  GroupMembers  GroupMember[]
-  GroupMessages GroupMessage[]
-}
-
-model GroupMember {
-  group_id  Int
-  member_id String
-
-  Member User       @relation(fields: [member_id], references: [id])
-  Group  GroupChats @relation(fields: [group_id], references: [id], onDelete: Cascade)
-
-  @@id([group_id, member_id])
-  @@unique([member_id, group_id])
 }
 
 enum MessageStatus {

@@ -46,7 +46,7 @@ export const DirectMessages = ({}) => {
                 setFollowing(data.following);
                 setLoading(false);
             })
-            .catch(err => console.log(err));
+            .catch(err => console.log('Error fetching conversations'));
     }, [token])
 
 

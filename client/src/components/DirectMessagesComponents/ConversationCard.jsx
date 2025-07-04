@@ -5,33 +5,20 @@ import 'moment/locale/sv';
 import {useEffect, useState} from "react";
 
 export const ConversationCard = ({
-                                            user = null,
-                                            group = null,
+                                            participants = null,
                                             latestMessage = null,
+                                            conversationId = null,
                                             chatname = '',
                                             loggedInUserId = "",
-                                            members = [],
-                                            realtimeUpdated = null,
                                         }) => {
 
-    const navigate = useNavigate();
 
+    const navigate = useNavigate();
     const [message, setMessage] = useState(latestMessage);
 
-
     useEffect(() => {
-        if (!realtimeUpdated) return;
-
-        const isGroupMessage = group && realtimeUpdated.group_id === group.id;
-        const isPrivateMessage =
-            !group &&
-            realtimeUpdated.conversation_id === latestMessage?.conversation_id;
-
-        if (isGroupMessage || isPrivateMessage) {
-            setMessage(realtimeUpdated);
-        }
-    }, [realtimeUpdated, group, latestMessage]);
-
+        console.log(participants);
+    }, [])
 
     const parseMessage = (content) => {
          if (content?.endsWith(".gif") || content.includes('media.giphy.com'))
@@ -41,13 +28,8 @@ export const ConversationCard = ({
 
     return (
         <article
-
             onClick={() => {
-                if (group) {
-                    navigate(`/messages/group/${group.id}`)
-                } else {
-                    navigate(`/messages/${encodeURIComponent(user.username)}`)
-                }
+                navigate(`/messages/${conversationId}`)
             }}
             className="direct-messages-card">
 
@@ -68,28 +50,26 @@ export const ConversationCard = ({
                     }}
                     className="direct-messages-card-title">
 
-                    {group ? (
-                        (members.length > 0 && (
-                                members.map((member, index) => (
-                                    <div
-                                        key={member.id}
-                                        style={{
-                                            marginLeft: index === 0 ? 0 : -8,
-                                            zIndex: members.length - index,
-                                            border: '2px solid white',
-                                            borderRadius: '50%',
-                                        }}
-                                    >
-                                        <UserAvatar
-                                            user={member}
-                                            size={25}
-                                        />
-                                    </div>
-                                ))
+                    {participants.length > 0 && (
+                        participants.length > 0 && (participants.map((member, index) => (
+                                <div
+                                    key={member.id}
+                                    style={{
+                                        marginLeft: index === 0 ? 0 : -8,
+                                        zIndex: participants.length - index,
+                                        border: '2px solid white',
+                                        borderRadius: '50%',
+                                    }}
+                                >
+                                    <UserAvatar
+                                        user={member.user}
+                                        size={25}
+                                    />
+                                </div>
                             ))
-                    ) : (
-                        <UserAvatar size={30} user={user} />
+                        )
                     )}
+
 
                 </div>
 
