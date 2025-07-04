@@ -65,7 +65,6 @@ export const Notifications = () => {
                                 />
                             ))
                         ) : (
-
                             <NoDataFound
                                 message={'No notifications found.'}
                                 svg={

@@ -53,8 +53,9 @@ export const CreateChat = ({setCreateChatUI = null, following = []}) => {
 
         try {
             let endPoint = participants.length > 1 ? 'group' : 'private'
+            console.log(endPoint);
 
-            fetch(`${API_URL}/chat/create/${endPoint}`, {
+            fetch(`${API_URL}/conversations/create/${endPoint}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token}`,

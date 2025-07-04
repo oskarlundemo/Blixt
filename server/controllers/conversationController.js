@@ -1,139 +1,131 @@
 import {prisma} from "../prisma/index.js";
 
-
 export const loadConversations = async (req, res) => {
     try {
 
         const userIdFromToken = req.user.id;
 
-        const conversations = await prisma.privateConversation.findMany({
+        const conversations = await prisma.conversation.findMany({
             where: {
-                OR: [
-                    { user1_id: userIdFromToken },
-                    { user2_id: userIdFromToken },
-                ],
+                members: {
+                    some: {
+                        user_id: userIdFromToken
+                    }
+                }
             },
             include: {
-                user1: true,
-                user2: true,
-            },
-        });
-
-        const enrichedConversations = await Promise.all(
-            conversations.map(async (conversation) => {
-                const latestMessage = await prisma.privateMessages.findFirst({
+                members: {
                     where: {
-                        conversation_id: conversation.id,
-                    },
-                    orderBy: {
-                        created_at: 'desc',
-                    },
-                    include: {
-                        sender: true,
-                    },
-                });
-
-                const otherUser =
-                    conversation.user1_id === userIdFromToken
-                        ? conversation.user2
-                        : conversation.user1;
-
-                return {
-                    id: conversation.id,
-                    latestMessage,
-                    otherUser,
-                };
-            })
-        );
-
-        const usersGroups = await prisma.groupMember.findMany({
-            where: {
-                member_id: userIdFromToken,
-            }
-        })
-
-        const groupIds = usersGroups.map(gm => gm.group_id);
-
-        const groupChats = await prisma.groupChats.findMany({
-            where: {
-                id: {
-                    in: groupIds
-                }
-            },
-            include: {
-                GroupMessages: {
-                    include: {
-                        sender: true,
-                    },
-                    orderBy: {
-                        created_at: 'desc',
-                    },
-                    take: 1
-                },
-                GroupMembers: {
-                    include: {
-                        Member: true,
-                    }
-                }
-            },
-        });
-
-        const formattedGroupChats = groupChats.map(gm => {
-            const latestMessage = gm.GroupMessages[0] || null;
-            return {
-                group: {
-                    id: gm.id,
-                    name: gm.name,
-                    avatar: gm.avatar,
-                },
-                latestMessage: latestMessage
-                    ? {
-                        id: latestMessage.id,
-                        content: latestMessage.content,
-                        created_at: latestMessage.created_at,
-                        sender: {
-                            id: latestMessage.sender.id,
-                            username: latestMessage.sender.username,
-                            avatar: latestMessage.sender.avatar,
+                        user_id: {
+                            not: userIdFromToken
                         }
+                    }, include: {
+                        user: true
                     }
-                    : null,
-                members: gm.GroupMembers.map(gmMember => ({
-                    id: gmMember.Member.id,
-                    username: gmMember.Member.username,
-                    avatar: gmMember.Member.avatar,
-                })),
-            };
-        });
-
-
-        const allConversations = [...enrichedConversations, ...formattedGroupChats];
-
-        allConversations.sort((a, b) => {
-            const aDate = new Date(a.latestMessage?.created_at || 0);
-            const bDate = new Date(b.latestMessage?.created_at || 0);
-            return bDate - aDate;
-        });
-
-        const following = await prisma.follows.findMany({
-            where: {
-                follower_id: userIdFromToken,
-            },
-            include: {
-                followed: true
+                },
+                messages: true
             }
         })
 
         res.status(200).json({
-            conversations: allConversations,
-            message: 'Conversations have been successfully fetched',
-            following: following
+            conversations
         });
     } catch (err) {
         console.error(err);
         res.status(500).json({
             error: "Internal server error",
             details: err.message,
+        });
+    }
+};
+
+
+export const createGroupConversation = async (req, res) => {
+
+    try {
+
+        const participants = req.body.participants;
+        let groupName = req.body.groupName
+        const userId = req.user.id;
+
+        if (!participants)
+            return res.status(400).json({
+                error: "Participants does not exist"
+            })
+
+        const groupMembersIds = [
+            userId,
+            ...participants.map(participant => participant.id)
+        ];
+
+        if (!groupName) {
+            groupName = participants.map(p => p.username).join(', ') + ', ' + req.user.username;
+        }
+
+        const newGroupConversation = await prisma.conversation.create({
+            data: {
+                admin_id: userId,
+                name: groupName,
+                is_group: true
+            }
+        })
+
+        await prisma.conversationMember.createMany({
+            data: groupMembersIds.map(memberId => ({
+                conversation_id: newGroupConversation.id,
+                user_id: memberId
+            }))
+        });
+
+        res.status(200).json({
+            message: 'Group conversation created successfully.'
+        })
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            error: "Internal server error",
+            message: "Error creating group conversation"
+        })
+    }
+}
+
+
+
+export const createPrivateConversation = async (req, res) => {
+    try {
+
+        const userIdFromToken = req.user.id;
+        const participants = req.body.participants;
+
+        if (!participants || participants.length !== 1) {
+            return res.status(400).json({ error: "Invalid number of participants" });
+        }
+
+        const participantId = participants[0].id;
+
+        const conversation = await prisma.conversation.create({
+            data: {
+                is_group: false,
+            },
+        });
+
+        await prisma.conversationMember.createMany({
+            data: [
+                { conversation_id: conversation.id, user_id: userIdFromToken },
+                { conversation_id: conversation.id, user_id: participantId },
+            ],
+            skipDuplicates: true,
+        });
+
+        res.status(200).json({
+            message: "Private conversation successfully created",
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            error: "Internal server error",
+            message: "Error creating private conversation",
         });
     }
 };
