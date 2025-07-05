@@ -9,51 +9,39 @@ import moment from "moment-timezone";
 import {MessageSplitter} from "../components/MessasgeSplitter.jsx";
 import {ConfigureChat} from "../components/ConversationComponents/ConfigureChat.jsx";
 import {ChatWindow} from "../components/ConversationComponents/ChatWindow.jsx";
-import { useChatContext} from "../context/GroupChatContext.jsx";
+import { useChatContext} from "../context/ConversationContext.jsx";
 
 
 export const Conversation = ({}) => {
 
-    const {username} = useParams();
     const {token, user, API_URL} = useAuth();
     const [loading, setLoading] = useState(true);
-    const {group_id} = useParams();
+    const {conversationId} = useParams();
 
-    const {setGroupMembers, setActiveChatRecipient, setIsGroup, configureUI} = useChatContext();
+    const {configureUI, setConversationMembers, setActiveConversation} = useChatContext();
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
-
-        let endpoint = "";
-
-        if (group_id) {
-            endpoint = `${API_URL}/messages/fetch/by-conversation/${group_id}`;
-        } else if (username) {
-            endpoint = `${API_URL}/messages/fetch/by-user/${encodeURIComponent(username)}`;
-        }
-
-        if (endpoint) {
-            fetch(endpoint, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                }
+        fetch(`${API_URL}/conversations/load/${conversationId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                setMessages(data.messages);
+                setActiveConversation(data.conversation);
+                setLoading(false);
+                setConversationMembers(data.members);
             })
-                .then(response => response.json())
-                .then(data => {
-                    setMessages(data.messages);
-                    setIsGroup(!!data.group);
-                    setActiveChatRecipient(data.otherUser || data.group);
-                    setGroupMembers(data.group?.GroupMembers || null)
-                    setLoading(false);
-                })
-                .catch(error =>  {
-                    console.log(error);
-                    setLoading(false);
-                });
-        }
-    }, [username, group_id]);
+            .catch(error =>  {
+                console.log(error);
+                setLoading(false);
+            });
+
+    }, [conversationId]);
 
     const renderedMessages = useMemo(() => {
         const rendered = [];
@@ -96,87 +84,48 @@ export const Conversation = ({}) => {
     };
 
     useEffect(() => {
-        if (!user?.id || !token) return;
+        if (!user?.id || !token || !conversationId) return;
 
-        const privateChannel = supabase
-            .channel(`private-messages-${user.id}`)
+        const messageChannel = supabase
+            .channel(`message-${user.id}`)
             .on(
                 'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'PrivateMessages' },
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'Message',
+                    filter: `conversation_id=eq.${conversationId}`,
+                },
                 async (payload) => {
-
                     const message = payload.new;
-                    console.log(message);
 
-                    if (message.sender_id === user.id || message.receiver_id === user.id) {
-                        try {
-                            const response = await fetch(`${API_URL}/messages/fetch/private/new/enriched`, {
+                    try {
+                        const response = await fetch(
+                            `${API_URL}/messages/fetch/enriched/message/${conversationId}`,
+                            {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
                                     Authorization: `Bearer ${token}`,
                                 },
                                 body: JSON.stringify({ message }),
-                            });
+                            }
+                        );
 
-                            const data = await response.json();
-                            console.log(data);
-                            setMessages((prev) => [...prev, data]);
-                            playNotificationSound();
-                        } catch (err) {
-                            console.error('Error fetching enriched message', err);
-                        }
+                        const data = await response.json();
+                        console.log(data);
+                        setMessages((prev) => [...prev, data]);
+                        playNotificationSound();
+                    } catch (err) {
+                        console.error('Error fetching enriched message', err);
                     }
                 }
             )
             .subscribe();
-
         return () => {
-            privateChannel.unsubscribe();
+            messageChannel.unsubscribe();
         };
-
-    }, [user?.id, group_id, token]);
-
-
-    useEffect(() => {
-        if (!group_id) return
-
-        const groupChannel = supabase
-            .channel(`group-messages-${group_id || 'global'}`)
-            .on(
-                'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'GroupMessage' },
-                async (payload) => {
-                    const message = payload.new;
-                    console.log(message);
-                    if (message.group_id === group_id) {
-                        try {
-                            const response = await fetch(`${API_URL}/messages/fetch/group/new/enriched`, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    Authorization: `Bearer ${token}`,
-                                },
-                                body: JSON.stringify({ message }),
-                            });
-
-                            const data = await response.json();
-                            console.log(data);
-                            setMessages((prev) => [...prev, data]);
-                            playNotificationSound();
-                        } catch (err) {
-                            console.error('Error fetching enriched message', err);
-                        }
-                    }
-                }
-            )
-            .subscribe();
-
-        return () => {
-            groupChannel.unsubscribe();
-        };
-
-    }, [group_id, user?.id]);
+    }, [user?.id, conversationId]);
 
     return (
             <main className="conversation-wrapper">

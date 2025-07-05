@@ -14,7 +14,7 @@ import { DirectMessages } from "./pages/DirectMessages.jsx";
 import { CreateChat } from "./pages/CreateChat.jsx";
 import toast, { Toaster } from 'react-hot-toast';
 
-import { ChatProvider } from "./context/GroupChatContext.jsx";
+import { ChatProvider } from "./context/ConversationContext.jsx";
 
 function App() {
     const PRODUCTION_URL = import.meta.env.VITE_API_BASE_URL;
@@ -42,15 +42,7 @@ function App() {
                 />
 
                 <Route
-                    path="/messages/:username"
-                    element={
-                        <ChatProvider>
-                            <Conversation />
-                        </ChatProvider>
-                    }
-                />
-                <Route
-                    path="/messages/group/:group_id"
+                    path="/messages/:conversationId"
                     element={
                         <ChatProvider>
                             <Conversation />

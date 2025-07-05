@@ -26,6 +26,7 @@ export const Conversations = ({conversations, realtimeUpdated, setCreateChatUI})
                         chatname={conversation.is_group ? conversation.name : conversation.members[0]?.user.username}
                         latestMessage={conversation.latestMessage}
                         loggedInUserId={user?.id}
+                        conversationId={conversation.id}
                     />
                 ))
             ) : (

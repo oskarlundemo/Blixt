@@ -4,7 +4,6 @@ export const loadConversations = async (req, res) => {
     try {
 
         const userIdFromToken = req.user.id;
-
         const conversations = await prisma.conversation.findMany({
             where: {
                 members: {
@@ -23,7 +22,12 @@ export const loadConversations = async (req, res) => {
                         user: true
                     }
                 },
-                messages: true
+                messages: {
+                    orderBy: {
+                        created_at: 'desc'
+                    },
+                    take: 1
+                }
             }
         })
 
@@ -59,7 +63,7 @@ export const createGroupConversation = async (req, res) => {
         ];
 
         if (!groupName) {
-            groupName = participants.map(p => p.username).join(', ') + ', ' + req.user.username;
+            groupName = participants.map(p => p.username).join(', ') + ', ' + req.user.user_metadata.username;
         }
 
         const newGroupConversation = await prisma.conversation.create({
@@ -130,3 +134,78 @@ export const createPrivateConversation = async (req, res) => {
     }
 };
 
+
+
+export const fetchConversationMessages = async (req, res) => {
+
+    try {
+
+        const conversationId = req.params.conversation_id;
+        const userId = req.user.id;
+
+        const conversationExists = await prisma.conversation.findUnique({
+            where: {
+                id: conversationId,
+            },
+            include: {
+                members: {
+                    where: {
+                        user_id: {
+                            not: userId
+                        }
+                    }, include: {
+                        user: true
+                    }
+                }
+            }
+        })
+
+        if (!conversationExists)
+            return res.status(404).json({
+                error: "Conversation does not exist",
+                message: 'The conversation does not exist'
+            })
+
+        const userIsInConvo = await prisma.conversationMember.findUnique({
+            where: {
+                conversation_id_user_id: {
+                    conversation_id: conversationId,
+                    user_id: userId
+                }
+            }
+        });
+
+        if (!userIsInConvo)
+            return res.status(403).json({
+                error: "Conversation does not exist",
+                message: 'Unauthorized action'
+            })
+
+        const messages = await prisma.conversation.findUnique({
+            where: {
+                id: conversationId,
+            },
+            include: {
+                messages: {
+                    include: {
+                        sender: true
+                    }
+                }
+            }
+        });
+
+        res.status(200).json({
+            conversation: conversationExists,
+            members: conversationExists.members,
+            messages: messages.messages,
+            message: 'Messages retrieved successfully'
+        })
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            err: "Internal server error while loading conversation",
+            status: 500
+        })
+    }
+}
