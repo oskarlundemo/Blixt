@@ -4,11 +4,9 @@ import {BottomSheet} from "../BottomSheet.jsx";
 import {GifContainer} from "./GifContainer.jsx";
 import {Overlay} from "../Overlay.jsx";
 import {useEffect, useRef, useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import { motion } from "framer-motion";
-import {useChatContext} from "../../context/GroupChatContext.jsx";
-import {GroupAvatar} from "../GroupAvatar.jsx";
-
+import {useChatContext} from "../../context/ConversationContext.jsx";
 
 
 export const ChatWindow = ({messages, renderedMessages, loading}) => {
@@ -17,7 +15,8 @@ export const ChatWindow = ({messages, renderedMessages, loading}) => {
     const bottomRef = useRef(null);
     const [message, setMessage] = useState('');
     const [showGif, setShowGif] = useState(false);
-    const {activeChatRecipient, groupMembers, isGroup, setConfigureUI} = useChatContext();
+    const {setConfigureUI, conversationMembers, activeConversation} = useChatContext();
+    const {conversationId} = useParams();
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -59,28 +58,21 @@ export const ChatWindow = ({messages, renderedMessages, loading}) => {
                     }}
 
                     style={{ display: "flex", alignItems: "center" }}>
-                    {isGroup ? (
-                        <>
-                            <GroupAvatar
-                                groupMembers={groupMembers}
-                                size={25}
-                            />
-                            <h2>{activeChatRecipient?.username || activeChatRecipient?.name}</h2>
-                        </>
 
-                    ) : (
-                        <>
+                    {conversationMembers.length > 0 && (
+                        conversationMembers.map((member, index) => (
                             <UserAvatar
-                                user={activeChatRecipient}
-                                size={25}
+                            user={member.user}
+                            key={member.user.id}
+                            size={25}
                             />
-                            <h2>{activeChatRecipient?.username || activeChatRecipient?.name}</h2>
-                        </>
-
+                        ))
                     )}
                 </div>
             )}
 
+            <h1
+            >{activeConversation.name || activeConversation.members[0].user.username}</h1>
         </div>
 
     <section

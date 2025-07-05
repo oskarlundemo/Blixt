@@ -2,7 +2,7 @@ import {useNavigate} from "react-router-dom";
 import {UserAvatar} from "../UserAvatar.jsx";
 import moment from "moment-timezone";
 import 'moment/locale/sv';
-import {useEffect, useState} from "react";
+import {useState} from "react";
 
 export const ConversationCard = ({
                                             participants = null,
@@ -12,13 +12,8 @@ export const ConversationCard = ({
                                             loggedInUserId = "",
                                         }) => {
 
-
     const navigate = useNavigate();
     const [message, setMessage] = useState(latestMessage);
-
-    useEffect(() => {
-        console.log(participants);
-    }, [])
 
     const parseMessage = (content) => {
          if (content?.endsWith(".gif") || content.includes('media.giphy.com'))

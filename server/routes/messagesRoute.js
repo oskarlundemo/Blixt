@@ -5,32 +5,22 @@
 
 import {Router} from 'express'
 import {
-    createGroupMessage,
-    createPrivateMessage, fetchEnrichedGroupMessage, fetchEnrichedPrivateMessage,
-    fetchMessagesByConversation,
-    fetchPrivateMessages, sendGifGroupChat, sendGifPrivateChat
+    createMessage, fetchEnrichedMessage, sendGif
 } from "../controllers/messagesController.js";
 import {authenticateUser} from "../middleware/supabase.js";
 
 
 const messagesRoute = new Router();
 
-messagesRoute.get('/fetch/by-user/:username', authenticateUser, fetchPrivateMessages)
+messagesRoute.post('/create/new/:conversation_id', authenticateUser, createMessage)
 
-messagesRoute.get('/fetch/by-conversation/:group_id', authenticateUser, fetchMessagesByConversation)
+messagesRoute.post('/send/gif/:conversation_id', authenticateUser, sendGif);
 
-messagesRoute.post('/create/private/:username', authenticateUser, createPrivateMessage);
+/**
+ * Ta bort dessa två
+ */
 
-messagesRoute.post('/create/group/:group_id', authenticateUser, createGroupMessage);
-
-messagesRoute.post('/fetch/private/new/enriched', authenticateUser, fetchEnrichedPrivateMessage);
-
-messagesRoute.post('/fetch/group/new/enriched', authenticateUser, fetchEnrichedGroupMessage);
-
-messagesRoute.post('/send/gif/private/:username', authenticateUser, sendGifPrivateChat);
-
-messagesRoute.post('/send/gif/group/:group_id', authenticateUser, sendGifGroupChat);
-
+messagesRoute.post('/fetch/enriched/message', authenticateUser, fetchEnrichedMessage);
 
 
 export default messagesRoute;

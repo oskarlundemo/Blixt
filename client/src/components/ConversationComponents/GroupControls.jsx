@@ -1,5 +1,5 @@
 import {BottomSheetItem} from "./BottomSheetItem.jsx";
-import {useChatContext} from "../../context/GroupChatContext.jsx";
+import {useChatContext} from "../../context/ConversationContext.jsx";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {useEffect} from "react";
 

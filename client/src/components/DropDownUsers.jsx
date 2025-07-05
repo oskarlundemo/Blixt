@@ -1,7 +1,7 @@
 import {UserAvatar} from "./UserAvatar.jsx";
 import {useAuth} from "../context/AuthContext.jsx";
 import {useParams} from "react-router-dom";
-import {useChatContext} from "../context/GroupChatContext.jsx";
+import {useChatContext} from "../context/ConversationContext.jsx";
 import {useEffect} from "react";
 import toast from 'react-hot-toast';
 

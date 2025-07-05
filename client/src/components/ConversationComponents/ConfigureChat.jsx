@@ -3,7 +3,7 @@ import { useState} from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {GroupAvatar} from "../GroupAvatar.jsx";
 import {AddNewGroupMember} from "./AddNewGroupMember.jsx";
-import {useChatContext} from "../../context/GroupChatContext.jsx";
+import {useChatContext} from "../../context/ConversationContext.jsx";
 import {GroupControls} from "./GroupControls.jsx";
 import {UserAvatar} from "../UserAvatar.jsx";
 import {BottomSheet} from "../BottomSheet.jsx";
@@ -21,8 +21,8 @@ export const ConfigureChat = ({}) => {
     const {group_id} = useParams();
     const navigate = useNavigate();
 
-    const {setConfigureUI, activeChatRecipient, setAddMemberUI, addMemberUI,
-        isGroup, groupMembers, setShowDeleteContainer, showDeleteContainer} = useChatContext();
+    const {setConfigureUI, activeConversation, setAddMemberUI, addMemberUI,
+        setShowDeleteContainer, showDeleteContainer} = useChatContext();
 
     const handleDelete = async () => {
         setLoading(true);
@@ -37,7 +37,6 @@ export const ConfigureChat = ({}) => {
         })
             .then(res => res.json())
             .then(data => {
-                console.log(data);
                 setLoading(false);
                 navigate('/messages')
             })
@@ -79,7 +78,7 @@ export const ConfigureChat = ({}) => {
                 xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M640-80 240-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
 
             <AnimatePresence mode="wait">
-                {addMemberUI && isGroup ? (
+                {addMemberUI ? (
                     <AddNewGroupMember
                         key="add-member" />
                 ) : (
@@ -93,18 +92,12 @@ export const ConfigureChat = ({}) => {
                             marginTop: '2rem'
                         }}>
 
-                            {isGroup ? (
-                                <GroupAvatar
-                                    groupMembers={groupMembers}
-                                    size={50}
-                                />
-                            ) : (
-                                <UserAvatar
-                                    user={activeChatRecipient}
-                                    size={50}/>
-                            )}
 
-                        <h1>{activeChatRecipient.name || activeChatRecipient.username}</h1>
+                            <UserAvatar
+                                user={null}
+                                size={50}/>
+
+                        <h1>{activeConversation.name || activeConversation.members[0].user.username}</h1>
 
                         </section>
 
@@ -116,19 +109,10 @@ export const ConfigureChat = ({}) => {
                             }}
                         >
 
-                            {isGroup ? (
-                                <GroupControls
-                                    setShowGroupUsers={setShowGroupUsers}
-                                    showGroupUsers={showGroupUsers}
-                                />
-                            ) : (
-                                <p
-                                    style={{
-                                        textAlign: 'center',
-                                    }}
-
-                                >Normal user</p>
-                            )}
+                            <GroupControls
+                                setShowGroupUsers={setShowGroupUsers}
+                                showGroupUsers={showGroupUsers}
+                            />
 
                         </section>
 

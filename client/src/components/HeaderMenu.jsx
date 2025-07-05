@@ -1,5 +1,5 @@
 import {useNavigate} from "react-router-dom";
-import {useChatContext} from "../context/GroupChatContext.jsx";
+import {useChatContext} from "../context/ConversationContext.jsx";
 
 
 export const HeaderMenu = ({backArrow = false,

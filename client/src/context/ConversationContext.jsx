@@ -7,32 +7,26 @@ const chatContext = createContext();
 
 export const ChatProvider = ({ children }) => {
 
-    const [groupMembers, setGroupMembers] = useState([]);
-    const [isGroup, setIsGroup] = useState(false);
-    const [activeChatRecipient, setActiveChatRecipient] = useState(null);
+    const [activeConversation, setActiveConversation] = useState(null);
     const [configureUI, setConfigureUI] = useState(false);
     const [addMemberUI, setAddMemberUI] = useState(false);
     const [creatChatUI, setCreatChatUI] = useState(false);
     const [showDeleteContainer, setShowDeleteContainer] = useState(false);
-
+    const [conversationMembers, setConversationMembers] = useState([]);
 
     return (
         <chatContext.Provider value={{
             showDeleteContainer,
             setShowDeleteContainer,
 
-
-            groupMembers,
-            setGroupMembers,
+            conversationMembers,
+            setConversationMembers,
 
             creatChatUI,
             setCreatChatUI,
 
-            activeChatRecipient,
-            setActiveChatRecipient,
-
-            isGroup,
-            setIsGroup,
+            activeConversation,
+            setActiveConversation,
 
             configureUI,
             setConfigureUI,

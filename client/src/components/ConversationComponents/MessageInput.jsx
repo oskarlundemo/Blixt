@@ -3,25 +3,24 @@ import {useParams} from "react-router-dom";
 import {GifContainer} from "./GifContainer.jsx";
 
 
-export const MessageInput = ({message, setMessage, showGif, setShowGif}) => {
+export const MessageInput = ({message, setMessage, setShowGif}) => {
 
 
     const {token, API_URL} = useAuth();
-    const {username, group_id} = useParams();
+    const {conversationId} = useParams();
 
     const handleSubmit = async (e) => {
+
+        console.log(conversationId)
 
         e.preventDefault();
 
         if (message.trim().length === 0)
             return;
 
-        const endpointType = group_id ? 'group' : 'private';
-        const identifier = group_id || encodeURIComponent(username);
-        const endpoint = `${API_URL}/messages/create/${endpointType}/${identifier}`;
 
         try {
-            await fetch(endpoint, {
+            await fetch(`${API_URL}/messages/create/new/${conversationId}`, {
                 method: "POST",
                 body: JSON.stringify({
                     message,
@@ -36,7 +35,6 @@ export const MessageInput = ({message, setMessage, showGif, setShowGif}) => {
         }
         setMessage('')
     }
-
 
     return (
         <footer
