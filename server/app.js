@@ -15,7 +15,6 @@ import notificationsRoute from "./routes/notificationsRoute.js";
 import messagesRoute from "./routes/messagesRoute.js";
 import conversationRoute from "./routes/conversationRoute.js";
 import createChatRoute from "./routes/createChatRoute.js";
-import groupRoute from "./routes/groupRoute.js";
 
 
 
@@ -32,8 +31,6 @@ const PORT = process.env.PORT || 5002;
 app.use(cors());
 app.use(express.json());
 
-
-app.use('/group', groupRoute)
 app.use('/chat', createChatRoute);
 app.use('/conversations', conversationRoute)
 app.use('/messages', messagesRoute);

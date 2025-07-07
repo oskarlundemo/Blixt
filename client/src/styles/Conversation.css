@@ -214,7 +214,7 @@
 
 .gifContainer-search-result {
     display: grid;
-    grid-template-columns: repeat(3, minmax(100px, 1fr));
+    grid-template-columns: repeat(3, minmax(auto, 1fr));
     gap: 0.5rem;
     max-height: 320px;
     min-height: 320px;
@@ -243,7 +243,7 @@
 }
 
 .gifContainer-search-result img:hover {
-    transform: scale(1.05);
+    transform: scale(1.02);
 }
 
 .show {
@@ -381,4 +381,11 @@
         font-size: 1rem;
         margin-left: 0.5rem;
     }
+}
+
+.conversation-title {
+    font-size: clamp(1rem, 1vw, 1rem);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

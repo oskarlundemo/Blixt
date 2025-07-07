@@ -1,12 +1,9 @@
-
-
-
-
 import moment from 'moment-timezone';
 import 'moment/locale/sv';
 
 export const MessageSplitter = ({ date }) => {
-    const inputDate = moment(date).tz("Europe/Stockholm").startOf('day');
+
+    const inputDate = moment.tz(date, 'dddd D MMMM YYYY', 'Europe/Stockholm').startOf('day');
     const today = moment().tz("Europe/Stockholm").startOf('day');
     const yesterday = moment().tz("Europe/Stockholm").subtract(1, 'day').startOf('day');
 

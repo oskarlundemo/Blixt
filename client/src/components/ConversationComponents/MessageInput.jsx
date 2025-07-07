@@ -1,23 +1,18 @@
 import {useAuth} from "../../context/AuthContext.jsx";
 import {useParams} from "react-router-dom";
-import {GifContainer} from "./GifContainer.jsx";
 
 
 export const MessageInput = ({message, setMessage, setShowGif}) => {
-
 
     const {token, API_URL} = useAuth();
     const {conversationId} = useParams();
 
     const handleSubmit = async (e) => {
 
-        console.log(conversationId)
-
         e.preventDefault();
 
         if (message.trim().length === 0)
             return;
-
 
         try {
             await fetch(`${API_URL}/messages/create/new/${conversationId}`, {

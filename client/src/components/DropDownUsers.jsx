@@ -8,18 +8,14 @@ import toast from 'react-hot-toast';
 export const DropDownUsers = ({items, openMenu, admin}) => {
 
     const {user, token, API_URL} = useAuth();
-    const {group_id} = useParams();
+    const {conversationId} = useParams();
     const {setGroupMembers, groupMembers} = useChatContext()
 
-    useEffect(() => {
-        console.log(groupMembers);
-    }, [])
+
 
     const handleKickUser = async (user) => {
 
-        console.log(user)
-
-        await fetch(`${API_URL}/group/kick/${group_id}`, {
+        await fetch(`${API_URL}/conversations/kick/${conversationId}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -47,16 +43,16 @@ export const DropDownUsers = ({items, openMenu, admin}) => {
                     items.map((item, index) => (
                         <li key={index} className="drop-down-item">
                             <UserAvatar
-                                user={item.Member}
+                                user={item?.user || null}
                                 size={25}
                             />
-                            <p>{item.Member.username}</p>
+                            <p>{item.user?.username || 'Undefined'}</p>
 
-                            {(admin === user.id) && (item.Member.id !== user.id) && (
+                            {(admin === user.id) && (item?.user?.id !== user.id) && (
                                 <svg
 
                                     onClick={() => {
-                                        handleKickUser(item.Member);
+                                        handleKickUser(item?.user);
                                     }}
 
                                     className={`close-icon`}

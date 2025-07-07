@@ -2,7 +2,7 @@ import {useNavigate} from "react-router-dom";
 import {UserAvatar} from "../UserAvatar.jsx";
 import moment from "moment-timezone";
 import 'moment/locale/sv';
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 export const ConversationCard = ({
                                             participants = null,
@@ -16,7 +16,7 @@ export const ConversationCard = ({
     const [message, setMessage] = useState(latestMessage);
 
     const parseMessage = (content) => {
-         if (content?.endsWith(".gif") || content.includes('media.giphy.com'))
+         if (content?.endsWith(".gif") || content?.includes('media.giphy.com') || 'Undefined')
              return 'Sent a Gif'
          return content
      }
@@ -48,7 +48,7 @@ export const ConversationCard = ({
                     {participants.length > 0 && (
                         participants.length > 0 && (participants.map((member, index) => (
                                 <div
-                                    key={member.id}
+                                    key={member.user.id}
                                     style={{
                                         marginLeft: index === 0 ? 0 : -8,
                                         zIndex: participants.length - index,
@@ -81,14 +81,14 @@ export const ConversationCard = ({
             <div className="direct-messages-card-body">
                 {message ? (
                     <p>
-                        {message?.sender.id === loggedInUserId ? (
+                        {message?.sender?.id === loggedInUserId ? (
                             <>
                                 <span>You: </span>
                                 {parseMessage(message?.content)}
                             </>
                         ) : (
                             <>
-                                <span>{message.sender.username}: </span>
+                                <span>{message.sender?.username}: </span>
                                 {parseMessage(message?.content)}
                             </>
                         )}

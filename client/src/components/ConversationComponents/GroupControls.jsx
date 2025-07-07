@@ -6,7 +6,7 @@ import {useEffect} from "react";
 
 export const GroupControls = ({setShowGroupUsers, showGroupUsers}) => {
 
-    const {activeChatRecipient, groupMembers, setAddMemberUI, setShowDeleteContainer} = useChatContext();
+    const {activeConversation, setAddMemberUI, setShowDeleteContainer} = useChatContext();
     const {user} = useAuth();
 
     return (
@@ -24,7 +24,7 @@ export const GroupControls = ({setShowGroupUsers, showGroupUsers}) => {
                     setShowGroupUsers(!showGroupUsers);
                 }}
 
-                admin={activeChatRecipient?.admin_id || ''}
+                admin={activeConversation?.admin_id || ''}
                 title={'Group members'}
                 svg={
                     <>
@@ -41,11 +41,11 @@ export const GroupControls = ({setShowGroupUsers, showGroupUsers}) => {
 
                 dropDown={true}
                 showDropDown={() => setShowGroupUsers(!showGroupUsers)}
-                groupMembers={groupMembers|| []}
+                groupMembers={activeConversation.members|| []}
                 showGroupUsers={showGroupUsers}
             />
 
-            {activeChatRecipient?.admin_id === user.id && (
+            {activeConversation?.admin_id === user.id && (
                 <BottomSheetItem
                     showDropDown={() => setShowDeleteContainer(true)}
                     title={'Delete group'}

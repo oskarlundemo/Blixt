@@ -2,6 +2,7 @@ import {ConversationCard} from "./ConversationCard.jsx";
 import {HeaderMenu} from "../HeaderMenu.jsx";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {NoDataFound} from "../NoDataFound.jsx";
+import {useEffect} from "react";
 
 
 export const Conversations = ({conversations, realtimeUpdated, setCreateChatUI}) => {
@@ -18,13 +19,13 @@ export const Conversations = ({conversations, realtimeUpdated, setCreateChatUI})
 
             <section className="direct-messages">
             {conversations.length > 0 ? (
-                conversations.map((conversation) => (
+                conversations.map((conversation, index) => (
                     <ConversationCard
                         realtimeUpdated={realtimeUpdated}
-                        key={conversation.id}
+                        key={conversation.id || index}
                         participants={conversation.members || null}
                         chatname={conversation.is_group ? conversation.name : conversation.members[0]?.user.username}
-                        latestMessage={conversation.latestMessage}
+                        latestMessage={conversation.messages[0] || 'No message yet'}
                         loggedInUserId={user?.id}
                         conversationId={conversation.id}
                     />
