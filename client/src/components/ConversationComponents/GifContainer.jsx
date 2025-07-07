@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {LoadingTitle} from "../LoadingTitle.jsx";
 import {useParams} from "react-router-dom";
-
+import toast from "react-hot-toast";
 
 /**
  * This component is used for showing the Gif container where users
@@ -24,12 +24,11 @@ import {useParams} from "react-router-dom";
 
 export const GifContainer = ({ showGifs, setShowGifs}) => {
 
-
     const {token, API_URL} = useAuth();
     const [gifs, setGifs] = useState([]);  // Array to hold the gifs
     const [gifSearch, setGifSearch] = useState("");  // Search string for gifs
     const [loading, setLoading] = useState(false);  // Set loading state for gifs
-    const {username, group_id} = useParams();
+    const {conversationId} = useParams();
 
     const apiKey = import.meta.env.VITE_GIPHY_KEY;  // Get API key from .env
     const limit = 9;  // Limit the gifs to 10
@@ -78,9 +77,6 @@ export const GifContainer = ({ showGifs, setShowGifs}) => {
     const sendGif = async (gif) => {
         setShowGifs(false);
 
-        const endPoint = username ? 'private' : 'group';
-        const params = username ? encodeURIComponent(username) : group_id;
-
         const sanitizedGif = {
             id: gif.id,
             url: gif.images?.original?.url,
@@ -88,7 +84,7 @@ export const GifContainer = ({ showGifs, setShowGifs}) => {
         };
 
         try {
-            const res = await fetch(`${API_URL}/messages/send/gif/${endPoint}/${params}`, {
+            const res = await fetch(`${API_URL}/messages/send/gif/${conversationId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -99,6 +95,7 @@ export const GifContainer = ({ showGifs, setShowGifs}) => {
 
             if (!res.ok) {
                 console.error("GIF send failed:", await res.text());
+                toast.error('Failed to send GIF!');
                 // Optionally notify user
             }
         } catch (err) {

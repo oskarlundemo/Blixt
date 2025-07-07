@@ -12,7 +12,7 @@ import toast from 'react-hot-toast';
 
 export const AddNewGroupMember = ({}) => {
 
-    const {group_id} = useParams();
+    const {conversationId} = useParams();
     const [searchResults, setSearchResults] = useState([]);
     const [search, setSearch] = useState("");
     const {token, API_URL} = useAuth();
@@ -21,17 +21,12 @@ export const AddNewGroupMember = ({}) => {
 
     const {groupMembers, setGroupMembers} = useChatContext();
 
-    useEffect(() => {
-        console.log(groupMembers);
-    }, [])
 
     const addNewGroupMember = async (user) => {
         setLoading(true);
         setError(false);
 
-        console.log(user);
-
-        await fetch(`${API_URL}/group/add/member/${group_id}`, {
+        await fetch(`${API_URL}/conversations/add/member/${conversationId}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -59,7 +54,7 @@ export const AddNewGroupMember = ({}) => {
     useEffect(() => {
         const delayBouncing = setTimeout(() => {
             if (search.trim().length > 0) {
-                fetch(`${API_URL}/group/search/members/${group_id}/?q=${search}`, {
+                fetch(`${API_URL}/conversations/search/members/${conversationId}/?q=${search}`, {
                     method: "GET",
                     headers: {
                         Authorization: `Bearer ${token}`,

@@ -16,11 +16,7 @@ messagesRoute.post('/create/new/:conversation_id', authenticateUser, createMessa
 
 messagesRoute.post('/send/gif/:conversation_id', authenticateUser, sendGif);
 
-/**
- * Ta bort dessa två
- */
-
-messagesRoute.post('/fetch/enriched/message', authenticateUser, fetchEnrichedMessage);
+messagesRoute.post('/fetch/enriched/message/:conversation_id', authenticateUser, fetchEnrichedMessage);
 
 
 export default messagesRoute;

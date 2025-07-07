@@ -198,7 +198,6 @@ export const deleteComment = async (req, res) => {
             select: { user_id: true },
         });
 
-
         const notification = await prisma.notification.findFirst({
             where: {
                 type: 'COMMENT',

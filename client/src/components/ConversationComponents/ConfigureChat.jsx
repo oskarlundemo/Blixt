@@ -1,5 +1,5 @@
 import {BottomSheetItem} from "./BottomSheetItem.jsx";
-import { useState} from "react";
+import {useEffect, useState} from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {GroupAvatar} from "../GroupAvatar.jsx";
 import {AddNewGroupMember} from "./AddNewGroupMember.jsx";
@@ -18,17 +18,17 @@ export const ConfigureChat = ({}) => {
     const [showGroupUsers, setShowGroupUsers] = useState(false)
     const [loading, setLoading] = useState(false);
     const {API_URL, token} = useAuth();
-    const {group_id} = useParams();
+    const {conversationId} = useParams();
     const navigate = useNavigate();
 
     const {setConfigureUI, activeConversation, setAddMemberUI, addMemberUI,
-        setShowDeleteContainer, showDeleteContainer} = useChatContext();
+        setShowDeleteContainer, conversationMembers, showDeleteContainer} = useChatContext();
 
     const handleDelete = async () => {
         setLoading(true);
         setShowDeleteContainer(false);
 
-        await fetch(`${API_URL}/group/delete/group/${group_id}`, {
+        await fetch(`${API_URL}/conversations/delete/${conversationId}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -79,8 +79,7 @@ export const ConfigureChat = ({}) => {
 
             <AnimatePresence mode="wait">
                 {addMemberUI ? (
-                    <AddNewGroupMember
-                        key="add-member" />
+                    <AddNewGroupMember/>
                 ) : (
                     <motion.div key="main-config">
                         <section
@@ -93,11 +92,35 @@ export const ConfigureChat = ({}) => {
                         }}>
 
 
-                            <UserAvatar
-                                user={null}
-                                size={50}/>
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                }}
+                            >
+                                {conversationMembers.length > 0 && (
+                                    conversationMembers.map((member, i) => (
+                                            <div
+                                                key={member.user.id}
+                                                style={{
+                                                    marginLeft: i === 0 ? 0 : -8,
+                                                    zIndex: conversationMembers.length - i,
+                                                    border: '2px solid white',
+                                                    borderRadius: '50%',
+                                                }}>
+                                                <UserAvatar
+                                                    user={member.user}
+                                                    size={40}
+                                                />
+                                            </div>
+                                        )
+                                    ))
+                                }
+                            </div>
 
-                        <h1>{activeConversation.name || activeConversation.members[0].user.username}</h1>
+                        <h1 className={'ellipse-text'}>
+                            {activeConversation.name || activeConversation.members[0].user.username}
+                        </h1>
 
                         </section>
 
@@ -160,7 +183,6 @@ export const ConfigureChat = ({}) => {
                                                 color: 'white'
                                             }}
                                         >Yes</button>
-
                                     </div>
                                 </div>
                             }

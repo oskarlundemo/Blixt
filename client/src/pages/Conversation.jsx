@@ -31,10 +31,11 @@ export const Conversation = ({}) => {
         })
             .then(response => response.json())
             .then(data => {
+                console.log(data)
                 setMessages(data.messages);
                 setActiveConversation(data.conversation);
                 setLoading(false);
-                setConversationMembers(data.members);
+                setConversationMembers(data.conversation.members);
             })
             .catch(error =>  {
                 console.log(error);
@@ -87,18 +88,16 @@ export const Conversation = ({}) => {
         if (!user?.id || !token || !conversationId) return;
 
         const messageChannel = supabase
-            .channel(`message-${user.id}`)
+            .channel('messages', )
             .on(
                 'postgres_changes',
                 {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'Message',
+                    event: 'INSERT', schema: 'public', table: 'Message',
                     filter: `conversation_id=eq.${conversationId}`,
                 },
                 async (payload) => {
                     const message = payload.new;
-
+                    console.log('New message:', message);
                     try {
                         const response = await fetch(
                             `${API_URL}/messages/fetch/enriched/message/${conversationId}`,
@@ -113,7 +112,6 @@ export const Conversation = ({}) => {
                         );
 
                         const data = await response.json();
-                        console.log(data);
                         setMessages((prev) => [...prev, data]);
                         playNotificationSound();
                     } catch (err) {
@@ -122,6 +120,7 @@ export const Conversation = ({}) => {
                 }
             )
             .subscribe();
+
         return () => {
             messageChannel.unsubscribe();
         };

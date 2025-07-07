@@ -16,7 +16,6 @@ export const ChatWindow = ({messages, renderedMessages, loading}) => {
     const [message, setMessage] = useState('');
     const [showGif, setShowGif] = useState(false);
     const {setConfigureUI, conversationMembers, activeConversation} = useChatContext();
-    const {conversationId} = useParams();
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -60,19 +59,30 @@ export const ChatWindow = ({messages, renderedMessages, loading}) => {
                     style={{ display: "flex", alignItems: "center" }}>
 
                     {conversationMembers.length > 0 && (
-                        conversationMembers.map((member, index) => (
-                            <UserAvatar
-                            user={member.user}
-                            key={member.user.id}
-                            size={25}
-                            />
+                        conversationMembers.map((member, i) => (
+                            <div
+                                key={member.user.id}
+                                style={{
+                                    marginLeft: i === 0 ? 0 : -8,
+                                    zIndex: conversationMembers.length - i,
+                                    border: '2px solid white',
+                                    borderRadius: '50%',
+                                }}>
+                                <UserAvatar
+                                    user={member.user}
+                                    size={25}
+                                />
+                            </div>
+                            )
                         ))
-                    )}
+                    }
                 </div>
             )}
 
             <h1
-            >{activeConversation.name || activeConversation.members[0].user.username}</h1>
+                className="conversation-title">
+                {activeConversation.name || activeConversation.members[0].user.username}
+            </h1>
         </div>
 
     <section

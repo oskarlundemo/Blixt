@@ -41,13 +41,13 @@ export const createMessage = async (req, res) => {
 
 export const fetchEnrichedMessage = async (req, res) => {
 
-
     try {
 
-        const messageId = parseInt(req.body.message.id)
+        const messageId = parseInt(req.body.message.id);
+        const conversationId = req.params.conversation_id;
 
         const newMessage = await prisma.message.findUnique({
-            where: { id: messageId },
+            where: { id: messageId, conversation_id: conversationId },
             include: {
                 sender: true,
                 attachments: true,
@@ -71,7 +71,8 @@ export const sendGif = async (req, res) => {
     try {
 
         const userIdFromToken = req.user.id;
-        const conversationId = parseInt(req.params.conversation_id);
+        const conversationId = req.params.conversation_id;
+        console.log(conversationId);
         const gif = req.body.gif;
 
         await prisma.message.create({
@@ -81,6 +82,7 @@ export const sendGif = async (req, res) => {
                 content: gif.url,
             }
         })
+
         return res.status(200).json({ message: 'Gif successfully sent' });
 
     } catch (err) {
