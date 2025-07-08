@@ -21,7 +21,6 @@ export const AuthProvider = ({ children }) => {
         ? import.meta.env.VITE_API_PROD_URL
         : "/api";
 
-
     useEffect(() => {
         const init = async () => {
             const { data: { session } } = await supabase.auth.getSession();
@@ -115,9 +114,9 @@ export const AuthProvider = ({ children }) => {
         return data;
     };
 
-
     return (
-        <AuthContext.Provider value={{ user, API_URL, logout, login, token: localStorage.getItem("token"), loading }}>
+        <AuthContext.Provider value={{ user, API_URL,
+            logout, login, token: localStorage.getItem("token"), loading }}>
             {children}
         </AuthContext.Provider>
     );

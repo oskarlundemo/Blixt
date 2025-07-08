@@ -10,6 +10,7 @@ import {MessageSplitter} from "../components/MessasgeSplitter.jsx";
 import {ConfigureChat} from "../components/ConversationComponents/ConfigureChat.jsx";
 import {ChatWindow} from "../components/ConversationComponents/ChatWindow.jsx";
 import { useChatContext} from "../context/ConversationContext.jsx";
+import toast from "react-hot-toast";
 
 
 export const Conversation = ({}) => {
@@ -17,6 +18,7 @@ export const Conversation = ({}) => {
     const {token, user, API_URL} = useAuth();
     const [loading, setLoading] = useState(true);
     const {conversationId} = useParams();
+    const channelRef = useRef(null);
 
     const {configureUI, setConversationMembers, setActiveConversation} = useChatContext();
     const [messages, setMessages] = useState([]);
@@ -85,46 +87,66 @@ export const Conversation = ({}) => {
     };
 
     useEffect(() => {
-        if (!user?.id || !token || !conversationId) return;
 
-        const messageChannel = supabase
-            .channel('messages', )
+        if (!conversationId) return;
+
+        if (channelRef.current) {
+            supabase.removeChannel(channelRef.current)
+                .then(() => console.log("Previous channel removed"))
+                .catch((err) => console.error("Failed to remove previous channel:", err));
+        }
+
+        const newChannel = supabase
+            .channel(`messages-${conversationId}`)
             .on(
                 'postgres_changes',
                 {
-                    event: 'INSERT', schema: 'public', table: 'Message',
-                    filter: `conversation_id=eq.${conversationId}`,
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'Message',
+                    filter: `conversation_id=eq."${conversationId}"`,
                 },
                 async (payload) => {
                     const message = payload.new;
-                    console.log('New message:', message);
-                    try {
-                        const response = await fetch(
-                            `${API_URL}/messages/fetch/enriched/message/${conversationId}`,
-                            {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    Authorization: `Bearer ${token}`,
-                                },
-                                body: JSON.stringify({ message }),
-                            }
-                        );
 
-                        const data = await response.json();
-                        setMessages((prev) => [...prev, data]);
-                        playNotificationSound();
+                    try {
+                        const response = await fetch(`${API_URL}/messages/fetch/enriched/message/${conversationId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ message }),
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            setMessages((prev) => [...prev, data]);
+                            playNotificationSound();
+                        } else {
+                            toast.error('There was an error retrieving the message');
+                        }
+
                     } catch (err) {
-                        console.error('Error fetching enriched message', err);
+                        console.error("Fetch failed:", err);
+                        toast.error('Message fetch failed');
                     }
                 }
-            )
-            .subscribe();
+            );
+
+        newChannel.subscribe();
+        channelRef.current = newChannel;
 
         return () => {
-            messageChannel.unsubscribe();
+            if (channelRef.current) {
+                supabase.removeChannel(channelRef.current)
+                    .then(() => console.log('Unsubscribed from realtime channel'))
+                    .catch((err) => console.error("Unsubscribe error:", err));
+                channelRef.current = null;
+            }
         };
-    }, [user?.id, conversationId]);
+    }, [token, conversationId]);
+
 
     return (
             <main className="conversation-wrapper">

@@ -19,8 +19,11 @@ export const AddNewGroupMember = ({}) => {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const {groupMembers, setGroupMembers} = useChatContext();
+    const {conversationMembers, setConversationMembers} = useChatContext();
 
+    useEffect(() => {
+        console.log(conversationMembers);
+    }, [])
 
     const addNewGroupMember = async (user) => {
         setLoading(true);
@@ -36,11 +39,9 @@ export const AddNewGroupMember = ({}) => {
         })
             .then(async res => {
                 const data = await res.json();
-                if (!res.ok) {
-                    throw new Error(data.message || "Failed to add user");
-                }
+                console.log(data);
                 toast.success(data.message);
-                setGroupMembers(prev => [...prev, data.member]);
+                setConversationMembers(prev => [...prev, data.addedUser]);
                 setSearchResults(prev => prev.filter(u => u.id !== user.id));
             })
             .catch(err => {
@@ -109,7 +110,7 @@ export const AddNewGroupMember = ({}) => {
                         searchResults={searchResults}
                         search={search}
                         add={true}
-                        participants={groupMembers}
+                        participants={conversationMembers}
                         addMember={addNewGroupMember}
                     />
                 </>
