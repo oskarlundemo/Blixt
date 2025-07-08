@@ -241,7 +241,6 @@ export const Post = ({
 
 export const parseTimeStamp = (timestamp) => {
 
-
     const now = new Date();
     const created = new Date(timestamp);
 

@@ -16,7 +16,7 @@ export const ConversationCard = ({
     const [message, setMessage] = useState(latestMessage);
 
     const parseMessage = (content) => {
-         if (content?.endsWith(".gif") || content?.includes('media.giphy.com') || 'Undefined')
+         if (content?.endsWith(".gif") || content?.includes('media.giphy.com'))
              return 'Sent a Gif'
          return content
      }

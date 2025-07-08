@@ -6,14 +6,12 @@ import {useAuth} from "../context/AuthContext.jsx";
 
 export const BottomMenu = ({showBottomMenu, setShowBottomMenu, archived, setPosts, postID = 0}) => {
 
-
     const {API_URL, token} = useAuth();
     const [isPublic, setIsPublic] = useState(archived);
 
     useEffect(() => {
         setIsPublic(archived);
     }, [archived]);
-
 
 
     const deletePostHandler = async (postID) => {

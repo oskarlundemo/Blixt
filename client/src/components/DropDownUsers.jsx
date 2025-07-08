@@ -5,13 +5,11 @@ import {useChatContext} from "../context/ConversationContext.jsx";
 import {useEffect} from "react";
 import toast from 'react-hot-toast';
 
-export const DropDownUsers = ({items, openMenu, admin}) => {
+export const DropDownUsers = ({members, openMenu, admin}) => {
 
     const {user, token, API_URL} = useAuth();
     const {conversationId} = useParams();
-    const {setGroupMembers, groupMembers} = useChatContext()
-
-
+    const {setConversationMembers, conversationMembers} = useChatContext()
 
     const handleKickUser = async (user) => {
 
@@ -27,32 +25,33 @@ export const DropDownUsers = ({items, openMenu, admin}) => {
         })
             .then(res => res.json())
             .then(data => {
+                console.log(data);
                 toast.success(data.message);
-                setGroupMembers(prev =>
-                    prev.filter(member => member.Member.id !== user.id)
+                setConversationMembers(prev =>
+                    prev.filter(member => member.user.id !== user.id)
                 );
             })
-            .catch(err => console.log(err));
+            .catch(err => console.log(err.message));
     };
 
     return (
         <div className="drop-container">
         <ul className={`sub-menu ${openMenu ? 'show' : ''}`}>
             <div>
-                {items.length > 0 && (
-                    items.map((item, index) => (
+                {members.length > 0 && (
+                    members.map((member, index) => (
                         <li key={index} className="drop-down-item">
                             <UserAvatar
-                                user={item?.user || null}
+                                user={member?.user || null}
                                 size={25}
                             />
-                            <p>{item.user?.username || 'Undefined'}</p>
+                            <p>{member.user?.username || 'Undefined'}</p>
 
-                            {(admin === user.id) && (item?.user?.id !== user.id) && (
+                            {(admin === user.id) && (member?.user?.id !== user.id) && (
                                 <svg
 
                                     onClick={() => {
-                                        handleKickUser(item?.user);
+                                        handleKickUser(member?.user);
                                     }}
 
                                     className={`close-icon`}

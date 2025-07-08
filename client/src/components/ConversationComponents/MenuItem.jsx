@@ -1,11 +1,9 @@
 import {DropDownUsers} from "../DropDownUsers.jsx";
-import {useEffect} from "react";
 
-
-export const BottomSheetItem = ({title = '',
+export const MenuItem = ({title = '',
                                     svg = null,
                                     dropDown = false,
-                                    groupMembers = [],
+                                    conversationMembers = [],
                                     showGroupUsers = false,
                                     showDropDown = false,
                                     admin = '',
@@ -24,10 +22,10 @@ export const BottomSheetItem = ({title = '',
                 {svg}
             </div>
 
-            {(dropDown && groupMembers.length > 0) && (
+            {(dropDown && conversationMembers.length > 0) && (
                 <DropDownUsers
                     admin={admin}
-                    items={groupMembers}
+                    members={conversationMembers}
                     openMenu={showGroupUsers}
                 />
             )}

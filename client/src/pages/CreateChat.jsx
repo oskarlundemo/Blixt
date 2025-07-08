@@ -5,7 +5,7 @@ import {ParticipantsSection} from "../components/CreateChatComponents/Participan
 import {useAuth} from "../context/AuthContext.jsx";
 import {Spinner} from "../components/Spinner.jsx";
 import toast from "react-hot-toast";
-import {BottomSheetItem} from "../components/ConversationComponents/BottomSheetItem.jsx";
+import {MenuItem} from "../components/ConversationComponents/MenuItem.jsx";
 import {BottomSheet} from "../components/BottomSheet.jsx";
 import {Overlay} from "../components/Overlay.jsx";
 

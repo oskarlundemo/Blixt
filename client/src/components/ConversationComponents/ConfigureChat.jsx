@@ -1,10 +1,10 @@
-import {BottomSheetItem} from "./BottomSheetItem.jsx";
+import {MenuItem} from "./MenuItem.jsx";
 import {useEffect, useState} from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {GroupAvatar} from "../GroupAvatar.jsx";
 import {AddNewGroupMember} from "./AddNewGroupMember.jsx";
 import {useChatContext} from "../../context/ConversationContext.jsx";
-import {GroupControls} from "./GroupControls.jsx";
+import {ConversationControlls} from "./ConversationControlls.jsx";
 import {UserAvatar} from "../UserAvatar.jsx";
 import {BottomSheet} from "../BottomSheet.jsx";
 import {Overlay} from "../Overlay.jsx";
@@ -132,7 +132,7 @@ export const ConfigureChat = ({}) => {
                             }}
                         >
 
-                            <GroupControls
+                            <ConversationControlls
                                 setShowGroupUsers={setShowGroupUsers}
                                 showGroupUsers={showGroupUsers}
                             />

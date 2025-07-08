@@ -1,14 +1,9 @@
 import {prisma} from "../prisma/index.js";
-import conversation from "express/lib/view.js";
 
 export const loadConversations = async (req, res) => {
     try {
 
-
-
-
         const userIdFromToken = req.user.id;
-
 
         const privateConversations = await prisma.conversation.findMany({
             where: {
@@ -275,6 +270,7 @@ export const fetchConversationMessages = async (req, res) => {
             }
         });
 
+
         res.status(200).json({
             conversation: conversation,
             members: conversationExists.members,
@@ -323,7 +319,6 @@ export const kickUserFromConversation = async (req, res) => {
             }
         })
 
-
         let updatedGroupName = conversationExists.name
             .split(', ')
             .filter(name => name !== deletedUsername)
@@ -338,6 +333,9 @@ export const kickUserFromConversation = async (req, res) => {
             }
         });
 
+        res.status(200).json({
+            message: `Successfully kicked ${deletedUsername} out of the conversation`,
+        })
 
     } catch (err) {
         console.error(err);
@@ -349,7 +347,6 @@ export const kickUserFromConversation = async (req, res) => {
 }
 
 export const deleteConversation = async (req, res) => {
-
 
     try {
 
@@ -427,15 +424,16 @@ export const addMemberToConversation = async (req, res) => {
             })
         }
 
-        await prisma.conversationMember.create({
+        const addedUserData = await prisma.conversationMember.create({
             data: {
                 conversation_id: conversationId,
                 user_id: addedUserId
+            }, include: {
+                user: true
             }
         });
 
         let updatedGroupName = conversationExists.name || "";
-
 
         const existingNames = updatedGroupName.split(',').map(n => n.trim());
 
@@ -452,8 +450,11 @@ export const addMemberToConversation = async (req, res) => {
             }
         });
 
+        console.log(addedUserData)
+
         res.status(200).send({
-            message: "Successfully added member to conversation",
+            message: `Successfully added ${addedUsername} to the conversation`,
+            addedUser: addedUserData
         })
 
     } catch (err) {

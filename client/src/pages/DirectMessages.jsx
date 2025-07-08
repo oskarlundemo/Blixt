@@ -17,7 +17,6 @@ export const DirectMessages = ({}) => {
     const [realtimeUpdate, setRealtimeUpdate] = useState(null);
     const {token, user, API_URL} = useAuth();
 
-
     useEffect(() => {
         if (!conversations?.length) return;
 
@@ -41,7 +40,6 @@ export const DirectMessages = ({}) => {
 
             .then(res => res.json())
             .then(data => {
-                console.log(data)
                 setConversations(data.conversations);
                 setFollowing(data.following);
                 setLoading(false);
@@ -58,15 +56,9 @@ export const DirectMessages = ({}) => {
         channel
             .on(
                 'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'PrivateMessages', filter: `receiver_id=eq.${user.id}` },
+                { event: 'INSERT', schema: 'public', table: 'Message' },
                 (payload) => {
-                    setRealtimeUpdate(payload.new);
-                }
-            )
-            .on(
-                'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'GroupMessages' },
-                (payload) => {
+                    console.log(payload)
                     setRealtimeUpdate(payload.new);
                 }
             )

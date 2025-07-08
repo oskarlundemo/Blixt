@@ -72,7 +72,6 @@ export const sendGif = async (req, res) => {
 
         const userIdFromToken = req.user.id;
         const conversationId = req.params.conversation_id;
-        console.log(conversationId);
         const gif = req.body.gif;
 
         await prisma.message.create({
