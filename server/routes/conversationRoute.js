@@ -7,11 +7,15 @@ import {
     fetchConversationMessages,
     kickUserFromConversation,
     deleteConversation,
-    addMemberToConversation, searchForNewGroupMembers,
+    addMemberToConversation, searchForNewGroupMembers, loadNewConversationCard, latestMessage,
 } from "../controllers/conversationController.js";
 
 
 const conversationRoute = new Router();
+
+conversationRoute.post('/latest/message/:conversation_id', authenticateUser, latestMessage);
+
+conversationRoute.post('/new/invite', authenticateUser, loadNewConversationCard)
 
 conversationRoute.get('/load/:conversation_id', authenticateUser, fetchConversationMessages);
 

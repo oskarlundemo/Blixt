@@ -1,4 +1,4 @@
-import {use, useEffect, useState} from "react";
+import {use, useEffect, useRef, useState} from "react";
 import {useAuth} from "../context/AuthContext.jsx";
 import '../styles/DirectMessages.css'
 import {LoadingTitle} from "../components/LoadingTitle.jsx";
@@ -6,6 +6,7 @@ import {CreateChat} from "./CreateChat.jsx";
 import {Conversations} from "../components/DirectMessagesComponents/Conversations.jsx";
 import { AnimatePresence, motion } from "framer-motion";
 import {supabase} from "../services/SupabaseClient.js";
+import toast from "react-hot-toast";
 
 
 export const DirectMessages = ({}) => {
@@ -14,21 +15,8 @@ export const DirectMessages = ({}) => {
     const [loading, setLoading] = useState(true);
     const [createChatUI, setCreateChatUI] = useState(false);
     const [following, setFollowing] = useState([]);
-    const [realtimeUpdate, setRealtimeUpdate] = useState(null);
+    const channelRef = useRef(null);
     const {token, user, API_URL} = useAuth();
-
-    useEffect(() => {
-        if (!conversations?.length) return;
-
-        const sorted = [...conversations].sort((a, b) => {
-            const dateA = new Date(a.latestMessage?.created_at || 0);
-            const dateB = new Date(b.latestMessage?.created_at || 0);
-            return dateB - dateA;
-        });
-
-        setConversations(sorted);
-    }, [realtimeUpdate]);
-
 
     useEffect(() => {
         fetch(`${API_URL}/conversations/fetch`, {
@@ -40,6 +28,7 @@ export const DirectMessages = ({}) => {
 
             .then(res => res.json())
             .then(data => {
+                console.log(data);
                 setConversations(data.conversations);
                 setFollowing(data.following);
                 setLoading(false);
@@ -47,27 +36,78 @@ export const DirectMessages = ({}) => {
             .catch(err => console.log('Error fetching conversations'));
     }, [token])
 
-
     useEffect(() => {
-        if (!user?.id || !token) return;
+        if (!user) return;
 
-        const channel = supabase.channel('messages-channel');
+        if (channelRef.current) {
+            supabase.removeChannel(channelRef.current)
+                .then(() => console.log("Previous channel removed"))
+                .catch((err) => console.error("Failed to remove previous channel:", err));
+        }
 
-        channel
+        channelRef.current = supabase
+            .channel(`conversations-${user.id}`)
             .on(
                 'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'Message' },
-                (payload) => {
-                    console.log(payload)
-                    setRealtimeUpdate(payload.new);
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'ConversationMember',
+                },
+                async (payload) => {
+                    try {
+
+                        const { eventType, new: newRow, old: oldRow } = payload;
+
+                        if (eventType === "INSERT") {
+                            if (!newRow) {
+                                console.warn("Missing new row");
+                                return;
+                            }
+
+                            const response = await fetch(`${API_URL}/conversations/new/invite`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    Authorization: `Bearer ${token}`,
+                                },
+                                body: JSON.stringify({ conversation: newRow }),
+                            });
+
+                            if (response.ok) {
+                                const data = await response.json();
+                                setConversations((prev) => [data.newConvo, ...prev]);
+                            } else {
+                                toast.error('There was an error retrieving the message');
+                            }
+
+                        } else if (eventType === "DELETE") {
+                            if (!oldRow) {
+                                console.warn("Blocked by RLS");
+                                return;
+                            }
+
+                            setConversations((prev) =>
+                                prev.filter(convo => convo.id !== oldRow.conversation_id)
+                            );
+                        }
+                    } catch (err) {
+                        console.error("Realtime event handler error:", err);
+                        toast.error("A realtime update failed to process.");
+                    }
                 }
             )
             .subscribe();
 
         return () => {
-            supabase.removeChannel(channel);
+            if (channelRef.current) {
+                supabase.removeChannel(channelRef.current)
+                    .then(() => console.log('Unsubscribed from realtime channel'))
+                    .catch((err) => console.error("Unsubscribe error:", err));
+                channelRef.current = null;
+            }
         };
-    }, [user?.id, token]);
+    }, [token, user]);
 
 
     return (
@@ -113,7 +153,7 @@ export const DirectMessages = ({}) => {
                         style={{ position: 'absolute', width: '100%' }}
                     >
                         <Conversations
-                            realtimeUpdated={realtimeUpdate}
+                            setConversations={setConversations}
                             setCreateChatUI={setCreateChatUI}
                             conversations={conversations}
                         />
