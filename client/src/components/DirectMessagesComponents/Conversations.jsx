@@ -1,11 +1,9 @@
 import {ConversationCard} from "./ConversationCard.jsx";
 import {HeaderMenu} from "../HeaderMenu.jsx";
-import {useAuth} from "../../context/AuthContext.jsx";
 import {NoDataFound} from "../NoDataFound.jsx";
-import {useEffect} from "react";
+import {useAuth} from "../../context/AuthContext.jsx";
 
-
-export const Conversations = ({conversations, realtimeUpdated, setCreateChatUI}) => {
+export const Conversations = ({conversations, setConversations, setCreateChatUI}) => {
 
     const {user} = useAuth();
 
@@ -21,11 +19,11 @@ export const Conversations = ({conversations, realtimeUpdated, setCreateChatUI})
             {conversations.length > 0 ? (
                 conversations.map((conversation, index) => (
                     <ConversationCard
-                        realtimeUpdated={realtimeUpdated}
+                        setConversations={setConversations}
                         key={conversation.id || index}
                         participants={conversation.members || null}
                         chatname={conversation.is_group ? conversation.name : conversation.members[0]?.user.username}
-                        latestMessage={conversation.messages[0] || 'No message yet'}
+                        latestMessage={conversation.messages[0] || null}
                         loggedInUserId={user?.id}
                         conversationId={conversation.id}
                     />

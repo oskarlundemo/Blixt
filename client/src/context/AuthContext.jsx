@@ -3,7 +3,6 @@
 import React, {createContext, useState, useEffect, useContext} from "react";
 import { jwtDecode } from "jwt-decode";
 import {supabase} from "../services/SupabaseClient.js";
-import {useNavigate} from "react-router-dom";
 
 /**
  * This context is used to create and assign users with their

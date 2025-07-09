@@ -468,6 +468,106 @@ export const addMemberToConversation = async (req, res) => {
 
 
 
+export const loadNewConversationCard  = async (req, res) => {
+
+    try {
+
+        const conversationId = req.body.conversation.conversation_id;
+        const userIdFromToken = req.user.id;
+
+        const conversationExists = await prisma.conversation.findUnique({
+            where: {
+                id: conversationId,
+            }
+        })
+
+        if (!conversationExists)
+            return res.status(404).json({
+                message: "The conversation does not exist",
+            })
+
+
+        const isMember = await prisma.conversationMember.findUnique({
+            where: {
+                conversation_id_user_id: {
+                    conversation_id: conversationId,
+                    user_id: userIdFromToken,
+                }
+            }
+        })
+
+        if (!isMember)
+            return res.status(403).json({
+                message: "Unauthorized action, not member of conversation",
+            })
+
+        let newConvoInfo;
+
+        if (conversationExists.is_group) {
+            newConvoInfo = await prisma.conversation.findUnique({
+                where: {
+                    id: conversationId,
+                    is_group: true
+                },
+                include: {
+                    members: {
+                        include: {
+                            user: true
+                        }
+                    },
+                    messages: {
+                        orderBy: {
+                            created_at: 'desc'
+                        },
+                        include: {
+                            sender: true
+                        },
+                        take: 1
+                    }
+                },
+            })
+        } else {
+            newConvoInfo = await prisma.conversation.findUnique({
+                where: {
+                    id: conversationId,
+                    is_group: false
+                },
+                include: {
+                    members: {
+                        where: {
+                            user_id: {
+                                not: userIdFromToken
+                            }
+                        }, include: {
+                            user: true
+                        }
+                    },
+                    messages: {
+                        orderBy: {
+                            created_at: 'desc'
+                        },
+                        include: {
+                            sender: true
+                        },
+                        take: 1
+                    }
+                },
+            })
+        }
+
+        res.status(200).send({
+            message: "Successfully added group",
+            newConvo: newConvoInfo
+        })
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            message: 'Internal server error while adding new conversation',
+            err: err
+        })
+    }
+}
 
 
 
@@ -532,4 +632,108 @@ export const searchForNewGroupMembers = async (req, res) => {
         console.log(err);
         res.status(500).json({err: err, message: "Server error"});
     }
+}
+
+export const latestMessage = async (req, res) => {
+
+    try {
+
+        const userId = req.user.id;
+        const conversationId = req.params.conversation_id;
+
+        const conversationExists = await prisma.conversation.findUnique({
+            where: {
+                id: conversationId,
+            },
+            include: {
+                members: true,
+                messages: {
+                    orderBy: {
+                        created_at: 'desc'
+                    },
+                    include: {
+                        sender: true
+                    },
+                    take: 1
+                }
+            }
+        })
+
+        if (!conversationExists)
+            return res.status(404).send({
+                message: 'Conversation does not exist'
+            })
+
+        const memberIds = conversationExists.members.map(m => m.user_id);
+
+        if  (memberIds.some(m => m.user_id === userId))
+            res.status(403).send({
+                message: 'Unauthorized action'
+            })
+
+        let conversation;
+
+        if (conversationExists.is_group) {
+            conversation = await prisma.conversation.findUnique({
+                where: {
+                    id: conversationId,
+                },
+                include: {
+                    members: {
+                        include: {
+                            user: true
+                        }
+                    },
+                    messages: {
+                        orderBy: {
+                            created_at: 'desc'
+                        },
+                        include: {
+                            sender: true
+                        },
+                        take: 1
+                    }
+                }
+            })
+        } else {
+            conversation = await prisma.conversation.findUnique({
+                where: {
+                    id: conversationId,
+                },
+                include: {
+                    members: {
+                        where: {
+                            user_id: {
+                                not: userId
+                            }
+                        }, include: {
+                            user: true
+                        }
+                    },
+                    messages: {
+                        orderBy: {
+                            created_at: 'desc'
+                        },
+                        include: {
+                            sender: true
+                        },
+                        take: 1
+                    }
+                }
+            })
+        }
+
+        return res.status(200).send({
+            message: "Successfully the latest message",
+            conversation: conversation
+        })
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            message: 'Internal server error while retrieving the latest message',
+            error: err
+        })
+    }
+
 }

@@ -1,5 +1,5 @@
 import '../styles/Conversation.css'
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useMemo, useRef, useState} from "react";
 import {useAuth} from "../context/AuthContext.jsx";
 import {LoadingTitle} from "../components/LoadingTitle.jsx";
@@ -9,7 +9,7 @@ import moment from "moment-timezone";
 import {MessageSplitter} from "../components/MessasgeSplitter.jsx";
 import {ConfigureChat} from "../components/ConversationComponents/ConfigureChat.jsx";
 import {ChatWindow} from "../components/ConversationComponents/ChatWindow.jsx";
-import { useChatContext} from "../context/ConversationContext.jsx";
+import {useChatContext} from "../context/ConversationContext.jsx";
 import toast from "react-hot-toast";
 
 
@@ -19,9 +19,12 @@ export const Conversation = ({}) => {
     const [loading, setLoading] = useState(true);
     const {conversationId} = useParams();
     const channelRef = useRef(null);
+    const deleteChannelRef = useRef(null);
+    const navigate = useNavigate();
 
     const {configureUI, setConversationMembers, setActiveConversation} = useChatContext();
     const [messages, setMessages] = useState([]);
+
 
     useEffect(() => {
         fetch(`${API_URL}/conversations/load/${conversationId}`, {
@@ -87,6 +90,41 @@ export const Conversation = ({}) => {
     };
 
     useEffect(() => {
+        if (!conversationId) return;
+
+        if (deleteChannelRef.current) {
+            supabase.removeChannel(deleteChannelRef.current);
+        }
+
+        deleteChannelRef.current = supabase
+            .channel(`delete-listener-${conversationId}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: 'DELETE',
+                    schema: 'public',
+                    table: 'ConversationMember',
+                    filter: `conversation_id=eq.${conversationId}`,
+                },
+                (payload) => {
+                    const oldRow = payload.old;
+                    if (oldRow.user_id === user.id) {
+                        console.log("User was removed from conversation!");
+                        navigate('/messages');
+                    }
+                }
+            )
+            .subscribe();
+
+        return () => {
+            if (deleteChannelRef.current) {
+                supabase.removeChannel(deleteChannelRef.current);
+                deleteChannelRef.current = null;
+            }
+        };
+    }, [token, conversationId]);
+
+    useEffect(() => {
 
         if (!conversationId) return;
 
@@ -96,7 +134,7 @@ export const Conversation = ({}) => {
                 .catch((err) => console.error("Failed to remove previous channel:", err));
         }
 
-        const newChannel = supabase
+        channelRef.current = supabase
             .channel(`messages-${conversationId}`)
             .on(
                 'postgres_changes',
@@ -104,9 +142,10 @@ export const Conversation = ({}) => {
                     event: 'INSERT',
                     schema: 'public',
                     table: 'Message',
-                    filter: `conversation_id=eq."${conversationId}"`,
+                    filter: `conversation_id=eq.${conversationId}`,
                 },
                 async (payload) => {
+                    console.log(payload);
                     const message = payload.new;
 
                     try {
@@ -114,9 +153,9 @@ export const Conversation = ({}) => {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                Authorization: `Bearer ${token}`
+                                Authorization: `Bearer ${token}`,
                             },
-                            body: JSON.stringify({ message }),
+                            body: JSON.stringify({message}),
                         });
 
                         if (response.ok) {
@@ -131,11 +170,8 @@ export const Conversation = ({}) => {
                         console.error("Fetch failed:", err);
                         toast.error('Message fetch failed');
                     }
-                }
-            );
-
-        newChannel.subscribe();
-        channelRef.current = newChannel;
+                })
+            .subscribe();
 
         return () => {
             if (channelRef.current) {
@@ -146,7 +182,6 @@ export const Conversation = ({}) => {
             }
         };
     }, [token, conversationId]);
-
 
     return (
             <main className="conversation-wrapper">
