@@ -99,7 +99,8 @@ export const sendProfileData = async (req, res) => {
         posts: res.locals.posts,
         followers: res.locals.followers,
         following: res.locals.following,
-        archive: res.locals.archivedPosts
+        archive: res.locals.archivedPosts,
+        conversationId: res.locals.conversationId
     });
 }
 
@@ -112,7 +113,6 @@ export const fetchPosts = async (req, res, next) => {
         const userIDFromToken = req.user.id;
         const username = decodeURIComponent(req.params.username);
         let archivedPosts;
-
 
         const inspectedUserProfile = await prisma.user.findUnique({
             where: {
@@ -226,6 +226,70 @@ export const inspectSinglePost = async (req, res) => {
     } catch (err) {
         console.log(err)
         res.status(500).json({message: 'Something went wrong', error: err});
+    }
+}
+
+export const fetchConversation = async (req, res, next) => {
+
+    try {
+
+        const userId = req.user.id
+        const inspectedUserId = res.locals.inspectedUserProfile.id;
+
+        const userConversations = await prisma.conversationMember.findMany({
+            where: {
+                user_id: userId,
+            },
+            select: {
+                conversation_id: true,
+            },
+        });
+
+        const conversationIds = userConversations.map(c => c.conversation_id);
+
+        let sharedConversation = await prisma.conversationMember.findFirst({
+            where: {
+                conversation_id: {
+                    in: conversationIds,
+                },
+                user_id: inspectedUserId,
+            },
+            include: {
+                conversation: true,
+            },
+        });
+
+        if (!sharedConversation) {
+            const createConversation = await prisma.conversation.create({});
+
+            await prisma.conversationMember.createMany({
+                data: [
+                    { conversation_id: createConversation.id, user_id: userId },
+                    { conversation_id: createConversation.id, user_id: inspectedUserId },
+                ],
+            });
+
+
+            sharedConversation = await prisma.conversationMember.findFirst({
+                where: {
+                    conversation_id: createConversation.id,
+                    user_id: userId, // or inspectedUserId — either works here
+                },
+                include: {
+                    conversation: true,
+                },
+            });
+        }
+
+        res.locals.conversationId = sharedConversation.conversation_id;
+        next();
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            message: 'Something went wrong',
+            error: err
+        });
     }
 }
 

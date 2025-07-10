@@ -20,6 +20,7 @@ export const Conversation = ({}) => {
     const {conversationId} = useParams();
     const channelRef = useRef(null);
     const deleteChannelRef = useRef(null);
+    const deleteConversationRef = useRef(null);
     const navigate = useNavigate();
 
     const {configureUI, setConversationMembers, setActiveConversation} = useChatContext();
@@ -36,7 +37,6 @@ export const Conversation = ({}) => {
         })
             .then(response => response.json())
             .then(data => {
-                console.log(data)
                 setMessages(data.messages);
                 setActiveConversation(data.conversation);
                 setLoading(false);
@@ -88,6 +88,45 @@ export const Conversation = ({}) => {
         const audio = new Audio('/notification.mp3');
         audio.play();
     };
+
+
+
+    useEffect(() => {
+        if (!conversationId) return;
+
+        if (deleteConversationRef.current) {
+            supabase.removeChannel(deleteConversationRef.current);
+        }
+
+        deleteConversationRef.current = supabase
+            .channel(`delete-conversation-${conversationId}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: 'DELETE',
+                    schema: 'public',
+                    table: 'Conversation',
+                    filter: `id=eq.${conversationId}`,
+                },
+                (payload) => {
+                    console.log(payload);
+                    const oldRow = payload.old;
+                    if (oldRow.id === conversationId) {
+                        navigate('/messages');
+                    }
+                }
+            )
+            .subscribe();
+
+        return () => {
+            if (deleteConversationRef.current) {
+                supabase.removeChannel(deleteConversationRef.current);
+                deleteConversationRef.current = null;
+            }
+        };
+    }, [token, conversationId]);
+
+
 
     useEffect(() => {
         if (!conversationId) return;

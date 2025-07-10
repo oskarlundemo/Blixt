@@ -4,6 +4,7 @@
 
 import {Router} from 'express';
 import {
+    fetchConversation,
     fetchFollowers,
     fetchPosts,
     follow,
@@ -14,7 +15,7 @@ import {authenticateUser} from "../middleware/supabase.js";
 
 const profileRoute = Router();
 
-profileRoute.get('/fetch/data/:username', authenticateUser, fetchPosts, fetchFollowers, sendProfileData);
+profileRoute.get('/fetch/data/:username', authenticateUser, fetchPosts, fetchFollowers, fetchConversation, sendProfileData);
 
 profileRoute.get('/inspect/:post_id', authenticateUser, inspectSinglePost)
 

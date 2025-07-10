@@ -76,7 +76,13 @@ export const DirectMessages = ({}) => {
 
                             if (response.ok) {
                                 const data = await response.json();
-                                setConversations((prev) => [data.newConvo, ...prev]);
+                                console.log(data);
+                                setConversations((prev) => {
+                                    if (prev.find(convo => convo.id === data.newConvo.id)) {
+                                        return prev; // already added
+                                    }
+                                    return [data.newConvo, ...prev];
+                                });
                             } else {
                                 toast.error('There was an error retrieving the message');
                             }

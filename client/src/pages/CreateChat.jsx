@@ -1,13 +1,10 @@
 import '../styles/CreateChat.css'
-import {use, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {CreateChatHeader} from "../components/CreateChatComponents/CreateChatHeader.jsx";
 import {ParticipantsSection} from "../components/CreateChatComponents/ParticipantsSection.jsx";
 import {useAuth} from "../context/AuthContext.jsx";
 import {Spinner} from "../components/Spinner.jsx";
 import toast from "react-hot-toast";
-import {MenuItem} from "../components/ConversationComponents/MenuItem.jsx";
-import {BottomSheet} from "../components/BottomSheet.jsx";
-import {Overlay} from "../components/Overlay.jsx";
 
 export const CreateChat = ({setCreateChatUI = null, following = []}) => {
 
@@ -53,7 +50,6 @@ export const CreateChat = ({setCreateChatUI = null, following = []}) => {
 
         try {
             let endPoint = participants.length > 1 ? 'group' : 'private'
-            console.log(endPoint);
 
             fetch(`${API_URL}/conversations/create/${endPoint}`, {
                 method: 'POST',
