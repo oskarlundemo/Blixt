@@ -46,7 +46,12 @@ export const ParticipantsSection = ({
                             ))}
                         </>
                     ) : (
-                        <p>No following</p>
+                        <p
+                            style={{
+                                textAlign: 'center',
+                                opacity: '0.5',
+                            }}
+                        >Users you follow are shown here</p>
                     )
                 ) : (
                     search.length > 0 && (

@@ -27,6 +27,7 @@ export const Profile = ({}) => {
     const [loading, setLoading] = useState(true);
     const [profileUser, setProfileUser] = useState([]);
     const [showMore, setShowMore] = useState(false);
+    const [conversationId, setConversationId] = useState(null);
 
     const [following, setFollowing] = useState(0);
     const [followers, setFollowers] = useState(0);
@@ -86,13 +87,14 @@ export const Profile = ({}) => {
         })
             .then(res => res.json())
             .then(data => {
-
+                console.log(data);
                 setProfileUser(data.user);
                 setBio(data.user?.bio || '');
                 setEditedBio(data.user.bio);
                 setProfileUsername(data.user.username || data.user.user_metadata.username);
                 setPosts(data.posts);
                 setArchive(data.archive);
+                setConversationId(data.conversationId);
 
                 setFollowing(data.following.length);
                 setFollowing(data.following?.length || 0);
@@ -212,6 +214,7 @@ export const Profile = ({}) => {
                                 <FollowMessageContainer
                                     username={profileUsername}
                                     follows={follows}
+                                    conversationId={conversationId}
                                     handleFollow={handleFollow}/>
                             ) : (
                                 (editing ? (

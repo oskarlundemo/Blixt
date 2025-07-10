@@ -1,14 +1,12 @@
-import {Fragment} from "react";
+import {Fragment, useState} from "react";
 
 
 import '../../styles/Profile.css'
 import {useNavigate} from "react-router-dom";
 
-export const FollowMessageContainer = ({follows, handleFollow, username}) => {
-
+export const FollowMessageContainer = ({follows, handleFollow, conversationId, username}) => {
 
     const navigate = useNavigate();
-
 
     return (
         <div
@@ -43,7 +41,7 @@ export const FollowMessageContainer = ({follows, handleFollow, username}) => {
                     color: 'white'
                 }}
                 onClick={() => {
-                    navigate(`/messages/${encodeURIComponent(username)}`);
+                    navigate(`/messages/${conversationId}`);
                 }}>
                 Message
             </button>
