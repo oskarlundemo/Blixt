@@ -11,8 +11,7 @@ import { Notifications } from "./pages/Notifications.jsx";
 import { Explore } from "./pages/Explore.jsx";
 import { Conversation } from "./pages/Conversation.jsx";
 import { DirectMessages } from "./pages/DirectMessages.jsx";
-import { CreateChat } from "./pages/CreateChat.jsx";
-import toast, { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
 
 import { ChatProvider } from "./context/ConversationContext.jsx";
 
@@ -22,7 +21,9 @@ function App() {
 
     return (
         <div className="App">
+
             <Routes>
+
                 <Route path="/" element={<Start />} />
                 <Route path="/new/post" element={<NewPost />} />
                 <Route path="/:username/:postid" element={<InspectPost />} />

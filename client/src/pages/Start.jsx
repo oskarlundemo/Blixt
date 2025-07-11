@@ -1,9 +1,10 @@
 import {LoginForm} from "../components/StartComponents/LoginForm.jsx";
-import {SmartphoneFrame} from "../components/StartComponents/SmartphoneFrame.jsx";
 import {CompanyLogo} from "../components/CompanyLogo.jsx";
 import '../styles/Start.css'
 import {CreateForm} from "../components/StartComponents/CreateForm.jsx";
 import {useState} from "react";
+import {ImageSection} from "../components/StartComponents/ImageSection.jsx";
+import {LandingPageFooter} from "../components/LandingPageComponents/LandingPageFooter.jsx";
 
 export const Start = ({}) => {
 
@@ -14,19 +15,20 @@ export const Start = ({}) => {
 
             <CompanyLogo/>
 
-            <div className='start-container'>
 
-                <SmartphoneFrame
-                    height={500}
-                />
+            <section className="content">
+                <ImageSection/>
 
                 {showLogin ? (
                     <LoginForm setShowLogin={setShowLogin} />
                 ) : (
                     <CreateForm setShowLogin={setShowLogin} />
                 )}
+            </section>
 
-            </div>
+
+
+            <LandingPageFooter/>
 
         </main>
     )
