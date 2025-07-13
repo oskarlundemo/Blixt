@@ -1,5 +1,19 @@
 import {useNavigate} from "react-router-dom";
-import {useChatContext} from "../context/ConversationContext.jsx";
+
+
+/**
+ * This component act as a header that is used for navigation once the
+ * user has logged-in to the app
+ *
+ * @param backArrow go back
+ * @param more toggle profile setting
+ * @param newMessage create a new message
+ * @param setShowMore state to set show more
+ * @param setCreateChatUI state to show createChat
+ * @param absolutePath navigate to specific path
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
 
 export const HeaderMenu = ({backArrow = false,
@@ -7,18 +21,17 @@ export const HeaderMenu = ({backArrow = false,
                                newMessage = false,
                                setShowMore = false,
                                setCreateChatUI = false,
-                                absolutePath = "/"
+                                absolutePath = null
 }) => {
 
     const navigate = useNavigate();
 
     return (
         <header className={'header-menu'}>
-
             {backArrow && (
                 <svg
                     onClick={() => {
-                        if (absolutePath) {
+                        if (absolutePath !== null && absolutePath !== undefined) {
                             navigate(absolutePath);
                         } else {
                             navigate(-1);

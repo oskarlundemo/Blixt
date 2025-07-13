@@ -1,10 +1,20 @@
 import {MenuItem} from "./MenuItem.jsx";
 import {useChatContext} from "../../context/ConversationContext.jsx";
 import {useAuth} from "../../context/AuthContext.jsx";
-import {useEffect} from "react";
+
+/**
+ * This component is rendered in the ConfigureChat.jsx and contains
+ * all the controls when the admin or creator of a conversation wants to either
+ * delete the whole conversation or kick or add new members
+ *
+ * @param setShowGroupUsers
+ * @param showGroupUsers
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
 
-export const ConversationControlls = ({setShowGroupUsers, showGroupUsers}) => {
+export const ConversationControls = ({setShowGroupUsers, showGroupUsers}) => {
 
     const {activeConversation, conversationMembers, setAddMemberUI, setShowDeleteContainer} = useChatContext();
     const {user} = useAuth();
@@ -19,6 +29,7 @@ export const ConversationControlls = ({setShowGroupUsers, showGroupUsers}) => {
 
             className="groupControls">
 
+            {/* This menu item contains a dropdown of the members inside the conversation*/}
             <MenuItem
                 onClick={() => {
                     setShowGroupUsers(!showGroupUsers);
@@ -45,22 +56,25 @@ export const ConversationControlls = ({setShowGroupUsers, showGroupUsers}) => {
                 showGroupUsers={showGroupUsers}
             />
 
+            {/* If the logged-in user is the creator of the conversation, they are allowed to see these options */}
             {activeConversation?.admin_id === user.id && (
-                <MenuItem
-                    showDropDown={() => setShowDeleteContainer(true)}
-                    title={'Delete group'}
-                    svg={<svg className={'delete-icon'} xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m376-300 104-104 104 104 56-56-104-104 104-104-56-56-104 104-104-104-56 56 104 104-104 104 56 56Zm-96 180q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520Zm-400 0v520-520Z"/></svg>}
-                />
-            )}
+                <>
+                    {/* This menu item allows the admin to delete the conversation*/}
+                    <MenuItem
+                        showDropDown={() => setShowDeleteContainer(true)}
+                        title={'Delete group'}
+                        svg={<svg className={'delete-icon'} xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m376-300 104-104 104 104 56-56-104-104 104-104-56-56-104 104-104-104-56 56 104 104-104 104 56 56Zm-96 180q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520Zm-400 0v520-520Z"/></svg>}
+                    />
 
-            {activeConversation?.admin_id === user.id && (
-                <MenuItem
-                    showDropDown={() => setAddMemberUI(true)}
-                    title={'Add group member'}
-                    svg={
-                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
-                    }
-                />
+                    {/* This menu item triggers to show the add member page*/}
+                    <MenuItem
+                        showDropDown={() => setAddMemberUI(true)}
+                        title={'Add group member'}
+                        svg={
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
+                        }
+                    />
+                </>
             )}
 
         </div>

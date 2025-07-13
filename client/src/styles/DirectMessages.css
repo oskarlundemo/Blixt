@@ -66,3 +66,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+@media (max-width: 800px) {
+
+    .direct-messages {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding: 1rem 0;
+        justify-self: center;
+    }
+}

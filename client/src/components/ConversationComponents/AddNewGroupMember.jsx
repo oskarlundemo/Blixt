@@ -10,24 +10,28 @@ import {useChatContext} from "../../context/ConversationContext.jsx";
 import toast from 'react-hot-toast';
 
 
+/**
+ * This component is rendered when an admin of a group conversation
+ * wants to add new members to an existing group. It is called in the ConfigureChat.jsx component
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
+
 export const AddNewGroupMember = ({}) => {
 
-    const {conversationId} = useParams();
-    const [searchResults, setSearchResults] = useState([]);
-    const [search, setSearch] = useState("");
-    const {token, API_URL} = useAuth();
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const {conversationId} = useParams(); // Get the id of the conversation through the params
+    const [searchResults, setSearchResults] = useState([]); // State to hold the results of users
+    const [search, setSearch] = useState(""); // State to set the search query
+    const {token, API_URL} = useAuth(); // Get the users token from the AuthContext.jsx
+    const [loading, setLoading] = useState(false); // State to check if the db is done loading
+    const {conversationMembers, setConversationMembers} = useChatContext(); // State containing the members of the conversation from ConversationContext.jsx
 
-    const {conversationMembers, setConversationMembers} = useChatContext();
 
-    useEffect(() => {
-        console.log(conversationMembers);
-    }, [])
-
+    // This function is used for handeling new conversations members
     const addNewGroupMember = async (user) => {
-        setLoading(true);
-        setError(false);
+
+        setLoading(true); // Start the loading animation
 
         await fetch(`${API_URL}/conversations/add/member/${conversationId}`, {
             method: "POST",
@@ -39,22 +43,22 @@ export const AddNewGroupMember = ({}) => {
         })
             .then(async res => {
                 const data = await res.json();
-                console.log(data);
-                toast.success(data.message);
-                setConversationMembers(prev => [...prev, data.addedUser]);
-                setSearchResults(prev => prev.filter(u => u.id !== user.id));
+                toast.success(data.message); // Show a toast displaying success
+                setConversationMembers(prev => [...prev, data.addedUser]); // Append the added users into the array of conversation members
+                setSearchResults(prev => prev.filter(u => u.id !== user.id)); //
             })
             .catch(err => {
-                toast.error(err.message || "Something went wrong");
+                toast.error(err.message || "Something went wrong"); // There was an error adding the user to the conversation
             })
             .finally(() => {
-                setLoading(false);
+                setLoading(false); // Always set loading to false anyways
             });
     };
 
+    // This hook is used for creating a search as you write effect, displaying results for each letter entered
     useEffect(() => {
-        const delayBouncing = setTimeout(() => {
-            if (search.trim().length > 0) {
+        const delayBouncing = setTimeout(() => { // Wrap it inside a timer to minimize fetches and prevent bad performance
+            if (search.trim().length > 0) { // If the search string is empty, do nothing
                 fetch(`${API_URL}/conversations/search/members/${conversationId}/?q=${search}`, {
                     method: "GET",
                     headers: {
@@ -63,17 +67,17 @@ export const AddNewGroupMember = ({}) => {
                 })
                     .then(res => res.json())
                     .then(data => {
-                        console.log(data)
                         setSearchResults(data.results);
                     })
                     .catch(err => {
-                        console.log(err)
+                        toast.error(err.message || 'There was an error handeling your search query.');
+                        console.log('There was an error handeling your search query.');
                     });
             } else {
-                setSearchResults([]);
+                setSearchResults([]); // If there is no search query, show no results
             }
         }, 300)
-        return () => clearTimeout(delayBouncing);
+        return () => clearTimeout(delayBouncing); // Clean up
     }, [search]);
 
 
@@ -95,7 +99,7 @@ export const AddNewGroupMember = ({}) => {
             className={'add-new-group-member'}>
 
             {loading ? (
-                <Spinner/>
+                <Spinner/> // Show the loading animation
             ) : (
                 <>
                     <h1>Invite new member</h1>

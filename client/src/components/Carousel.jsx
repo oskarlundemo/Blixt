@@ -1,10 +1,17 @@
-
-
-
-
-
 import React from 'react';
 import '../App.css';
+
+
+/**
+ * This component is just a carousel, used to render posts that have several pictures in them
+ *
+ * @param slides the images themselves
+ * @returns {Element}
+ * @constructor
+ */
+
+
+
 
 export const Carousel = ({ children: slides }) => {
 

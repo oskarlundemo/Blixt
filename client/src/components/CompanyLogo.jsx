@@ -1,9 +1,13 @@
-
-
 import '../styles/Start.css'
 
 
-export const CompanyLogo = ({height, width = 'auto'}) => {
+/**
+ * This component is used to render the company logo
+ * @returns {JSX.Element}
+ * @constructor
+ */
+
+export const CompanyLogo = ({}) => {
 
     return (
         <div className="company-logo">
@@ -11,7 +15,9 @@ export const CompanyLogo = ({height, width = 'auto'}) => {
                 className="start-logo">
                 Blixt ⚡️
             </h1>
-            <h2>Save moments in a flash</h2>
+            <h2>
+                Capture Life in a Flash.
+            </h2>
         </div>
     )
 }

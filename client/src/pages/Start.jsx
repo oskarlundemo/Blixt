@@ -4,7 +4,7 @@ import '../styles/Start.css'
 import {CreateForm} from "../components/StartComponents/CreateForm.jsx";
 import {useState} from "react";
 import {ImageSection} from "../components/StartComponents/ImageSection.jsx";
-import {LandingPageFooter} from "../components/LandingPageComponents/LandingPageFooter.jsx";
+import {StartPageFooter} from "../components/StartComponents/StartPageFooter.jsx";
 
 export const Start = ({}) => {
 
@@ -28,7 +28,7 @@ export const Start = ({}) => {
 
 
 
-            <LandingPageFooter/>
+            <StartPageFooter/>
 
         </main>
     )

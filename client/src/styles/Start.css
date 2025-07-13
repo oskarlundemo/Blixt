@@ -47,6 +47,9 @@
     display: flex;
     flex-direction: column;
     height:fit-content;
+    position: absolute;
+    right: 20%;
+    z-index: 10;
 
     span {
         margin: auto auto 0 auto;
@@ -233,15 +236,16 @@
     height: 100%;
     align-items: center;
     background-color: transparent;
+    position: relative;
 }
 
 .start-images {
-    overflow: hidden;
+    position: absolute;
+    right: 10%;
     display: flex;
     flex-direction: column !important;
     justify-content: center;
     align-items: center;
-    position: relative;
     height: 100%;
     width: 100%;
     background-color: transparent;
@@ -276,4 +280,39 @@
     align-items: center;
     justify-content: center;
     background-color: transparent;
+}
+
+
+@media (max-width: 800px ) {
+
+    .content {
+        display: flex;
+        flex-direction: row;
+        width: 80%;
+        height: 100%;
+        align-items: center;
+        background-color: transparent;
+        position: relative;
+    }
+
+    .start-images {
+        position: absolute;
+        right: 0%;
+        display: flex;
+        flex-direction: column !important;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+        background-color: transparent;
+    }
+
+
+
+    .login-section, .create-section {
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+    }
+
 }

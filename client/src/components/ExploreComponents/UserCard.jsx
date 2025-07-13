@@ -1,5 +1,19 @@
 import {useNavigate} from "react-router-dom";
+import {UserAvatar} from "../UserAvatar.jsx";
 
+
+/**
+ * This component is used for rendering all the search results of users when a
+ * user wants to find other profiles, and once they click on it they are
+ * shown that users profile
+ *
+ * @param avatar of the user
+ * @param username of the user
+ * @param size of the
+ * @param inputFocus
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
 export const UserCard = ({avatar, username, size = '20px', inputFocus}) => {
 
@@ -23,18 +37,8 @@ export const UserCard = ({avatar, username, size = '20px', inputFocus}) => {
             }}
         >
 
-            <img
-                src={avatar}
-                alt={avatar}
-                height={size}
-                width={size}
-                style={{
-                    borderRadius: '50%',
-                }}
-                />
-
+            <UserAvatar user={avatar} />
             <p>{username}</p>
-
         </div>
     )
 }

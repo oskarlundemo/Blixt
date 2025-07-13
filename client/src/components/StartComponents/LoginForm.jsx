@@ -4,30 +4,49 @@ import {SectionSplitter} from "../SectionSplitter.jsx";
 import {supabase} from "../../services/SupabaseClient.js";
 import {useNavigate} from "react-router-dom";
 import {Spinner} from "../Spinner.jsx";
+import toast from "react-hot-toast";
+
+/**
+ * This component is rendered when a user wants to log-in
+ * in the Start.jsx page
+ *
+ * @param setShowLogin state to either show this component or CreateForm.jsx
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
 
 export const LoginForm = ({setShowLogin}) => {
 
-    const navigate = useNavigate();
+    const navigate = useNavigate(); // Use this hook for navigation
 
-    const [errors, setErrors] = useState([]);
-    const [disabled, setDisabled] = useState(true);
-    const [resetDisabled, setResetDisabled] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState([]); // State to hold errors
+    const [disabled, setDisabled] = useState(true); // State to prevent submission if input is not valid
+    const [isEmailValid, setIsEmailValid] = useState(false); // State to prevent "forget password" if there is not a valid email
+    const [loading, setLoading] = useState(false); // State to check if loading
 
+
+    // State to hold the data from the fomr
     const [formData, setFormData] = useState({
         password: "",
         email: "",
     });
 
     useEffect(() => {
-        setResetDisabled(!(formData.email.length > 0));
-    }, [formData.email]);
-
-    useEffect(() => {
         setDisabled(!(formData.password.length > 0 && formData.email.length > 0));
     }, [formData])
 
+    // This function validates so that the email is ok
+    const validateEmail = (email) => {
+        const standardEmailFormat = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const valid = standardEmailFormat.test(email);
+        setIsEmailValid(!valid)
+    };
+
+    // If a user has forgotten their password, they need to pass a valid email
+    useEffect(() => {
+        validateEmail(formData.email);
+    }, [formData.email]);
 
     // This function is used for updating the state of the form
     const handleInputChange = (e) => {
@@ -42,7 +61,7 @@ export const LoginForm = ({setShowLogin}) => {
         });
     }
 
-
+    // This function is used for handeling the submission of the login form
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -54,7 +73,6 @@ export const LoginForm = ({setShowLogin}) => {
             email,
             password,
         });
-
 
         if (error) {
             setErrors([
@@ -71,22 +89,20 @@ export const LoginForm = ({setShowLogin}) => {
         }
     };
 
-
+    // This function is used for handeling the form submission
     const handleForgotPassword = async (e) => {
         e.preventDefault();
 
-        console.log('Clicking forgot');
-
         const {email} = formData;
-
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
             redirectTo: 'http://localhost:5173/reset-password'
         });
 
         if (error) {
+            toast.error(error.message);
             console.error('Error sending reset email:', error.message);
         } else {
-            console.log('Password reset email sent!');
+            toast.success('Password reset email sent!');
         }
     };
 
@@ -95,13 +111,9 @@ export const LoginForm = ({setShowLogin}) => {
     return (
         <section className="login-section">
 
-            <h1
-                className="form-box-title"
-            >Login on Blixt</h1>
+            <h1 className="form-box-title">Login on Blixt</h1>
 
-            {loading && (
-                <Spinner/>
-            )}
+            {loading && (<Spinner/>)}
 
             <form onSubmit={handleSubmit}>
 
@@ -142,7 +154,7 @@ export const LoginForm = ({setShowLogin}) => {
                 className="start-footer">
 
                 <button
-                    disabled={resetDisabled}
+                    disabled={isEmailValid}
                     onClick={handleForgotPassword}
                     type="submit">Forgot password?
                 </button>

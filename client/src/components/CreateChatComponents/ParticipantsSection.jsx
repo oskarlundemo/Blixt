@@ -1,5 +1,25 @@
 import { SelectableUserCard } from "./SelectableUserCard.jsx";
 
+
+/**
+ * This component is used for rendering search results when a user
+ * wants to add another member to their conversation
+ *
+ * @param searchResults array containing user objects
+ * @param addMember function to add members
+ * @param addParticipant function to add member to conversation
+ * @param removeParticipant function to remove member from conversation
+ * @param following list of users the user is following
+ * @param participants array containing the new participants
+ * @param add
+ * @param search string provided by the user
+ * @returns {JSX.Element}
+ * @constructor
+ */
+
+
+
+
 export const ParticipantsSection = ({
                                         searchResults = [],
                                         addMember = null,
@@ -10,6 +30,7 @@ export const ParticipantsSection = ({
                                         add = false,
                                         search = ''
                                     }) => {
+
     return (
         <section className={'participants-section'}>
             {searchResults.length > 0 ? (
@@ -50,8 +71,10 @@ export const ParticipantsSection = ({
                             style={{
                                 textAlign: 'center',
                                 opacity: '0.5',
-                            }}
-                        >Users you follow are shown here</p>
+                            }}>
+
+                            Users you follow are shown here
+                        </p>
                     )
                 ) : (
                     search.length > 0 && (

@@ -8,7 +8,6 @@ import {useNavigate, useParams} from "react-router-dom";
 import {UserAvatar} from "../components/UserAvatar.jsx";
 import {BioInput} from "../components/ProfileComponents/BioInput.jsx";
 import {ButtonContainer} from "../components/ProfileComponents/ButtonContainer.jsx";
-import {LoadingBox} from "../components/LoadingBox.jsx";
 import {LoadingTitle} from "../components/LoadingTitle.jsx";
 import {FollowMessageContainer} from "../components/ProfileComponents/FollowMessageContainer.jsx";
 import {HeaderMenu} from "../components/HeaderMenu.jsx";
@@ -87,7 +86,6 @@ export const Profile = ({}) => {
         })
             .then(res => res.json())
             .then(data => {
-                console.log(data);
                 setProfileUser(data.user);
                 setBio(data.user?.bio || '');
                 setEditedBio(data.user.bio);

@@ -1,23 +1,34 @@
-
-
 import {useEffect, useRef, useState} from "react";
 import {useAuth} from "../context/AuthContext.jsx";
-
-
 import '../styles/Profile.css'
 
-export const UserAvatar = ({ user, setEdit = false, setFile, file, size = '50px', selectPicture }) => {
 
-    const [userAvatar, setUserAvatar] = useState('');
-    const [loadingAvatar, setLoadingAvatar] = useState(true);
+/**
+ * This component is used to render the avatars of all
+ * the users on the plattform
+ *
+ * @param user object
+ * @param setEdit state to set edit
+ * @param setFile set that selected file
+ * @param file reference to a new file
+ * @param size of the avatar
+ * @param selectPicture true or false, if they user can select a new picture or not
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
-    const {user: loggedInUser} = useAuth();
+export const UserAvatar = ({ user, setEdit = false, setFile, file, size = '25px', selectPicture }) => {
 
+    const [userAvatar, setUserAvatar] = useState(''); // State to hold the src of the avatar
+    const [loadingAvatar, setLoadingAvatar] = useState(true); // State for loading the avatar
+    const {user: loggedInUser} = useAuth(); // Get user from context
+
+    // This hook runs on mount
     useEffect(() => {
         if (user?.avatar) {
             setUserAvatar(user.avatar);
             setLoadingAvatar(false);
-        } else {
+        } else { // If the users avatar is null, then set it to default
             setUserAvatar('/default.jpg');
             setLoadingAvatar(false);
         }
@@ -42,9 +53,6 @@ export const UserAvatar = ({ user, setEdit = false, setFile, file, size = '50px'
             setFile(selectedFile);
         }
     };
-
-
-
 
     return (
         <>

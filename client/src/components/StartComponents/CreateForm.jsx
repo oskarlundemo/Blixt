@@ -7,16 +7,26 @@ import {PasswordChecks} from "./PasswordChecks.jsx";
 import { supabase } from '../../services/SupabaseClient.js';
 import {useNavigate} from "react-router-dom";
 import {useAuth} from "../../context/AuthContext.jsx";
+import toast from "react-hot-toast";
 
+
+/**
+ * This component is rendered in the Start.jsx page, when a user
+ * wants to create a new account
+ *
+ * @param setShowLogin state to either show this component or LoginForm.jsx
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
 
 export const CreateForm = ({setShowLogin}) => {
 
 
-    const {login, user, API_URL} = useAuth();
+    const {API_URL} = useAuth();
     const navigate = useNavigate();  // Used to navigate to chats after creation is successful
-    const [errors, setErrors] = useState([]);
-    const [disabled, setDisabled] = useState(true);
+    const [errors, setErrors] = useState([]); // State to hold errors
+    const [disabled, setDisabled] = useState(true); // State to disabled input if not valid
 
     const [isPasswordFocused, setPasswordFocused] = useState(false);  // State to check if password is focused
     const [isUsernameFocused, setUsernameFocused] = useState(false); // State to check if username input is focus
@@ -27,10 +37,12 @@ export const CreateForm = ({setShowLogin}) => {
     const [acceptedEmail, setAcceptedEmail] = useState(false);  // State to check if email meets requirements
 
 
+    // This hook is used for preventing invalid data in the frontend
     useEffect(() => {
         setDisabled(!(acceptedEmail && acceptedPassword && acceptedUsername));
     }, [acceptedEmail, acceptedPassword, acceptedUsername]);
 
+    // This function is used for setting the state of the data in the form
     const [formData, setFormData] = useState({
         password: "",
         username: "",
@@ -50,12 +62,13 @@ export const CreateForm = ({setShowLogin}) => {
         });
     }
 
-
+    // This function is used for handeling the submission of the form
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         const { email, password, username } = formData;
 
+        // Send the data through the supabase client
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             email,
             password,
@@ -66,6 +79,7 @@ export const CreateForm = ({setShowLogin}) => {
             },
         });
 
+        // Show errors if there are any
         if (signUpError) {
             setErrors([signUpError.message]);
             return;
@@ -73,40 +87,43 @@ export const CreateForm = ({setShowLogin}) => {
 
         const newUser = signUpData.user;
 
-        const response = await fetch(`${API_URL}/auth/signup/supabase`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                id: newUser.id,
-                email: newUser.email,
-                username: newUser.user_metadata.username || username,
-            }),
-        });
 
-        if (!response.ok) {
-            const err = await response.json();
-            setErrors([err.error || "Failed to create user"]);
-            return;
-        }
+        try {
+            const response = await fetch(`${API_URL}/auth/signup/supabase`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    id: newUser.id,
+                    email: newUser.email,
+                    username: newUser.user_metadata.username || username,
+                }),
+            });
 
-        if (signUpData.session) {
-            navigate("/feed");
-        } else {
-            setErrors(["Check your inbox to confirm your email before logging in."]);
+
+            if (!response.ok) {
+                const err = await response.json();
+                setErrors([err.error || "Failed to create user"]);
+                return;
+            }
+
+            if (signUpData.session) {
+                navigate("/feed");
+            } else {
+                setErrors(["Check your inbox to confirm your email before logging in."]);
+            }
+
+        } catch (err) {
+            toast.error('Something went wrong! Please try again later.');
         }
     };
-
 
     return (
         <section className="create-section">
 
 
-            <h1
-                className="form-box-title"
-            >Sign up to Blixt</h1>
-
+            <h1 className="form-box-title">Sign up to Blixt</h1>
 
             <form onSubmit={handleSubmit}>
 
@@ -153,7 +170,6 @@ export const CreateForm = ({setShowLogin}) => {
                     name="email"
                 />
 
-
                 <Inputfield
                     type='password'
                     title='Password'
@@ -181,7 +197,6 @@ export const CreateForm = ({setShowLogin}) => {
             </form>
 
             <SectionSplitter/>
-
 
             <div className="start-footer">
                 <span>Already have an account? <a onClick={() => setShowLogin(true)}>Login</a></span>

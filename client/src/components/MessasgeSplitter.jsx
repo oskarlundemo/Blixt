@@ -1,6 +1,17 @@
 import moment from 'moment-timezone';
 import 'moment/locale/sv';
 
+
+/**
+ * This component is used for separating message by date,
+ * creating a more UI friendly chat experience
+ *
+ * @param date object that will be parsed
+ * @returns {JSX.Element}
+ * @constructor
+ */
+
+
 export const MessageSplitter = ({ date }) => {
 
     const inputDate = moment.tz(date, 'dddd D MMMM YYYY', 'Europe/Stockholm').startOf('day');
@@ -9,6 +20,7 @@ export const MessageSplitter = ({ date }) => {
 
     let displayDate;
 
+    // If the date is the same as today, show yesterday
     if (inputDate.isSame(yesterday)) {
         displayDate = "Yesterday";
     } else {

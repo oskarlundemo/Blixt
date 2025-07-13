@@ -1,8 +1,14 @@
 import React, {createContext, useContext, useState} from "react";
-
-
 const chatContext = createContext();
 
+
+/**
+ * This context is used for UI changes and holding state of group members inside a conversation
+ *
+ * @param children
+ * @returns {Element}
+ * @constructor
+ */
 
 
 export const ChatProvider = ({ children }) => {

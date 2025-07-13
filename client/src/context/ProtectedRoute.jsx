@@ -9,7 +9,7 @@
 
 
 import {Navigate} from 'react-router-dom';
-import {useAuth} from "../context/AuthContext.jsx";
+import {useAuth} from "./AuthContext.jsx";
 
 const ProtectedRoute = ({children}) => {
     const {user} = useAuth(); // Get the current user from AuthContext.jsx
