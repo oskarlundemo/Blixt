@@ -1,18 +1,29 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {UserAvatar} from "../UserAvatar.jsx";
-import {useNavigate} from "react-router-dom";
+import toast from "react-hot-toast";
+
+/**
+ * This component is the UI the users writes their comments into
+ * when they want to comment on a post
+ *
+ * @param postId the id of the post they are writing the comment on
+ * @param setComments update and append the new comment to the existing ones
+ * @returns {JSX.Element}
+ */
+
 
 
 export const CommentInput = ({postId, setComments}) => {
 
-    const [comment, setComment] = useState('');
-    const {API_URL, token, user} = useAuth();
+    const [comment, setComment] = useState(''); // State to hold the comment itself
+    const {API_URL, token, user} = useAuth(); // Get the token and user from AuthContext.jsx
 
+    // This function handles the submission of a new comment
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (comment.trim() === "") {
+        if (comment.trim() === "") { // Prevent posting comments that are empty
             return;
         }
 
@@ -29,11 +40,14 @@ export const CommentInput = ({postId, setComments}) => {
 
             .then(res => res.json())
             .then(data => {
-                setComments((prevComments) => [...prevComments, data.comment]);
+                setComments((prevComments) => [...prevComments, data.comment]); // Insertion went ok, append the data of the new comment into the other ones
             })
-            .catch(err => console.log(err));
+            .catch(err => {
+                toast.error('There was an error submitting your comment, try again later') // Show a UI friendly error message
+                console.log('An error occured while creating comment');
+            });
 
-        setComment('');
+        setComment(''); // Reset the comment for
     }
 
     return (
@@ -41,7 +55,6 @@ export const CommentInput = ({postId, setComments}) => {
         <form className={'comment-input'} onSubmit={handleSubmit}>
 
             <UserAvatar
-                size={30}
                 user={user
             }/>
 
@@ -58,7 +71,6 @@ export const CommentInput = ({postId, setComments}) => {
                         handleSubmit(e);
                     }}
                     className={comment.length > 0 ? 'active' : ''}>Post</p>
-
             </div>
 
         </form>

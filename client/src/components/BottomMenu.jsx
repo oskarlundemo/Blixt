@@ -1,19 +1,35 @@
 import {useEffect, useState} from "react";
-
-
 import '../App.css'
 import {useAuth} from "../context/AuthContext.jsx";
+
+
+/**
+ * This component is a menu that slides in from the bottom in the Post.jsx,
+ * giving the user functionality to delete a post, archive or make it public.
+ *
+ *
+ * @param showBottomMenu state to show the menu
+ * @param setShowBottomMenu set the state
+ * @param archived check if the post is archived or public
+ * @param setPosts state to update the posts
+ * @param postID id of the post
+ * @returns {JSX.Element}
+ * @constructor
+ */
+
+
 
 export const BottomMenu = ({showBottomMenu, setShowBottomMenu, archived, setPosts, postID = 0}) => {
 
     const {API_URL, token} = useAuth();
-    const [isPublic, setIsPublic] = useState(archived);
+    const [isPublic, setIsPublic] = useState(archived);  // State to check if the post is accessible to the public
 
+    // This hook updates and checks if the post is public or not
     useEffect(() => {
         setIsPublic(archived);
     }, [archived]);
 
-
+    // This function handles the delete request of a post
     const deletePostHandler = async (postID) => {
         try {
             setShowBottomMenu(false);
@@ -28,6 +44,7 @@ export const BottomMenu = ({showBottomMenu, setShowBottomMenu, archived, setPost
             console.log('Error while deleting post', err.code);
         }
     }
+
 
     const archivePostHandler = async (postID) => {
         try {

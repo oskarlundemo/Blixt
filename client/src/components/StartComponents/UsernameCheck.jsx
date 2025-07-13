@@ -15,7 +15,6 @@ import {useEffect, useState} from "react";
  */
 
 
-
 export const UsernameCheck = ({name, username, setAcceptedUsername, isUsernameFocused, errors}) => {
 
     const [isValidUsername, setIsValidUsername] = useState(false); // State to check if username is ok

@@ -1,5 +1,3 @@
-
-
 import '../../styles/Post.css'
 import {Carousel} from "../Carousel.jsx";
 import {useAuth} from "../../context/AuthContext.jsx";
@@ -9,6 +7,26 @@ import {CommentCard} from "../CommentSectionComponents/CommentCard.jsx";
 import {useEffect, useState} from "react";
 import {BottomMenu} from "../BottomMenu.jsx";
 import {Overlay} from "../Overlay.jsx";
+import toast from "react-hot-toast";
+
+
+/**
+ * This component is used for rendering a post that a user has made. It is
+ * used in both the Feed.jsx and InspectPost.jsx component
+ *
+ * @param username of the user that posted
+ * @param caption of the post
+ * @param likes for the post
+ * @param comments for the post
+ * @param images associated with the post
+ * @param id of the post
+ * @param post object
+ * @param poster object of the user who posted
+ * @param setPosts state to update the list of posts
+ * @param inFeed state to check if parent component is Feed.jsx or not
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
 export const Post = ({
                          username = 'Unknown',
@@ -23,14 +41,14 @@ export const Post = ({
                          inFeed = false,
                       }) => {
 
-    const {user, API_URL, token} = useAuth();
-    const [liked, setLiked] = useState(false);
-    const navigate = useNavigate();
-    const [testLikes, setLikes] = useState(likes);
-    const [renderedIndex, setRenderedIndex] = useState(5);
-    const [showBottomMenu, setShowBottomMenu] = useState(false);
+    const {user, API_URL, token} = useAuth(); // Get token from authContext
+    const [liked, setLiked] = useState(false); // Set to true of false if the logged-in user likes the post
+    const navigate = useNavigate(); // Hook to use for navigation
+    const [testLikes, setLikes] = useState(likes); // Set the number of likes for the post
+    const [renderedIndex, setRenderedIndex] = useState(5); // Show five posts at a time and load more if needed
+    const [showBottomMenu, setShowBottomMenu] = useState(false); // State to toggle bottom menu with options
 
-
+    // This hook is used to check if the logged-in user viewing has liked the post
     useEffect(() => {
         if (user) {
             const hasLiked = likes.some(like => like.user_id === user.id);
@@ -38,15 +56,16 @@ export const Post = ({
         }
     }, [likes, user]);
 
-
+    // This function is triggered if the user likes a post
     const likePostHandler = async (postID, userID) => {
 
+        // Prevent if there is not enough data
        if (!postID || !userID || isNaN(Number(postID))) {
             console.warn("Invalid postID or userID");
             return;
         }
 
-        try {
+       try {
            await fetch(`${API_URL}/posts/like/${postID}`, {
                 method: "POST",
                 headers: {
@@ -60,7 +79,8 @@ export const Post = ({
                     setLikes(data.likes);
                 })
                 .catch((err) => {
-                    console.error(err);
+                    toast.error('There was an error while trying like the post');
+                    console.error('Error liking post');
                 })
         } catch (err) {
             console.error("Network or fetch error:", err);
@@ -69,7 +89,6 @@ export const Post = ({
 
 
     return (
-
         <>
         <article className="post">
 

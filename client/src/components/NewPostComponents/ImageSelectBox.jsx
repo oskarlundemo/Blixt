@@ -1,3 +1,10 @@
+/**
+ * This component enables the user to select an image that they wish to add ot their post once
+ * they click on it.
+ *
+ */
+
+
 import {useRef} from "react";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -6,6 +13,7 @@ export const ImageSelectBox = ({setImages}) => {
 
     const pictureInputRef = useRef(null);
 
+    // This function is used for adding the image to the state setImages
     const handleFileAdd = (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -24,6 +32,7 @@ export const ImageSelectBox = ({setImages}) => {
         reader.readAsDataURL(file);
     };
 
+    // This component triggers the click
     const handleButtonClick = () => {
         pictureInputRef.current.click();
     };

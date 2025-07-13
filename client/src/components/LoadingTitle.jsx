@@ -1,7 +1,13 @@
-
-
 import '../App.css'
 
+
+/**
+ * This component is the default loading animation that is used a bit here
+ * and there
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
 
 export const LoadingTitle = () => {
@@ -14,10 +20,9 @@ export const LoadingTitle = () => {
                 position: "fixed",
                 top: "50%",
                 left: "50%",
-                transform: "translate(-50%, -50%)", // This centers the element properly
+                transform: "translate(-50%, -50%)",
             }}>
             Loading
-
 
             <span
                 style={{
@@ -26,6 +31,7 @@ export const LoadingTitle = () => {
                     display: "inline-block",
                 }}
             >.</span>
+
             <span
                 style={{
                     animation: "bounce 1s infinite ease-in-out",
@@ -33,6 +39,7 @@ export const LoadingTitle = () => {
                     display: "inline-block",
                 }}
             >.</span>
+
             <span
                 style={{
                     animation: "bounce 1s infinite ease-in-out",

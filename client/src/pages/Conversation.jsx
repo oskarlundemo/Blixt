@@ -228,7 +228,7 @@ export const Conversation = ({}) => {
                 <LoadingTitle/>
             ) : (
                 (configureUI ? (
-                        <ConfigureChat/>
+                    <ConfigureChat/>
                 ) : (
                     <ChatWindow
                         messages={messages}

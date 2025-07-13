@@ -1,46 +1,77 @@
 import {UserAvatar} from "../UserAvatar.jsx";
-import moment from "moment-timezone";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {useParams} from "react-router-dom";
-import {useEffect} from "react";
+import toast from "react-hot-toast";
+
+
+/**
+ * This component is used for rendering comments inside the CommentSection.jsx beneath
+ * Post.jsx components
+ *
+ * @param comment
+ * @param author
+ * @param timestamp
+ * @param commentSection
+ * @param id
+ * @param isUsersPost
+ * @param feed
+ * @param setComments
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
 
 export const CommentCard = ({
-                                comment = '',
-                                author = null,
-                                timestamp,
-                                commentSection = false,
-                                id = 0,
-                                isUsersPost = false,
-                                feed = false,
-                                setComments = [],
+                                comment = '', // Comment
+                                author = null, // Object containing the user who wrote the comment
+                                timestamp, // The timestamp the comment was inserted into db
+                                commentSection = false, // If the comment is shown in feed, do not show controlls
+                                id = 0, // Id of the comment
+                                isUsersPost = false, // If the comment is written by the logged in user
+                                feed = false, // Is the comment in a post shown in the feed
+                                setComments = [], // Update comments for the post if one is deleted or added for that post
                             }) => {
 
-    const {user, API_URL, token} = useAuth();
-    const {postid} = useParams();
+    const {user, API_URL, token} = useAuth(); // Get the user and their token from the authcontext
+    const {postid} = useParams(); // The id of the post the comment is on through params
 
+    /**
+     * Parse the date object sent from the backend into a more readable UI format and
+     * show ex 5 min ago
+     *
+     * @param timestamp Date object
+     * @returns {string}
+     */
     const parseTimeStamp = (timestamp) => {
-        const now = new Date();
-        const created = new Date(timestamp);
 
+        const now = new Date(); // Create a new date object to compare the timestamp
+        const created = new Date(timestamp); // Convert for safety
+
+        // Calculate the time that has passed since comment was posted
         const diffInMs = now - created;
         const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
         const diffInHours = Math.floor(diffInMinutes / 60);
         const diffInDays = Math.floor(diffInHours / 24);
 
-        if (diffInMinutes < 60) {
+
+        if (diffInMinutes < 60) { // Within an hour show the minutes or 'Just now
             if (diffInMinutes <= 0) {
                 return 'Just now'
             }
             return `${diffInMinutes} min`;
-        } else if (diffInHours < 24) {
+        } else if (diffInHours < 24) { // Show hours
             return `${diffInHours} h`;
-        } else {
+        } else { // Just show the days since
             return `${diffInDays} d`;
         }
     };
 
-
+    /**
+     * Function that handles the deletion of a comment
+     *
+     * @param commentId
+     * @returns {Promise<void>}
+     */
 
     const deleteCommentHandler = async (commentId) => {
         await fetch(`${API_URL}/posts/comments/delete/${commentId}/${postid}`, {
@@ -52,9 +83,14 @@ export const CommentCard = ({
         })
             .then(res => res.json())
             .then(data => {
-                setComments((prevComments) => prevComments.filter(comment => comment.id !== commentId));
+                setComments((prevComments) => prevComments.filter(comment => comment.id !== commentId)); // If response was ok, remove that comment from the array of comments
             })
-            .catch(err => console.log(err));
+            .catch(err => {
+                toast.error('There was an error while deleting the comment'); // If the user is not authorized or an error occured, show a toast
+                console.log(
+                    'There was an error while deleting the comment'
+                )
+            });
     }
 
 
@@ -87,7 +123,6 @@ export const CommentCard = ({
                                 textWrap: 'break-word',
                             }}>
 
-
                         <span
                             style={{
                                 fontWeight: 'bold',
@@ -108,10 +143,12 @@ export const CommentCard = ({
                             alignSelf: 'flex-start',
                         }}>
 
+                        {/*If the comment is not shown in a feed, then the author of that comment can delete it*/}
                         {!feed && (
                             <p>{parseTimeStamp(timestamp)}</p>
                         )}
 
+                        {/*Only the author of the comment or the admin of post can delete this comment*/}
                         {((isUsersPost || author?.id === user?.id) && !feed) && (
                             <svg
                                 className={'delete-comment-icon'}

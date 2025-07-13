@@ -1,3 +1,11 @@
+/**
+ * This component is used for wrapping and containing all the
+ * images that a user has selected for their new post in the NewPost.jsx page.
+ *
+ * In this component I have also used dnd-kit to make the images re-arrangeable
+ * by drag-and-drop, if the user want to change the order before posting
+ */
+
 import {ImageBox} from "./ImageBox.jsx";
 import {ImageSelectBox} from "./ImageSelectBox.jsx";
 import {rectSortingStrategy, SortableContext} from "@dnd-kit/sortable";

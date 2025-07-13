@@ -2,17 +2,29 @@ import {UserAvatar} from "./UserAvatar.jsx";
 import {useAuth} from "../context/AuthContext.jsx";
 import {useParams} from "react-router-dom";
 import {useChatContext} from "../context/ConversationContext.jsx";
-import {useEffect} from "react";
 import toast from 'react-hot-toast';
+
+/**
+ * This component is a drop-down menu with users that
+ * are in a conversation
+ *
+ *
+ * @param members of a conversation
+ * @param openMenu state to toggle the menu
+ * @param admin id of the admin of the conversation
+ * @returns {JSX.Element}
+ * @constructor
+ */
+
 
 export const DropDownUsers = ({members, openMenu, admin}) => {
 
-    const {user, token, API_URL} = useAuth();
-    const {conversationId} = useParams();
-    const {setConversationMembers, conversationMembers} = useChatContext()
+    const {user, token, API_URL} = useAuth(); // Get token from authContext
+    const {conversationId} = useParams(); // Get id from parameters
+    const {setConversationMembers} = useChatContext() // Set the state of the conversation members
 
+    // This function handles kicking other users from the conversation
     const handleKickUser = async (user) => {
-
         await fetch(`${API_URL}/conversations/kick/${conversationId}`, {
             method: "DELETE",
             headers: {
@@ -49,11 +61,9 @@ export const DropDownUsers = ({members, openMenu, admin}) => {
 
                             {(admin === user.id) && (member?.user?.id !== user.id) && (
                                 <svg
-
                                     onClick={() => {
                                         handleKickUser(member?.user);
                                     }}
-
                                     className={`close-icon`}
 
                                     style={{

@@ -1,5 +1,17 @@
-
-
+/**
+ * This component is used for holding an image that is rendered in its parent
+ * container, ImageSection.sjx
+ *
+ * @param imgSrc to the image
+ * @param height of the image
+ * @param width of the image
+ * @param zIndex in the layout
+ * @param rotateDeg rotation
+ * @param translateX move by the x-axis
+ * @param boxShadow style
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
 
 export const ImageCard = ({
@@ -22,8 +34,7 @@ export const ImageCard = ({
                 boxShadow,
                 transition: 'transform 0.3s ease, box-shadow 0.3s ease',
             }}
-            className="start-image-wrapper"
-        >
+            className="start-image-wrapper">
             <img
                 style={{
                     height: `${height}px`,

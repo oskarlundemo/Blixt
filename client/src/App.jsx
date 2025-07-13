@@ -15,6 +15,15 @@ import { Toaster } from 'react-hot-toast';
 
 import { ChatProvider } from "./context/ConversationContext.jsx";
 
+
+/**
+ * Oskar, fixa alla i en protected route, och lägg en default "Hmm.. are that file does not exist "
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
+
+
 function App() {
     const PRODUCTION_URL = import.meta.env.VITE_API_BASE_URL;
     const API_BASE_URL = import.meta.env.PROD ? PRODUCTION_URL : "/api";
@@ -25,6 +34,7 @@ function App() {
             <Routes>
 
                 <Route path="/" element={<Start />} />
+
                 <Route path="/new/post" element={<NewPost />} />
                 <Route path="/:username/:postid" element={<InspectPost />} />
                 <Route path="/:username/:postid/comments" element={<CommentSection />} />

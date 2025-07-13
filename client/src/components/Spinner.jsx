@@ -1,5 +1,9 @@
-
-
+/**
+ * This component is just a loading animation that spinns
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
 
 export const Spinner = ({}) => {

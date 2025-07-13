@@ -20,15 +20,13 @@ import toast from "react-hot-toast";
  */
 
 
-
-
 export const GifContainer = ({ showGifs, setShowGifs}) => {
 
-    const {token, API_URL} = useAuth();
+    const {token, API_URL} = useAuth(); // Get the token from the authContext.jsx
     const [gifs, setGifs] = useState([]);  // Array to hold the gifs
     const [gifSearch, setGifSearch] = useState("");  // Search string for gifs
     const [loading, setLoading] = useState(false);  // Set loading state for gifs
-    const {conversationId} = useParams();
+    const {conversationId} = useParams(); // Get the id of the conversation through the params
 
     const apiKey = import.meta.env.VITE_GIPHY_KEY;  // Get API key from .env
     const limit = 9;  // Limit the gifs to 10
@@ -68,16 +66,17 @@ export const GifContainer = ({ showGifs, setShowGifs}) => {
     };
 
 
+    // This function is used for handeling the submission when a user clicks on a gif
     const handleSubmit = (e) => {
         e.preventDefault();
         if (gifSearch.trim()) fetchGifs(gifSearch);
     };
 
-
+    // This function is used for writing
     const sendGif = async (gif) => {
-        setShowGifs(false);
+        setShowGifs(false); // Remove the UI where users can select gifs
 
-        const sanitizedGif = {
+        const sanitizedGif = { // Sanitize in front end first
             id: gif.id,
             url: gif.images?.original?.url,
             title: gif.title || ""
@@ -95,12 +94,11 @@ export const GifContainer = ({ showGifs, setShowGifs}) => {
 
             if (!res.ok) {
                 console.error("GIF send failed:", await res.text());
-                toast.error('Failed to send GIF!');
-                // Optionally notify user
+                toast.error('Failed to send GIF!'); // Notify user
             }
+
         } catch (err) {
-            console.error("Message send error:", err);
-            // Optionally notify user
+            console.error('There was a problem sending gif');
         }
     }
 
@@ -112,7 +110,6 @@ export const GifContainer = ({ showGifs, setShowGifs}) => {
 
             <div className="gifContainer-search">
                 <form onSubmit={handleSubmit}>
-
                     <input
                         type='text'
                         value={gifSearch}
@@ -120,7 +117,6 @@ export const GifContainer = ({ showGifs, setShowGifs}) => {
                         placeholder='Send something funny...'
                     />
                 </form>
-
               </div>
 
             <div className="gifContainer-search-result">

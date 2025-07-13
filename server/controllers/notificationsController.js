@@ -18,6 +18,9 @@ export const loadNotifications = async (req, res) => {
                         images: true,
                     }
                 },
+            },
+            orderBy: {
+                createdAt: 'desc'
             }
         });
 

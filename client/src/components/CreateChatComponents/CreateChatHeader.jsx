@@ -1,11 +1,28 @@
 import {useEffect, useState} from "react";
-
 import '../../styles/CreateChat.css'
 
-export const CreateChatHeader = ({participants = [], add = false, search = '', removeParticipant = null, setSearch = ''}) => {
+/**
+ * This component is rendered inside the AddNewGroupMember.jsx components
+ * when a user want to add more members to their conversation
+ *
+ * @param participants of the conversation
+ * @param add
+ * @param search search string provided by user
+ * @param removeParticipant state to remove participant in the conversation
+ * @param setSearch state to update the state of the conversation
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
-    const [numberOfParticipants, setNumberOfParticipants] = useState(0);
+export const CreateChatHeader = ({participants = [],
+                                     add = false,
+                                     search = '',
+                                     removeParticipant = null,
+                                     setSearch = ''}) => {
 
+    const [numberOfParticipants, setNumberOfParticipants] = useState(0); // State to check number of participants
+
+    // Hook to set the number of participants on mount
     useEffect(() => {
         setNumberOfParticipants(participants.length);
     }, [participants]);
@@ -18,20 +35,18 @@ export const CreateChatHeader = ({participants = [], add = false, search = '', r
                     display: 'flex',
                     flexDirection: 'row',
                     alignItems: 'center',
-                }}
-            >
+                }}>
+
                 <h2
                     style={{
                         width: 'fit-content',
                         margin: '0 1rem'
-                    }}
-                >
+                    }}>
                     {add ? 'Add:' : 'To:'}
                 </h2>
 
                 {participants && (
                     <div
-
                         style={{
                             minHeight: "55px",
                         }}

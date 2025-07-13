@@ -38,8 +38,6 @@ export const Inputfield = ({ title, type, id, name, onChange, value, example, sv
         }
     }, [errors, name]);
 
-
-
     return (
         <div className="input-field">
             <fieldset className="input-fieldset">

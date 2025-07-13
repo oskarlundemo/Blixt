@@ -2,20 +2,26 @@ import {useAuth} from "../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 import {useUI} from "../context/UIContext.jsx";
 
+/**
+ * This component is used as the navigation bar of the
+ * entire app, rendered at the bottom
+ *
+ * @param searchHasFocus
+ * @returns {JSX.Element}
+ * @constructor
+ */
+
 
 export const NavigationBar = ({searchHasFocus}) => {
 
-    const navigate = useNavigate();
-
-    const {user} = useAuth();
-
-    const {footerIndex, setFooterIndex} = useUI();
+    const navigate = useNavigate(); // Use this hook for navigation
+    const {user} = useAuth(); // Get the user object form context
+    const {footerIndex, setFooterIndex} = useUI(); // Index to keep track of the current index
 
     const getFillColor = (index) => (index === footerIndex ? 'var(--accent-color)' : '#e3e3e3');
 
     return (
         <nav
-
             style={{
                 zIndex: searchHasFocus ? 5 : 100,
             }}

@@ -8,16 +8,30 @@ import {useNavigate, useParams} from "react-router-dom";
 import { motion } from "framer-motion";
 import {useChatContext} from "../../context/ConversationContext.jsx";
 
+/**
+ * This component is used for displaying the chat from a
+ * conversation. Displaying messages that was sent. It is rendered in the
+ * Conversation.jsx component once the users click on a ConversationCard.jsx element in
+ * the DirectMessage.jsx page
+ *
+ * @param messages the messages sent in the conversation
+ * @param renderedMessages the messages refactored with spacers for better readability
+ * @param loading state
+ * @returns {JSX.Element}
+ * @constructor
+ */
+
+
 
 export const ChatWindow = ({messages, renderedMessages, loading}) => {
 
-    const navigate = useNavigate();
-    const bottomRef = useRef(null);
-    const [message, setMessage] = useState('');
-    const [showGif, setShowGif] = useState(false);
-    const {setConfigureUI, conversationMembers, activeConversation} = useChatContext();
+    const navigate = useNavigate(); // Use the navigation hook to go to other sites
+    const bottomRef = useRef(null); // Ref to automatically scroll down to the bottom of the messages
+    const [message, setMessage] = useState(''); // State to hold the new message a user enters
+    const [showGif, setShowGif] = useState(false); // State to either show or not the gif selector
+    const {setConfigureUI, conversationMembers, activeConversation} = useChatContext(); // State that updates the UI
 
-    useEffect(() => {
+    useEffect(() => { // Effect hook to scroll to the bottom of the messages automatically on render or when a new message is inserted
         const timeout = setTimeout(() => {
             bottomRef.current?.scrollIntoView({ behavior: "smooth" });
         }, 500);
@@ -103,8 +117,7 @@ export const ChatWindow = ({messages, renderedMessages, loading}) => {
                         left: "50%",
                         transform: "translate(-50%, -50%)",
                         textAlign: "center"
-                    }}
-                >
+                    }}>
                     No messages yet! Initiate a conversation
                 </p>
             )}
@@ -143,9 +156,10 @@ export const ChatWindow = ({messages, renderedMessages, loading}) => {
      />
 
          <Overlay
-        showOverlay={showGif}
-        setShowOverlay={setShowGif}
-        clickToggle={true}/>
+             showOverlay={showGif}
+             setShowOverlay={setShowGif}
+             clickToggle={true}
+         />
 
         </motion.section>
     )

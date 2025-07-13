@@ -4,9 +4,8 @@ import {useEffect, useState} from "react";
 import {NavigationBar} from "../components/NavigationBar.jsx";
 import {closestCorners, DndContext, PointerSensor, TouchSensor, useSensor, useSensors} from "@dnd-kit/core";
 import {ImageGridContainer} from "../components/NewPostComponents/ImageGridContainer.jsx";
-import {arrayMove, SortableContext} from "@dnd-kit/sortable";
+import {arrayMove} from "@dnd-kit/sortable";
 import {Overlay} from "../components/Overlay.jsx";
-import {PopUpModule} from "../components/PopUpModule.jsx";
 import {useAuth} from "../context/AuthContext.jsx";
 import {HeaderMenu} from "../components/HeaderMenu.jsx";
 import toast from "react-hot-toast";
@@ -156,8 +155,6 @@ export const NewPost = ({}) => {
 
 
             <NavigationBar/>
-
-            <PopUpModule images={images} showPopup={showPopup}/>
 
             <Overlay showOverlay={showOverlay}/>
 

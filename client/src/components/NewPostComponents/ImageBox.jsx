@@ -1,5 +1,10 @@
 
 
+/**
+ * This component is used for containing an image that the users has
+ * selected to be in their new post in its parent container, ImageGridContainer.jsx
+ *
+ */
 
 import {useSortable} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";

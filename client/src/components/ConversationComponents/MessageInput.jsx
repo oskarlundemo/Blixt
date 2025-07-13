@@ -1,17 +1,29 @@
 import {useAuth} from "../../context/AuthContext.jsx";
 import {useParams} from "react-router-dom";
+import toast from "react-hot-toast";
 
+
+/**
+ * This component is the interface where users write their message
+ * that will be sent in a conversation. Rendered in the ChatWindow.jsx component
+ *
+ * @param message
+ * @param setMessage
+ * @param setShowGif
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
 export const MessageInput = ({message, setMessage, setShowGif}) => {
 
-    const {token, API_URL} = useAuth();
-    const {conversationId} = useParams();
+    const {token, API_URL} = useAuth(); // Get the token from the authContext.jsx
+    const {conversationId} = useParams(); // Get the id of the conversation from the params
 
+    // This function is used for handeling submission when a users sends a message in the chat
     const handleSubmit = async (e) => {
-
         e.preventDefault();
 
-        if (message.trim().length === 0)
+        if (message.trim().length === 0) // Prevent send if the message is empty
             return;
 
         try {
@@ -26,15 +38,14 @@ export const MessageInput = ({message, setMessage, setShowGif}) => {
                 }
             })
         } catch (error) {
-            console.error(error);
+            toast.error('Something went wrong sending your message!');
+            console.error('There was an error while sending the message');
         }
-        setMessage('')
+        setMessage('') // Clear the state of the message
     }
 
     return (
-        <footer
-            className="conversation-footer"
-        >
+        <footer className="conversation-footer">
 
             <form onSubmit={handleSubmit}>
                 <textarea
@@ -48,7 +59,6 @@ export const MessageInput = ({message, setMessage, setShowGif}) => {
                 />
             </form>
                 <div className="message-icons">
-
                     <div className="gif-icon">
                         <svg
                             onClick={() => {
@@ -56,14 +66,12 @@ export const MessageInput = ({message, setMessage, setShowGif}) => {
                             }}
                             xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm240-160h60v-240h-60v240Zm-160 0h80q17 0 28.5-11.5T400-400v-80h-60v60h-40v-120h100v-20q0-17-11.5-28.5T360-600h-80q-17 0-28.5 11.5T240-560v160q0 17 11.5 28.5T280-360Zm280 0h60v-80h80v-60h-80v-40h120v-60H560v240ZM200-200v-560 560Z"/></svg>
                     </div>
-
                     <svg
                         onClick={(e) => {
                             handleSubmit(e);
                         }}
                         xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/></svg>
                 </div>
-
         </footer>
     )
 
