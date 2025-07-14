@@ -10,11 +10,10 @@
     gap: 1rem;
     padding-bottom: 60px;
 
+}
 
-
-    section {
-        height: 100%;
-        width: 80%;
-        margin: 0 auto;
-    }
+.notifications-section {
+    max-width: 800px;
+    align-self: center;
+    width: 100%;
 }

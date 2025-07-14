@@ -54,6 +54,9 @@ export const ChatWindow = ({messages, renderedMessages, loading}) => {
         >
 
         <div
+            onClick={() => {
+                setConfigureUI(true);
+            }}
             className="conversation-header">
 
             <svg
@@ -66,10 +69,6 @@ export const ChatWindow = ({messages, renderedMessages, loading}) => {
 
             {!loading && (
                 <div
-                    onClick={() => {
-                        setConfigureUI(true);
-                    }}
-
                     style={{ display: "flex", alignItems: "center" }}>
 
                     {conversationMembers.length > 0 && (

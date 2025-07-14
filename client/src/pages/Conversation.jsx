@@ -11,22 +11,32 @@ import {ConfigureChat} from "../components/ConversationComponents/ConfigureChat.
 import {ChatWindow} from "../components/ConversationComponents/ChatWindow.jsx";
 import {useChatContext} from "../context/ConversationContext.jsx";
 import toast from "react-hot-toast";
+import {ErrorMessage} from "../components/ErrorMessage.jsx";
 
+
+/**
+ * This component / page is rendered when a user is in a chat. Essentially here the whole
+ * conversation and it's components is shown
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 
 export const Conversation = ({}) => {
 
-    const {token, user, API_URL} = useAuth();
-    const [loading, setLoading] = useState(true);
-    const {conversationId} = useParams();
-    const channelRef = useRef(null);
-    const deleteChannelRef = useRef(null);
-    const deleteConversationRef = useRef(null);
-    const navigate = useNavigate();
+    const {token, user, API_URL} = useAuth(); // Get token from context
+    const [loading, setLoading] = useState(true); // Loading
+    const {conversationId} = useParams(); // Id from url
+    const [error, setError] = useState(false);
+    const channelRef = useRef(null); // Ref to stay persistent between renders
+    const deleteChannelRef = useRef(null);  // Ref to stay persistent between renders
+    const deleteConversationRef = useRef(null);  // Ref to stay persistent between renders
+    const navigate = useNavigate(); // Hook for navigation
 
-    const {configureUI, setConversationMembers, setActiveConversation} = useChatContext();
-    const [messages, setMessages] = useState([]);
+    const {configureUI, setConversationMembers, setActiveConversation} = useChatContext(); // UI and state from context
+    const [messages, setMessages] = useState([]); // State to hold the messages in a conversation
 
-
+    // This hook runs on mount and fetches the messages for that conversation
     useEffect(() => {
         fetch(`${API_URL}/conversations/load/${conversationId}`, {
             method: 'GET',
@@ -43,12 +53,14 @@ export const Conversation = ({}) => {
                 setConversationMembers(data.conversation.members);
             })
             .catch(error =>  {
-                console.log(error);
+                setError(true);
+                console.log('There was an error while loading conversation');
                 setLoading(false);
             });
 
     }, [conversationId]);
 
+    // useMemo to optimize performance, only rendering those messages when the array changes
     const renderedMessages = useMemo(() => {
         const rendered = [];
         let lastDate = null;
@@ -84,13 +96,14 @@ export const Conversation = ({}) => {
     }, [messages]);
 
 
+    // This function plays a notofication sound
     const playNotificationSound = () => {
         const audio = new Audio('/notification.mp3');
         audio.play();
     };
 
 
-
+    // This hook listens for realtime updates from supabase when a conversation is deleted
     useEffect(() => {
         if (!conversationId) return;
 
@@ -109,7 +122,7 @@ export const Conversation = ({}) => {
                     filter: `id=eq.${conversationId}`,
                 },
                 (payload) => {
-                    console.log(payload);
+                    // If the conversation a user is inspecting is deleted, take them back to /messages
                     const oldRow = payload.old;
                     if (oldRow.id === conversationId) {
                         navigate('/messages');
@@ -127,7 +140,7 @@ export const Conversation = ({}) => {
     }, [token, conversationId]);
 
 
-
+    // This hook listens for members that are kicked out of a conversation
     useEffect(() => {
         if (!conversationId) return;
 
@@ -147,8 +160,7 @@ export const Conversation = ({}) => {
                 },
                 (payload) => {
                     const oldRow = payload.old;
-                    if (oldRow.user_id === user.id) {
-                        console.log("User was removed from conversation!");
+                    if (oldRow.user_id === user.id) { // If the user was kicked out, take them back to /messages
                         navigate('/messages');
                     }
                 }
@@ -163,14 +175,14 @@ export const Conversation = ({}) => {
         };
     }, [token, conversationId]);
 
+
+    // This hook listens for realtime updated
     useEffect(() => {
 
         if (!conversationId) return;
 
         if (channelRef.current) {
             supabase.removeChannel(channelRef.current)
-                .then(() => console.log("Previous channel removed"))
-                .catch((err) => console.error("Failed to remove previous channel:", err));
         }
 
         channelRef.current = supabase
@@ -223,20 +235,25 @@ export const Conversation = ({}) => {
     }, [token, conversationId]);
 
     return (
-            <main className="conversation-wrapper">
+        <main className="conversation-wrapper">
             {loading ? (
                 <LoadingTitle/>
+            ) : error ? (
+                <ErrorMessage
+                    message="There was an error while loading conversation"
+                    svg={
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M280-400q-17 0-28.5-11.5T240-440q0-17 11.5-28.5T280-480q17 0 28.5 11.5T320-440q0 17-11.5 28.5T280-400Zm548 154-74-74h46v-480H274l-80-80h606q33 0 56.5 23.5T880-800v480q0 26-14.5 45.5T828-246ZM554-520l-80-80h246v80H554ZM820-28 606-240H240L80-80v-688l-52-52 56-56L876-84l-56 56ZM344-504Zm170-56Zm-234 40q-17 0-28.5-11.5T240-560q0-17 11.5-28.5T280-600q17 0 28.5 11.5T320-560q0 17-11.5 28.5T280-520Zm154-120-34-34v-46h320v80H434Zm-274-48v413l46-45h322L160-688Z"/></svg>
+                    }
+                />
+            ) : configureUI ? (
+                <ConfigureChat />
             ) : (
-                (configureUI ? (
-                    <ConfigureChat/>
-                ) : (
-                    <ChatWindow
-                        messages={messages}
-                        renderedMessages={renderedMessages}
-                        loading={loading}
-                    />
-                ))
+                <ChatWindow
+                    messages={messages}
+                    renderedMessages={renderedMessages}
+                    loading={loading}
+                />
             )}
-            </main>
-    )
+        </main>
+    );
 }

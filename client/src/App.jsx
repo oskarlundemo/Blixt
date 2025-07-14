@@ -14,6 +14,8 @@ import { DirectMessages } from "./pages/DirectMessages.jsx";
 import { Toaster } from 'react-hot-toast';
 
 import { ChatProvider } from "./context/ConversationContext.jsx";
+import ProtectedRoute from "./context/ProtectedRoute.jsx";
+import {NotFound} from "./pages/NotFound.jsx";
 
 
 /**
@@ -30,38 +32,42 @@ function App() {
 
     return (
         <div className="App">
-
             <Routes>
 
+                {/* Public routes */}
                 <Route path="/" element={<Start />} />
-
-                <Route path="/new/post" element={<NewPost />} />
-                <Route path="/:username/:postid" element={<InspectPost />} />
-                <Route path="/:username/:postid/comments" element={<CommentSection />} />
-                <Route path="/explore" element={<Explore />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/notifications" element={<Notifications />} />
-                <Route path="/feed" element={<Feed />} />
-                <Route path="/:username" element={<Profile />} />
+                <Route path="/reset" element={<ResetPassword />} />
 
-                <Route path="/messages"
-                       element={
-                    <ChatProvider>
-                        <DirectMessages/>
-                    </ChatProvider>
-                    }
-                />
+                {/* Protected routes */}
+                <Route element={<ProtectedRoute />}>
+                    <Route path="/new/post" element={<NewPost />} />
+                    <Route path="/:username/:postid" element={<InspectPost />} />
+                    <Route path="/explore" element={<Explore />} />
+                    <Route path="/notifications" element={<Notifications />} />
+                    <Route path="/feed" element={<Feed />} />
+                    <Route path="/:username" element={<Profile />} />
+                    <Route path="/:username/:postid/comments" element={<CommentSection />} />
+                    <Route
+                        path="/messages"
+                        element={
+                            <ChatProvider>
+                                <DirectMessages />
+                            </ChatProvider>
+                        }
+                    />
+                    <Route
+                        path="/messages/:conversationId"
+                        element={
+                            <ChatProvider>
+                                <Conversation />
+                            </ChatProvider>
+                        }
+                    />
+                </Route>
 
-                <Route
-                    path="/messages/:conversationId"
-                    element={
-                        <ChatProvider>
-                            <Conversation />
-                        </ChatProvider>
-                    }
-                />
-
-                <Route path="*" element={<Start />} />
+                {/* Catch-all */}
+                <Route path="*" element={<NotFound />} />
             </Routes>
 
             <Toaster position="bottom-center" />

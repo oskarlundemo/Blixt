@@ -1,10 +1,37 @@
 import {prisma} from "../prisma/index.js";
 
+/**
+ * What does this function do?
+ * (Describe its main purpose in 1-2 sentences.)
+ *
+ * What inputs does it expect?
+ * (Mention what parameters or data it uses, e.g., req.user.id.)
+ *
+ * What does it return or send back?
+ * (Explain the response, like data sent or status codes.)
+ *
+ */
+
+
+/**
+ * 1. This component fetches all the conversation a user has
+ *
+ * 2. It expects the users token to be passed in through the front-end
+ *
+ * 3. It returns an array containing all the conversations a users has. If successful then 200
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
+
+
+
 export const loadConversations = async (req, res) => {
     try {
 
-        const userIdFromToken = req.user.id;
+        const userIdFromToken = req.user.id; // Get user token
 
+        // Get all private conversations
         const privateConversations = await prisma.conversation.findMany({
             where: {
                 members: {
@@ -36,6 +63,7 @@ export const loadConversations = async (req, res) => {
             },
         })
 
+        // Get all group conversations
         const groupConversations = await prisma.conversation.findMany({
             where: {
                 members: {
@@ -63,15 +91,17 @@ export const loadConversations = async (req, res) => {
             },
         })
 
-
+        // Merge the conversatiosn
         const allConversations = [...privateConversations, ...groupConversations];
 
+        // Sort them by the one with the latest message
         allConversations.sort((a, b) => {
             const aTime = a.messages[0]?.created_at || new Date(0);
             const bTime = b.messages[0]?.created_at || new Date(0);
             return bTime - aTime;
         });
 
+        // Send it
         res.status(200).json({
             conversations: allConversations,
         });
@@ -86,28 +116,43 @@ export const loadConversations = async (req, res) => {
 };
 
 
+/**
+ * What does this function do?
+ * This function creates a new conversation with several users, aka. a group chat
+ *
+ * What inputs does it expect?
+ * It expects the users token and the array of users in the new conversation sent through the body
+ *
+ * What does it return or send back?
+ * It returns nothing but a 200 status code if successful and message that is displayed in the front-end
+ */
+
+
 export const createGroupConversation = async (req, res) => {
 
     try {
 
-        const participants = req.body.participants;
-        let groupName = req.body.groupName
-        const userId = req.user.id;
+        const participants = req.body.participants; // All the participants of the new conversation
+        let groupName = req.body.groupName // Name of the group if provided
+        const userId = req.user.id; // Id from token
 
-        if (!participants)
+        if (!participants) // No participants? Return
             return res.status(400).json({
                 error: "Participants does not exist"
             })
 
+        // Scrape id´s of members
         const groupMembersIds = [
             userId,
             ...participants.map(participant => participant.id)
         ];
 
+        // If there is not a group name provided, set the username of each participant as default
         if (!groupName) {
             groupName = participants.map(p => p.username).join(', ') + ', ' + req.user.user_metadata.username;
         }
 
+        // Create the new conversation
         const newGroupConversation = await prisma.conversation.create({
             data: {
                 admin_id: userId,
@@ -116,6 +161,7 @@ export const createGroupConversation = async (req, res) => {
             }
         })
 
+        // Add all the participants to the new conversation
         await prisma.conversationMember.createMany({
             data: groupMembersIds.map(memberId => ({
                 conversation_id: newGroupConversation.id,
@@ -123,6 +169,7 @@ export const createGroupConversation = async (req, res) => {
             }))
         });
 
+        // Successful
         res.status(200).json({
             message: 'Group conversation created successfully.'
         })
@@ -136,26 +183,40 @@ export const createGroupConversation = async (req, res) => {
     }
 }
 
+/**
+ * What does this function do?
+ * This functions create a new conversation between two users, 1-on-1
+ *
+ * What inputs does it expect?
+ * Besides the users token it expects an array containing the user object of the other user
+ *
+ * What does it return or send back?
+ * It returns nothing but a message if successful
+ *
+ */
 
 
 export const createPrivateConversation = async (req, res) => {
     try {
 
-        const userIdFromToken = req.user.id;
-        const participants = req.body.participants;
+        const userIdFromToken = req.user.id; // Get id from token
+        const participants = req.body.participants; // Get the other user
 
+        // If participants are missing or the length is not 1, return
         if (!participants || participants.length !== 1) {
             return res.status(400).json({ error: "Invalid number of participants" });
         }
 
-        const participantId = participants[0].id;
+        const participantId = participants[0].id; // Get the id of the other user
 
+        // Create the conversation
         const conversation = await prisma.conversation.create({
             data: {
                 is_group: false,
             },
         });
 
+        // Add all the members to the conversation
         await prisma.conversationMember.createMany({
             data: [
                 { conversation_id: conversation.id, user_id: userIdFromToken },
@@ -164,6 +225,7 @@ export const createPrivateConversation = async (req, res) => {
             skipDuplicates: true,
         });
 
+        // Success
         res.status(200).json({
             message: "Private conversation successfully created",
         });
@@ -177,13 +239,23 @@ export const createPrivateConversation = async (req, res) => {
 };
 
 
+/**
+ * What does this function do?
+ * This functions fetches all the messages in a conversation once a users wants to chat
+ *
+ * What inputs does it expect?
+ * The users token and the id of the conversation passed through the parameter
+ *
+ * What does it return or send back?
+ * It returns the conversation including messages, members and a message
+ */
 
 export const fetchConversationMessages = async (req, res) => {
 
     try {
 
-        const conversationId = req.params.conversation_id;
-        const userId = req.user.id;
+        const conversationId = req.params.conversation_id; // The id of the conversation
+        const userId = req.user.id; // User id from token
 
         const conversationExists = await prisma.conversation.findUnique({
             where: {
@@ -202,12 +274,13 @@ export const fetchConversationMessages = async (req, res) => {
             }
         })
 
-        if (!conversationExists)
+        if (!conversationExists) // If the conversation does not exist, return
             return res.status(404).json({
                 error: "Conversation does not exist",
                 message: 'The conversation does not exist'
             })
 
+        // Check that the user is actually in the conversation
         const userIsInConvo = await prisma.conversationMember.findUnique({
             where: {
                 conversation_id_user_id: {
@@ -217,7 +290,7 @@ export const fetchConversationMessages = async (req, res) => {
             }
         });
 
-        if (!userIsInConvo)
+        if (!userIsInConvo) // User is not in the conversation, return
             return res.status(403).json({
                 error: "Conversation does not exist",
                 message: 'Unauthorized action'
@@ -225,7 +298,9 @@ export const fetchConversationMessages = async (req, res) => {
 
         let conversation;
 
+        // Is the conversation a group?
         if (conversationExists.is_group) {
+            // Yes, include all members data
             conversation = await prisma.conversation.findUnique({
                 where: {
                     id: conversationId,
@@ -239,6 +314,7 @@ export const fetchConversationMessages = async (req, res) => {
                 }
             })
         } else {
+            // No, only include the data of the other member
             conversation = await prisma.conversation.findUnique({
                 where: {
                     id: conversationId,
@@ -252,11 +328,17 @@ export const fetchConversationMessages = async (req, res) => {
                         }, include: {
                             user: true
                         }
+                    },
+                    messages: {
+                        include: {
+                            sender: true
+                        }
                     }
                 }
             })
         }
 
+        // Get all the messages for that conversation
         const messages = await prisma.conversation.findUnique({
             where: {
                 id: conversationId,
@@ -288,15 +370,27 @@ export const fetchConversationMessages = async (req, res) => {
 }
 
 
+/**
+ * What does this function do?
+ * This function kicks users from a conversation
+ *
+ * What inputs does it expect?
+ * The token of the user and the id of the kicked user through req.body
+ *
+ * What does it return or send back?
+ * Nothing besides a message and 200 status code
+ */
+
 export const kickUserFromConversation = async (req, res) => {
 
     try {
 
-        const conversationId = req.params.conversation_id;
-        const deletedUserId = req.body.deletedUser.id;
-        const deletedUsername = req.body.deletedUser.username;
-        const userId = req.user.id;
+        const conversationId = req.params.conversation_id; // Id of the conversation
+        const deletedUserId = req.body.deletedUser.id; // The id of the user that will be deleted
+        const deletedUsername = req.body.deletedUser.username; // The username of that deleted user
+        const userId = req.user.id; // Token of the user
 
+        // Check if the conversation exists
         const conversationExists = await prisma.conversation.findUnique({
             where: {
                 id: conversationId,
@@ -304,12 +398,21 @@ export const kickUserFromConversation = async (req, res) => {
             }
         })
 
-        if (!conversationExists || conversationExists.admin_id !== userId) {
+        // If the conversation does not exist, return
+        if (!conversationExists) {
+            return res.status(404).json({
+                message: "The conversation does not exist"
+            });
+        }
+
+        // If the user is not admin of the conversation, then return
+        if (conversationExists.admin_id !== userId) {
             return res.status(403).json({
                 message: "Unauthorized action, only admin can kick users"
             });
         }
 
+        // Delete the kicked member from conversation
         await prisma.conversationMember.delete({
             where: {
                 conversation_id_user_id: {
@@ -319,11 +422,13 @@ export const kickUserFromConversation = async (req, res) => {
             }
         })
 
+        // Update the name of the group and remove the old username
         let updatedGroupName = conversationExists.name
             .split(', ')
             .filter(name => name !== deletedUsername)
             .join(', ');
 
+        // Update conversation name
         await prisma.conversation.update({
             where: {
                 id: conversationId,
@@ -333,6 +438,7 @@ export const kickUserFromConversation = async (req, res) => {
             }
         });
 
+        // Success
         res.status(200).json({
             message: `Successfully kicked ${deletedUsername} out of the conversation`,
         })
@@ -346,13 +452,26 @@ export const kickUserFromConversation = async (req, res) => {
     }
 }
 
+
+/**
+ * What does this function do?
+ * This function is used for deleting conversation
+ *
+ * What inputs does it expect?
+ * The token of the user and the id of the conversation through the parameters
+ *
+ * What does it return or send back?
+ * Just a 200:code and a success message
+ */
+
 export const deleteConversation = async (req, res) => {
 
     try {
 
-        const conversationId = req.params.conversation_id;
-        const userIdFromToken = req.user.id;
+        const conversationId = req.params.conversation_id; // Id of conversation that will be deleted
+        const userIdFromToken = req.user.id; // Id from token
 
+        // Check if conversation exists
         const conversationExists = await prisma.conversation.findUnique({
             where: {
                 id: conversationId,
@@ -360,12 +479,19 @@ export const deleteConversation = async (req, res) => {
             }
         })
 
-        if (!conversationExists || conversationExists.admin_id !== userIdFromToken)
+        // If the conversation does not exist, return
+        if (!conversationExists)
+            return res.status(404).json({
+                message: "The conversation does not exist",
+            })
+
+        // If the user is not the admin of the conversation, return
+        if (conversationExists.admin_id !== userIdFromToken)
             return res.status(403).json({
                 message: "Unauthorized action, only admin delete conversations",
             })
 
-
+        // Delete the conversation
         await prisma.conversation.delete({
             where: {
                 id: conversationId,
@@ -373,6 +499,7 @@ export const deleteConversation = async (req, res) => {
             }
         })
 
+        // Return a message
         res.status(200).send({
             message: "Successfully deleted group",
         })
@@ -386,16 +513,27 @@ export const deleteConversation = async (req, res) => {
     }
 }
 
+/**
+ * What does this function do?
+ * This function is used for adding members to a current conversation
+ *
+ * What inputs does it expect?
+ * The token of the user and an object of the other user passed in the body
+ *
+ * What does it return or send back?
+ * Success message and the data of the added user
+ */
 
 export const addMemberToConversation = async (req, res) => {
 
     try {
 
-        const conversationId = req.params.conversation_id;
-        const userIdFromToken = req.user.id;
-        const addedUserId = req.body.user.id;
-        const addedUsername = req.body.user.username;
+        const conversationId = req.params.conversation_id; // Id of the conversation
+        const userIdFromToken = req.user.id; // Id from token
+        const addedUserId = req.body.user.id; // Id of the user that will be added
+        const addedUsername = req.body.user.username; // Username of the user that will be added
 
+        // Check if conversation exists
         const conversationExists = await prisma.conversation.findUnique({
             where: {
                 id: conversationId,
@@ -403,12 +541,21 @@ export const addMemberToConversation = async (req, res) => {
             }
         })
 
-        if (!conversationExists || conversationExists.admin_id !== userIdFromToken) {
+        // If the conversation does not exist, return
+        if (!conversationExists) {
+            return res.status(404).json({
+                message: "The conversation does not exist",
+            })
+        }
+
+        // If the user is not admin of the conversation, return
+        if (conversationExists.admin_id !== userIdFromToken) {
             return res.status(403).json({
                 message: "Unauthorized action, only admin can add users"
             })
         }
 
+        // Check if user is already in the conversation
         const userIsAlreadyInConversation = await prisma.conversationMember.findUnique({
             where: {
                 conversation_id_user_id: {
@@ -418,12 +565,14 @@ export const addMemberToConversation = async (req, res) => {
             }
         });
 
+        // Yes, just return with a message
         if (userIsAlreadyInConversation) {
             res.status(200).send({
                 message: "User is already in group",
             })
         }
 
+        // No, insert the user into the conversation
         const addedUserData = await prisma.conversationMember.create({
             data: {
                 conversation_id: conversationId,
@@ -433,14 +582,17 @@ export const addMemberToConversation = async (req, res) => {
             }
         });
 
-        let updatedGroupName = conversationExists.name || "";
 
+        let updatedGroupName = conversationExists.name || ""; // Update the name if there is none
+
+        // Add the existing names into an array
         const existingNames = updatedGroupName.split(',').map(n => n.trim());
 
         if (!existingNames.includes(addedUsername)) {
             existingNames.push(addedUsername);
         }
 
+        // Update the name of the conversation
         await prisma.conversation.update({
             where: {
                 id: conversationId,
@@ -449,8 +601,6 @@ export const addMemberToConversation = async (req, res) => {
                 name: existingNames.join(', '),
             }
         });
-
-        console.log(addedUserData)
 
         res.status(200).send({
             message: `Successfully added ${addedUsername} to the conversation`,

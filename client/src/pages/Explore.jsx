@@ -1,5 +1,3 @@
-
-
 import '../styles/Explore.css'
 import {NavigationBar} from "../components/NavigationBar.jsx";
 import {useEffect, useState} from "react";
@@ -10,23 +8,31 @@ import {useAuth} from "../context/AuthContext.jsx";
 import {UserCard} from "../components/ExploreComponents/UserCard.jsx";
 import {HeaderMenu} from "../components/HeaderMenu.jsx";
 import {LoadingTitle} from "../components/LoadingTitle.jsx";
+import toast from "react-hot-toast";
+
+
+/**
+ * This component is rendered when the user wants to explore other peoples profiles
+ * or just browse all the posts on the plattform
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
+
 
 
 export const Explore = () => {
 
-
-    const [searchQuery, setSearchQuery] = useState('');
-    const [searchHasFocus, setSearchHasFocus] = useState(false);
-    const [searchResults, setSearchResults] = useState([]);
-    const [posts, setPosts] = useState([]);
-    const [loading, setLoading] = useState(true);
-
     const {API_URL, user, token} = useAuth();
+    const [searchQuery, setSearchQuery] = useState(''); // State to hold search string
+    const [searchHasFocus, setSearchHasFocus] = useState(false); // State to display overlay
+    const [searchResults, setSearchResults] = useState([]); // State to hold the search results
+    const [posts, setPosts] = useState([]); // State to hold the posts
+    const [loading, setLoading] = useState(true); // Set loading
 
-
+    // This hook runs when a users start searching for other profiles
     useEffect(() => {
         const delayBouncing = setTimeout(() => {
-
             if (searchQuery.trim().length > 0) {
                 fetch(`${API_URL}/explore/search/?q=${searchQuery}`, {
                     method: "GET",
@@ -38,7 +44,9 @@ export const Explore = () => {
                     .then(data => {
                         setSearchResults(data);
                     })
-                    .catch(err => console.log(err));
+                    .catch(err => {
+                        toast.error('There was an error with your search query.');
+                    });
             } else {
                 setSearchResults([]);
             }
@@ -50,7 +58,6 @@ export const Explore = () => {
 
 
     useEffect(() => {
-
         fetch(`${API_URL}/explore/load/posts`, {
             method: "GET",
             headers: {
@@ -63,7 +70,7 @@ export const Explore = () => {
                 setLoading(false);
             })
             .catch(err => {
-                console.log(err);
+                console.log('There was an error loading posts');
                 setLoading(false);
             });
     }, [])
@@ -74,13 +81,12 @@ export const Explore = () => {
     return (
         <main className="explore">
 
-
             <HeaderMenu/>
 
             {loading ? (
                 <LoadingTitle/>
             ): (
-                <>
+                <section className="explore-wrapper">
                     <div
                         style={{
                             zIndex: 9999,
@@ -119,18 +125,15 @@ export const Explore = () => {
 
                     <ExploreImageGrid
                         loading={loading}
-                        posts={posts}
-                    />
-                </>
+                        posts={posts}/>
+                </section>
             )}
-
 
             <NavigationBar
                 searchHasFocus={searchHasFocus}
             />
 
             <Overlay showOverlay={searchHasFocus} />
-
         </main>
     )
 }

@@ -17,7 +17,7 @@ import '../styles/Profile.css'
  * @constructor
  */
 
-export const UserAvatar = ({ user, setEdit = false, setFile, file, size = '25px', selectPicture }) => {
+export const UserAvatar = ({ user, setEdit = false, autoSize = false, setFile, file, size = '25px', selectPicture }) => {
 
     const [userAvatar, setUserAvatar] = useState(''); // State to hold the src of the avatar
     const [loadingAvatar, setLoadingAvatar] = useState(true); // State for loading the avatar
@@ -54,6 +54,8 @@ export const UserAvatar = ({ user, setEdit = false, setFile, file, size = '25px'
         }
     };
 
+    const finalSize = autoSize || size;
+
     return (
         <>
             {user?.id === loggedInUser?.id && selectPicture ? (
@@ -61,8 +63,8 @@ export const UserAvatar = ({ user, setEdit = false, setFile, file, size = '25px'
                 <div className="user-avatar-select-picture"
                      style={{
                          backgroundImage: `url(${file || user?.avatar || '/default.jpg'})`,
-                         height: size,
-                         width: size,
+                         height: finalSize,
+                         width: finalSize,
                      }}
                 >
 
@@ -88,13 +90,13 @@ export const UserAvatar = ({ user, setEdit = false, setFile, file, size = '25px'
                 </div>
             ) : (
                 (loadingAvatar ? (
-                    <div style={{height: size, width: size}} className="loading-avatar"></div>
+                    <div style={{height: finalSize, width: finalSize}} className="loading-avatar"></div>
                 ) : (
                     <div
                         style={{
                             backgroundImage: `url(${file || user?.avatar || '/default.jpg'})`,
-                            height: size,
-                            width: size,
+                            height: finalSize,
+                            width: finalSize,
                         }}
 
                         className="user-avatar-select-picture-default">

@@ -13,6 +13,14 @@
     gap: 1rem;
 }
 
+.explore-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 800px;
+    align-self: center;
+}
+
 
 
 .explore-image-grid {
@@ -21,7 +29,6 @@
     gap: 0.2rem;
     width: 80%;
     align-self: center;
-
 }
 
 

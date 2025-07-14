@@ -10,6 +10,7 @@ import {Spinner} from "../Spinner.jsx";
 import {useAuth} from "../../context/AuthContext.jsx";
 import {useNavigate, useParams} from "react-router-dom";
 import toast from "react-hot-toast";
+import '../../styles/ConfigureConversation.css'
 
 /**
  * This component is rendered when the admin of a conversation (the creator) wants to
@@ -82,7 +83,15 @@ export const ConfigureChat = ({}) => {
 
             <AnimatePresence mode="wait">
                 {addMemberUI ? (
-                    <AddNewGroupMember/>
+                    <motion.div
+                        key="add-member"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <AddNewGroupMember />
+                    </motion.div>
                 ) : (
                     <motion.div key="main-config">
                         <section
@@ -93,8 +102,6 @@ export const ConfigureChat = ({}) => {
                             alignItems: 'center',
                             marginTop: '2rem'
                         }}>
-
-
                             <div
                                 style={{
                                     display: 'flex',

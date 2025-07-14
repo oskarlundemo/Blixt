@@ -1,5 +1,3 @@
-
-
 import '../styles/Feed.css'
 import {Post} from "../components/FeedComponents/Post.jsx";
 import {NavigationBar} from "../components/NavigationBar.jsx";
@@ -8,8 +6,18 @@ import {useAuth} from "../context/AuthContext.jsx";
 import {LoadingTitle} from "../components/LoadingTitle.jsx";
 import {HeaderMenu} from "../components/HeaderMenu.jsx";
 
-export const Feed = ({}) => {
 
+/**
+ * This component is the main page where the user can scroll through posts
+ * from other users they follow
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
+
+
+
+export const Feed = ({}) => {
 
     const [loading, setLoading] = useState(true);
     const {API_URL, token} = useAuth();

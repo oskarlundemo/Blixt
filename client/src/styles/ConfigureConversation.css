@@ -1,0 +1,18 @@
+
+
+
+
+
+.add-new-group-member {
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.inspect-conversation{
+    section {
+        max-width: 800px;
+        align-self: center;
+        margin: 0 auto;
+    }
+}
