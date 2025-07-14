@@ -1,5 +1,3 @@
-
-
 import '../styles/Profile.css'
 import {NavigationBar} from "../components/NavigationBar.jsx";
 import {useEffect, useRef, useState} from "react";
@@ -14,41 +12,60 @@ import {HeaderMenu} from "../components/HeaderMenu.jsx";
 import {Overlay} from "../components/Overlay.jsx";
 import {BottomSheet} from "../components/BottomSheet.jsx";
 import {MenuItem} from "../components/ConversationComponents/MenuItem.jsx";
+import {ProfileStat} from "../components/ProfileComponents/ProfileStat.jsx";
+import {ErrorMessage} from "../components/ErrorMessage.jsx";
+import {PostGrid} from "../components/ProfileComponents/PostGrid.jsx";
+
+
+/**
+ * This component is rendered when a user inspects another users
+ * profile or their own
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
+
 
 
 
 export const Profile = ({}) => {
 
+    const navigate = useNavigate(); // Hook used for navigation
+    const [posts, setPosts] = useState([]); // State to hold the posts on the profile
+    const [archive, setArchive] = useState([]); // State to hold the archived posts
+    const [loading, setLoading] = useState(true); // Loading state
+    const [profileUser, setProfileUser] = useState([]); // The user object of the profile
+    const [showMore, setShowMore] = useState(false); // State to show settings
+    const [conversationId, setConversationId] = useState(null); // State to set the conversation id
+    const [isOwnProfile, setIsOwnProfile] = useState(false); // State to check if the profile is the logged-in users
 
-    const navigate = useNavigate();
-    const [posts, setPosts] = useState([]);
-    const [archive, setArchive] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [profileUser, setProfileUser] = useState([]);
-    const [showMore, setShowMore] = useState(false);
-    const [conversationId, setConversationId] = useState(null);
+    const [following, setFollowing] = useState(0); // Number of people they are following
+    const [followers, setFollowers] = useState(0); // Numbers of followers
 
-    const [following, setFollowing] = useState(0);
-    const [followers, setFollowers] = useState(0);
+    const [follows, setFollows] = useState(false); // Check if the logged-in user follow this profile
 
-    const [follows, setFollows] = useState(false);
+    const [avatar, setAvatar] = useState(null); // State to hold the avatar
+    const [avatarPreview, setAvatarPreview] = useState(null); // State to change avatar
 
-    const [avatar, setAvatar] = useState(null);
-    const [avatarPreview, setAvatarPreview] = useState(null);
+    const [editedBio, setEditedBio] = useState(''); // State to edit bio
 
-    const [editedBio, setEditedBio] = useState('');
+    const [bioLength, setBioLength] = useState(0); // Length of bio
+    const [bio, setBio] = useState(""); // The bio loaded on mount
+    const [profileUsername, setProfileUsername] = useState(""); // The name of the profile
+    const [error, setError] = useState(false);
 
-    const [bioLength, setBioLength] = useState(0);
-    const [bio, setBio] = useState("");
-    const [profileUsername, setProfileUsername] = useState("");
+    const [active, setActive] = useState('posts') // Ref used for UI slider
+    const postsRef = useRef('posts'); // Ref used for UI slider
+    const archiveRef = useRef(null); /**/
+    const sliderRef = useRef(null); /**/
 
-    const [active, setActive] = useState('posts')
-    const postsRef = useRef('posts');
-    const archiveRef = useRef(null);
-    const sliderRef = useRef(null);
+    const [editing, setEditing] = useState(false); // State to check if the user is editing the profile
+    const { username } = useParams(); // Get username from params
+    const decodedUsername = decodeURIComponent(username); // Decode it
+    const {API_URL, user, token, logout} = useAuth(); // Token from context
 
-    const [isOwnProfile, setIsOwnProfile] = useState(false);
 
+    // This hook runs and updates the position of the slider beneath the public or archived posts
     useEffect(() => {
         const updateSlider = () => {
             const target = active === 'posts' ? postsRef.current : archiveRef.current;
@@ -57,7 +74,6 @@ export const Profile = ({}) => {
                 sliderRef.current.style.left = `${target.offsetLeft}px`;
             }
         };
-
         requestAnimationFrame(updateSlider);
         window.addEventListener('resize', updateSlider);
 
@@ -66,13 +82,7 @@ export const Profile = ({}) => {
         };
     }, [active]);
 
-
-    const [editing, setEditing] = useState(false);
-    const { username } = useParams();
-    const decodedUsername = decodeURIComponent(username);
-
-    const {API_URL, user, token, logout} = useAuth();
-
+    // This hook runs when a profile is loaded and fetches the data
     useEffect(() => {
 
         setLoading(true);
@@ -104,7 +114,11 @@ export const Profile = ({}) => {
                 setLoading(false);
 
             })
-            .catch(err => console.log(err));
+            .catch(err => {
+                console.log(err)
+                setLoading(false);
+                setError(true);
+            });
     }, [username])
 
     useEffect(() => {
@@ -165,192 +179,140 @@ export const Profile = ({}) => {
     return (
         <main className="profile">
 
-            <HeaderMenu
-                newMessage={false}
-                more={true}
-                setShowMore={setShowMore}
-            />
+            {!error && (
+                <HeaderMenu
+                    newMessage={false}
+                    more={true}
+                    setShowMore={setShowMore}
+                />
+            )}
 
-            {loading ? (
-                <LoadingTitle/>
+            {/* Error and Loading States */}
+            {error ? (
+                <ErrorMessage
+                    message="Failed to load profile."
+                    svg={
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-280q17 0 28.5-11.5T520-320q0-17-11.5-28.5T480-360q-17 0-28.5 11.5T440-320q0 17 11.5 28.5T480-280Zm-40-160h80v-240h-80v240Zm40 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
+                    }
+                />
+            ) : loading ? (
+                <LoadingTitle />
             ) : (
                 <section className="profile-wrapper">
+
+                    {/* Profile Header Section */}
                     <section className="profile-header-container">
+                        <section className="profile-header">
 
-                    <section className={'profile-header'}>
+                            <UserAvatar
+                                user={profileUser}
+                                autoSize="15vw"
+                                selectPicture={true}
+                                setEdit={setEditing}
+                                setFile={(file) => {
+                                    setAvatar(file);
+                                    setAvatarPreview(URL.createObjectURL(file));
+                                }}
+                                file={avatarPreview}
+                            />
 
-                        <UserAvatar
-                            user={profileUser}
-                            size="100px"
-                            selectPicture={true}
-                            setEdit={setEditing}
-                            setFile={(file) => {
-                                setAvatar(file);
-                                setAvatarPreview(URL.createObjectURL(file));
-                            }}
-                            file={avatarPreview}
-                        />
+                            {/* Follower/Following Info & Action Buttons */}
+                            <div className="profile-followers">
+                                <ProfileStat label="Posts" value={posts.length} />
+                                <ProfileStat label="Followers" value={followers} />
+                                <ProfileStat label="Following" value={following} />
 
-                        <div className="profile-followers">
-
-                            <div>
-                                <p>{posts.length}</p>
-                                <p>Posts</p>
-                            </div>
-
-                            <div>
-                                <p>{followers}</p>
-                                <p>Followers</p>
-                            </div>
-
-                            <div>
-                                <p>{following}</p>
-                                <p>Following</p>
-                            </div>
-
-                            {!isOwnProfile ? (
-                                <FollowMessageContainer
-                                    username={profileUsername}
-                                    follows={follows}
-                                    conversationId={conversationId}
-                                    handleFollow={handleFollow}/>
-                            ) : (
-                                (editing ? (
-                                    <ButtonContainer
-                                        handleSubmit={handleSubmit}
-                                        setEditing={setEditing}
+                                {!isOwnProfile ? (
+                                    <FollowMessageContainer
+                                        username={profileUsername}
+                                        follows={follows}
+                                        conversationId={conversationId}
+                                        handleFollow={handleFollow}
                                     />
                                 ) : (
+                                    editing ? (
+                                        <ButtonContainer
+                                            handleSubmit={handleSubmit}
+                                            setEditing={setEditing}
+                                        />
+                                    ) : (
+                                        <button
+                                            onClick={() => setEditing(true)}
+                                            className="edit-button">
+                                            Edit
+                                        </button>
+                                    )
+                                )}
+                            </div>
+                        </section>
 
-                                    <button
-                                        onClick={() => setEditing(true)}
-                                        className="edit-button">
-                                        Edit
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/></svg>
-                                    </button>
-                                ))
+                        {/* Bio Section */}
+                        <div className="profile-bio">
+                            <h1 className="profile-username">@{username}</h1>
+                            {editing ? (
+                                <BioInput
+                                    editedBio={editedBio}
+                                    bio={bio}
+                                    setEditedBio={setEditedBio}
+                                    bioLength={bioLength}
+                                />
+                            ) : (
+                                <p>{bio}</p>
                             )}
                         </div>
+
+                        {/* Posts/Archive Toggle (if own profile) */}
+                        {isOwnProfile && (
+                            <div className="archive-container">
+                                <div className="button-container">
+                                    <button ref={postsRef} onClick={() => setActive('posts')}>Posts</button>
+                                    <button ref={archiveRef} onClick={() => setActive('archive')}>Archive</button>
+                                </div>
+                                <div className="active-slider-container">
+                                    <div className="active-slider" ref={sliderRef}></div>
+                                </div>
+                            </div>
+                        )}
                     </section>
 
-                    <div className="profile-bio">
-                        {loading ? (
-                            <p>Loading...</p>
+                    {/* Posts or Archive Section */}
+                    <section className="profile-content-grid">
+                        {active === 'posts' ? (
+                            <PostGrid posts={posts} emptyMessage="No public posts" />
                         ) : (
-                            <h1
-                                style={{
-                                    textAlign: "left",
-                                    margin: "10px auto",
-                                    fontSize: '1.5rem',
-                                }}
-                            >@{username}</h1>
+                            <PostGrid posts={archive} emptyMessage="No archived posts" />
                         )}
-
-                        {editing ? (
-                            <BioInput
-                                editedBio={editedBio}
-                                bio={bio}
-                                setEditedBio={setEditedBio}
-                                bioLength={bioLength}
-                            />
-                        ) : (
-                            <p>{bio}</p>
-                        )}
-                    </div>
-
-
-                    {isOwnProfile && (
-                        <div className="archive-container">
-                            <div className="button-container">
-                                <button ref={postsRef} onClick={() => setActive('posts')}>Posts</button>
-                                <button ref={archiveRef} onClick={() => setActive('archive')}>Archive</button>
-                            </div>
-
-                            <div className="active-slider-container">
-                                <div className="active-slider" ref={sliderRef}></div>
-                            </div>
-                        </div>
-                    )}
-
-                </section>
-
-                <section className="profile-content-grid">
-
-            {/* Snygga till och bryt ut till komponenter */}
-
-                {active === 'posts' ? (
-                    (posts.length > 0 ? (
-                        posts.map((post) => (
-                            <article
-                                onClick={() => navigate(`/${post.poster.username}/${post.id}`)}
-                                key={post.id}>
-                                {post.images[0] && post.images.length > 0 ? (
-                                    <img draggable={false} src={post.images[0].url} alt={`Post ${post.id}`} />
-                                ) : (
-                                    <p>No image available</p>
-                                )}
-                            </article>
-                        ))
-                    ) : (
-                        <p
-                            style={{
-                                textAlign: "center",
-                                position: "relative",
-                                gridArea:  "1 / 2 / 2 / 2"
-                            }}
-                        >No public posts</p>
-                    ))
-                ) : (
-                    (archive.length > 0 ? (
-                        archive.map((post) => (
-                            <article
-                                onClick={() => navigate(`/${post.poster.username}/${post.id}`)}
-                                key={post.id}>
-                                {post.images[0] && post.images.length > 0 ? (
-                                    <img draggable={false} src={post.images[0].url} alt={`Post ${post.id}`} />
-                                ) : (
-                                    <p>No image available</p>
-                                )}
-                            </article>
-                        ))
-                    ) : (
-                        <p
-                            style={{
-                                textAlign: "center",
-                                position: "relative",
-                                gridArea:  "1 / 2 / 2 / 2"
-                            }}
-                        >No archived posts</p>
-                    ))
-                )}
-                </section>
+                    </section>
                 </section>
             )}
 
+            {/* BottomSheet Menu */}
             <BottomSheet
                 showMenu={showMore}
                 setShowMenu={setShowMore}
                 clickMore={() => setShowMore(true)}
                 childrenElements={
+                    <MenuItem
+                        title="Logout"
+                        svg={
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/></svg>
+                        }
+                        showDropDown={() => {
+                            logout();
+                            navigate('/');
+                        }}
+                    />
+                }
+            />
 
-                <MenuItem
-                    title={'Logout'}
-                    svg={
-                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/></svg>
-                    }
-                    showDropDown={() => {
-                        logout();
-                        navigate('/');
-                    }}
-                />
-            }/>
-
+            {/* Overlay and Navigation */}
             <Overlay
                 showOverlay={showMore}
                 setShowOverlay={setShowMore}
-                clickToggle={true}/>
-
-            <NavigationBar/>
+                clickToggle={true}
+            />
+            <NavigationBar />
         </main>
-    )
+    );
+
 }

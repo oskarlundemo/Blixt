@@ -7,11 +7,13 @@ import {Conversations} from "../components/DirectMessagesComponents/Conversation
 import { AnimatePresence, motion } from "framer-motion";
 import {supabase} from "../services/SupabaseClient.js";
 import toast from "react-hot-toast";
+import {ErrorMessage} from "../components/ErrorMessage.jsx";
 
 
 export const DirectMessages = ({}) => {
 
     const [conversations, setConversations] = useState([]);
+    const [error, setError] = useState(false);
     const [loading, setLoading] = useState(true);
     const [createChatUI, setCreateChatUI] = useState(false);
     const [following, setFollowing] = useState([]);
@@ -28,12 +30,14 @@ export const DirectMessages = ({}) => {
 
             .then(res => res.json())
             .then(data => {
-                console.log(data);
                 setConversations(data.conversations);
                 setFollowing(data.following);
                 setLoading(false);
             })
-            .catch(err => console.log('Error fetching conversations'));
+            .catch(err => {
+                setError(true);
+                console.log('Error fetching conversations')
+            });
     }, [token])
 
     useEffect(() => {
@@ -41,8 +45,6 @@ export const DirectMessages = ({}) => {
 
         if (channelRef.current) {
             supabase.removeChannel(channelRef.current)
-                .then(() => console.log("Previous channel removed"))
-                .catch((err) => console.error("Failed to remove previous channel:", err));
         }
 
         channelRef.current = supabase
@@ -108,65 +110,71 @@ export const DirectMessages = ({}) => {
         return () => {
             if (channelRef.current) {
                 supabase.removeChannel(channelRef.current)
-                    .then(() => console.log('Unsubscribed from realtime channel'))
-                    .catch((err) => console.error("Unsubscribe error:", err));
                 channelRef.current = null;
             }
         };
     }, [token, user]);
 
-
     return (
-        <main className={'direct-messages-container'}>
-
-            <AnimatePresence mode="wait">
-                {loading ? (
-                    <motion.div
-                        key="loading"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                    >
-                        <LoadingTitle />
-                    </motion.div>
-                ) : createChatUI ? (
-                    <motion.div
-                        key="create-chat"
-                        initial={{ x: '100%' }}
-                        animate={{ x: 0 }}
-                        transition={{
-                            type: 'tween',
-                            ease: 'easeInOut',
-                            duration: 0.5
-                        }}
-                        style={{ position: 'absolute', width: '100%' }}
-                    >
-                        <CreateChat
-                            setCreateChatUI={setCreateChatUI}
-                            following={following}
-                        />
-                    </motion.div>
-                ) : (
-                    <motion.div
-                        key="conversations"
-                        initial={{ x: '-100%' }}
-                        animate={{ x: 0 }}
-                        transition={{
-                            type: 'tween',
-                            ease: 'easeInOut',
-                            duration: 0.5
-                        }}
-                        style={{ position: 'absolute', width: '100%' }}
-                    >
-                        <Conversations
-                            setConversations={setConversations}
-                            setCreateChatUI={setCreateChatUI}
-                            conversations={conversations}
-                        />
-                    </motion.div>
-                )})
-            </AnimatePresence>
-
+        <main className="direct-messages-container">
+            {error ? (
+                <div className="error-message">
+                    <ErrorMessage
+                        message="There was an error loading your conversations."
+                        svg={
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m376-400 104-104 104 104 56-56-104-104 104-104-56-56-104 104-104-104-56 56 104 104-104 104 56 56ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"/></svg>
+                        }
+                    />
+                </div>
+            ) : (
+                <AnimatePresence mode="wait">
+                    {loading ? (
+                        <motion.div
+                            key="loading"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                        >
+                            <LoadingTitle />
+                        </motion.div>
+                    ) : createChatUI ? (
+                        <motion.div
+                            key="create-chat"
+                            initial={{ x: '100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '100%' }}
+                            transition={{
+                                type: 'tween',
+                                ease: 'easeInOut',
+                                duration: 0.5,
+                            }}
+                            style={{ position: 'absolute', width: '100%' }}
+                        >
+                            <CreateChat
+                                setCreateChatUI={setCreateChatUI}
+                                following={following}
+                            />
+                        </motion.div>
+                    ) : (
+                        <motion.div
+                            key="conversations"
+                            initial={{ x: '-100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '-100%' }}
+                            transition={{
+                                type: 'tween',
+                                ease: 'easeInOut',
+                                duration: 0.5,
+                            }}
+                            style={{ position: 'absolute', width: '100%' }}>
+                            <Conversations
+                                setConversations={setConversations}
+                                setCreateChatUI={setCreateChatUI}
+                                conversations={conversations}/>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            )}
         </main>
     );
 }

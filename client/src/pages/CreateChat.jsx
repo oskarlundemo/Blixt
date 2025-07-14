@@ -6,20 +6,34 @@ import {useAuth} from "../context/AuthContext.jsx";
 import {Spinner} from "../components/Spinner.jsx";
 import toast from "react-hot-toast";
 
+
+/**
+ * This component / page is rendered when a user wants to initiate a new
+ * conversation with one or several users
+ *
+ * @param setCreateChatUI state to toggle this component
+ * @param following array of the users following
+ * @returns {JSX.Element}
+ * @constructor
+ */
+
+
+
 export const CreateChat = ({setCreateChatUI = null, following = []}) => {
 
-    const {API_URL, token} = useAuth();
-    const [participants, setParticipants] = useState([]);
-    const [searchResults, setSearchResults] = useState([]);
-    const [search, setSearch] = useState("");
-    const [showBottomMenu, setShowBottomMenu] = useState(true);
-    const [loading, setLoading] = useState(false);
+    const {API_URL, token} = useAuth(); // Token from context
+    const [participants, setParticipants] = useState([]); // Of the new conversation
+    const [searchResults, setSearchResults] = useState([]); // State to hold the search results of the users searches
+    const [search, setSearch] = useState(""); // String to hold the search string
+    const [showBottomMenu, setShowBottomMenu] = useState(true); // State to toggle bottom menu
+    const [loading, setLoading] = useState(false); // Loading state
 
+    // This hook toggles the bottom menu once the participants are more than one
     useEffect(() => {
         participants.length > 0 ? setShowBottomMenu(true) : setShowBottomMenu(false);
     }, [participants]);
 
-
+    // This hook searches "as you write" with a small timeout for fewer requests
     useEffect(() => {
         const delayBouncing = setTimeout(() => {
             if (search.trim().length > 0) {
@@ -43,6 +57,7 @@ export const CreateChat = ({setCreateChatUI = null, following = []}) => {
         return () => clearTimeout(delayBouncing);
     }, [search]);
 
+    // This functions handles the submission once a users clicks create chat button
     const handleSubmit = (e) => {
 
         e.preventDefault();
@@ -78,6 +93,7 @@ export const CreateChat = ({setCreateChatUI = null, following = []}) => {
         }
     }
 
+    // This function appends new participants to the array
     const addParticipant = (participant) => {
 
         if (participants.length >= 5)
@@ -92,8 +108,7 @@ export const CreateChat = ({setCreateChatUI = null, following = []}) => {
         });
     };
 
-
-
+    // This function removes participants from the array
     const removeParticipant = (participant) => {
         setParticipants((prev) => {
             if (prev.some(p => p.id === participant.id)) {
@@ -114,8 +129,7 @@ export const CreateChat = ({setCreateChatUI = null, following = []}) => {
                 height="24px"
                 viewBox="0 -960 960 960"
                 width="24px"
-                fill="#e3e3e3"
-            >
+                fill="#e3e3e3">
                 <path d="M640-80 240-480l400-400 71 71-329 329 329 329-71 71Z" />
             </svg>
 

@@ -1,6 +1,6 @@
 import {ConversationCard} from "./ConversationCard.jsx";
 import {HeaderMenu} from "../HeaderMenu.jsx";
-import {NoDataFound} from "../NoDataFound.jsx";
+import {ErrorMessage} from "../ErrorMessage.jsx";
 import {useAuth} from "../../context/AuthContext.jsx";
 
 /**
@@ -43,7 +43,7 @@ export const Conversations = ({conversations,
                     />
                 ))
             ) : (
-                <NoDataFound
+                <ErrorMessage
                     message={'No conversations yet.'}
                     svg={<svg xmlns="http://www.w3.org/2000/svg"
                               height="24px" viewBox="0 -960 960 960"

@@ -53,8 +53,6 @@ export const ConversationCard = ({
          // If there is a channel currently, remove it
         if (channelRef.current) {
             supabase.removeChannel(channelRef.current)
-                .then(() => console.log("Previous channel removed"))
-                .catch((err) => console.error("Failed to remove previous channel:", err));
         }
 
          // Attach the channel to listen for updates
@@ -107,8 +105,6 @@ export const ConversationCard = ({
         return () => {
             if (channelRef.current) {
                 supabase.removeChannel(channelRef.current)
-                    .then(() => console.log('Unsubscribed from realtime channel'))
-                    .catch((err) => console.error("Unsubscribe error:", err));
                 channelRef.current = null;
             }
         };

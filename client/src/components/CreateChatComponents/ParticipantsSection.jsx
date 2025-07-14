@@ -72,7 +72,6 @@ export const ParticipantsSection = ({
                                 textAlign: 'center',
                                 opacity: '0.5',
                             }}>
-
                             Users you follow are shown here
                         </p>
                     )

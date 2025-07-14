@@ -5,7 +5,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import {useAuth} from "../context/AuthContext.jsx";
 import {CommentCard} from "../components/CommentSectionComponents/CommentCard.jsx";
 import {LoadingTitle} from "../components/LoadingTitle.jsx";
-import {NoDataFound} from "../components/NoDataFound.jsx";
+import {ErrorMessage} from "../components/ErrorMessage.jsx";
 
 
 /**
@@ -63,7 +63,7 @@ export const CommentSection = ({}) => {
             ) : (
 
                 (error ? (
-                    <NoDataFound
+                    <ErrorMessage
                         message={'Something went wrong loading the comments!'}
                         svg={
                             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m376-400 104-104 104 104 56-56-104-104 104-104-56-56-104 104-104-104-56 56 104 104-104 104 56 56ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"/></svg>
@@ -91,7 +91,7 @@ export const CommentSection = ({}) => {
                                     />
                                 )))
                             ) : (
-                                <NoDataFound
+                                <ErrorMessage
                                     message={'No comments yet'}
                                     svg={
                                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m376-400 104-104 104 104 56-56-104-104 104-104-56-56-104 104-104-104-56 56 104 104-104 104 56 56ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"/></svg>                    }/>

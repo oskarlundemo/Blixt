@@ -6,18 +6,21 @@
  */
 
 
+import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from "./AuthContext.jsx";
+import {LoadingTitle} from "../components/LoadingTitle.jsx";
 
+const ProtectedRoute = () => {
+    const { user, loading } = useAuth();
 
-import {Navigate} from 'react-router-dom';
-import {useAuth} from "./AuthContext.jsx";
+    // Optional: loading state to prevent flashing
+    if (loading) return<LoadingTitle/>;
 
-const ProtectedRoute = ({children}) => {
-    const {user} = useAuth(); // Get the current user from AuthContext.jsx
-    if (!user) { {/*If there is no user and the user is not admin, go home*/}
-        return <Navigate to="/"/>;
+    if (!user || !user.id) {
+        return <Navigate to="/" replace />;
     }
-    return children;
-}
+
+    return <Outlet />;
+};
 
 export default ProtectedRoute;
-

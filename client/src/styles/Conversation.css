@@ -42,8 +42,22 @@ html, body {
     overflow: hidden;
 }
 
+.conversation-header {
+    cursor: pointer;
+
+    &:hover {
+        h1 {
+            color: var(--accent-color);
+        }
+    }
+}
+
+
 
 .conversation-content {
+    max-width: 1200px;
+    align-self: center;
+    width: 100%;
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
@@ -322,69 +336,66 @@ html, body {
 }
 
 
-@media screen and (max-width: 1700px) {
+.conversation-header {
+    height: 60px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    box-shadow: var(--soft-box-shadow);
+    background-color: var(--background-color);
+    z-index: 10;
+}
 
-    .conversation-header {
-        height: 60px;
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        box-shadow: var(--soft-box-shadow);
-        background-color: var(--background-color);
-        z-index: 10;
-    }
+.conversation-content {
 
-    .conversation-content {
-
-        flex: 1;
-        overflow-y: auto;
-        overflow-x: hidden;
-        display: flex;
-        flex-direction: column;
-        padding: 1rem;
-        box-sizing: border-box;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    box-sizing: border-box;
 
 
-        div {
-            width: 100%;
-        }
-    }
-
-    .conversation-footer {
-        padding: 0.5rem 1rem;
-        flex-shrink: 0;
+    div {
         width: 100%;
     }
+}
 
-    .message-card {
-        width: 100%;
-        margin: 5px 0;
-    }
+.conversation-footer {
+    padding: 0.5rem 1rem;
+    flex-shrink: 0;
+    width: 100%;
+}
 
-    .card-body {
-        max-width: 80%;
-        word-break: break-word;
-        width: fit-content !important;
-    }
+.message-card {
+    width: 100%;
+    margin: 5px 0;
+}
 
-    .gifContainer-wrapper {
-        max-height: 300px;
-        overflow-y: auto;
-    }
+.card-body {
+    max-width: 80%;
+    word-break: break-word;
+    width: fit-content !important;
+}
 
-    .bottom-sheet-item {
-        padding: 0.5rem;
-    }
+.gifContainer-wrapper {
+    max-height: 300px;
+    overflow-y: auto;
+}
 
-    .back-icon {
-        height: 24px;
-        width: 24px;
-    }
+.bottom-sheet-item {
+    padding: 0.5rem;
+}
 
-    h2 {
-        font-size: 1rem;
-        margin-left: 0.5rem;
-    }
+.back-icon {
+    height: 24px;
+    width: 24px;
+}
+
+h2 {
+    font-size: 1rem;
+    margin-left: 0.5rem;
 }
 
 .conversation-title {
@@ -392,6 +403,7 @@ html, body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-left: 5px;
 }
 
 

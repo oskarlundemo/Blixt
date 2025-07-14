@@ -9,10 +9,12 @@
     position: relative;
 }
 
+
 .participants-section {
     overflow-y: scroll;
+    background-color: var(--background-color);
+    max-width: 800px;
 }
-
 
 .create-chat section {
     width: 80%;
@@ -39,6 +41,7 @@
 .create-chat-header {
     display: flex;
     flex-direction: column;
+    max-width: 800px;
 
     > div {
         display: flex;

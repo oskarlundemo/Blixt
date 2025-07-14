@@ -26,8 +26,6 @@ export const Start = ({}) => {
                 )}
             </section>
 
-
-
             <StartPageFooter/>
 
         </main>

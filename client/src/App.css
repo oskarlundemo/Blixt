@@ -201,6 +201,7 @@
 
   svg {
     transition: var(--default-transition);
+    margin: 1rem;
   }
 
   svg:hover {
@@ -229,21 +230,54 @@
 
 
 .no-data-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+
   display: flex;
   flex-direction: row;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+
+  background-color: var(--background-color);
   text-align: center;
-  color: var(--light-grey);
-  height: 100%;
-  padding-left: 2rem;
-  gap: 0.5rem;
-  opacity: 0.7;
+  color: black;
+  opacity: 0.9;
+  gap: 1rem;
 
-
-  svg {
-    fill: var(--light-grey)
+  svg:last-of-type {
+    fill: black;
   }
+}
+
+.back-button {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.back-button svg {
+  fill: black;
+  width: 24px;
+  height: 24px;
+}
+
+.top-left {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+}
+
+.no-data-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
 
 
@@ -289,4 +323,9 @@
   align-items: center;
   gap: 1rem;
   padding: 5px;
+}
+
+
+.no-data-container {
+
 }
