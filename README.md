@@ -73,7 +73,6 @@ Delete the entire group chat if needed
 
 
 ## Screenshots 📸
-<img width="3098" height="2076" alt="localhost_5173_ (16)" src="https://github.com/user-attachments/assets/a147d7b2-6577-4404-805b-0ac9c2d50cf0" />
 
 ### Start
 <img width="3098" height="2076" alt="localhost_5173_ (17)" src="https://github.com/user-attachments/assets/3d41bedc-c3d8-4dd9-9302-5cc9db86e1c1" />
