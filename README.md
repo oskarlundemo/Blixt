@@ -88,10 +88,11 @@ Email: oskarlundemo@gmail.com
 ### Dashboard
 <img width="1800" alt="Skärmavbild 2025-05-20 kl  21 54 06" src="https://github.com/user-attachments/assets/cfc94edc-367e-4607-9ebd-c9c7ff10e220" />
 
-### Sign in 
-<img width="1800" alt="Skärmavbild 2025-05-20 kl  21 50 45" src="https://github.com/user-attachments/assets/299ab0b7-3d55-463e-b354-a7a5b1592b4e" />
 
-### Sign up
+### Conversations 
 
-<img width="1800" alt="Skärmavbild 2025-05-20 kl  21 51 41" src="https://github.com/user-attachments/assets/6cc7a81c-2d04-416f-b920-74dfa7df39ed" />
+### Feed
+<img width="2478" height="1660" alt="localhost_5173_ (9)" src="https://github.com/user-attachments/assets/e9492c8a-f0bf-4783-9899-e8c02eeddd5e" />
 
+### Start
+<img width="2478" height="1660" alt="localhost_5173_ (8)" src="https://github.com/user-attachments/assets/551e2ba1-c91c-473f-b5c6-cd3296dd5ce2" />
