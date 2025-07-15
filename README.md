@@ -1,10 +1,8 @@
 # Blixt - React & Node.js
 
-
 ## Live demo 
 
 Note that the project spins down with inactivity, so it might take 50 seconds before everything is running
-
 
 ## 📌 Project Overview
 
@@ -16,18 +14,18 @@ Built with a fast React + Vite frontend and a scalable Node.js + PostgreSQL back
 
 ## 🛠 Tech Stack
 
-### Frontend
+### 🎨 Frontend
  
 <img src="https://github.com/user-attachments/assets/8e9dc8b3-34f3-4d8a-85ee-b6855f5cfd9f" width="20" height="20"> React
 
 <img src="https://github.com/user-attachments/assets/2fa439e3-c53c-43dd-a9b3-15640b7df4e1" width="20" height="20"> Vite
 
 
-### Styling
+### 👨‍🎨 Styling
 
 <img src="https://github.com/user-attachments/assets/fbf0b28a-c829-4c27-b6e8-400eda2095ee" width="20" height="20"> CSS 
 
-### Backend
+### 💾 Backend
 
 <img src="https://github.com/user-attachments/assets/a9f78615-dbff-4047-bc6f-f83386718c14" width="20" height="20"> Node.js 
 
@@ -51,14 +49,13 @@ Real-time notifications keep users updated on likes, comments, follows, and mess
 
 Users can customize their profiles with an avatar and bio
 
-Users can block others for privacy and control
-
 Integrated GIF support in chats via the GIPHY API
 
 ### 💬 Messaging
+
 Users can send private (1:1) messages
 
-Users can share media and files in chats
+Users can send gifs 
 
 Users can participate in group conversations for community and social interaction
 
@@ -74,25 +71,33 @@ Update the group avatar and description
 
 Delete the entire group chat if needed
 
-## 📧 Contact
+
+## Screenshots 📸
+<img width="3098" height="2076" alt="localhost_5173_ (16)" src="https://github.com/user-attachments/assets/a147d7b2-6577-4404-805b-0ac9c2d50cf0" />
+
+### Start
+<img width="3098" height="2076" alt="localhost_5173_ (17)" src="https://github.com/user-attachments/assets/3d41bedc-c3d8-4dd9-9302-5cc9db86e1c1" />
+
+### Profile
+<img width="3098" height="2076" alt="localhost_5173_ (14)" src="https://github.com/user-attachments/assets/42bfcd3a-dbc6-4071-9303-4486fe092904" />
+
+### Feed
+<img width="3098" height="2076" alt="localhost_5173_ (12)" src="https://github.com/user-attachments/assets/4eee11e2-8a5e-46f9-b283-f4548d6a3ac5" />
+
+### Conversations 
+<img width="3098" height="2076" alt="localhost_5173_ (11)" src="https://github.com/user-attachments/assets/0eb94975-0609-4661-bbcf-53f4729e2700" />
+
+### Chat 
+<img width="3098" height="2076" alt="localhost_5173_ (18)" src="https://github.com/user-attachments/assets/79795a97-a2ae-49ec-becf-66d43d00fdf0" />
+
+### Notifications 
+<img width="3098" height="2076" alt="localhost_5173_ (13)" src="https://github.com/user-attachments/assets/0253aa16-d1cb-45d6-989c-3dc184c511b5" />
+
+### Explore page
+<img width="3098" height="2076" alt="localhost_5173_ (15)" src="https://github.com/user-attachments/assets/0571c87d-6228-4fb4-89bf-bc2d0adaa451" />
+
+## Contact 📧
 
 Author: Oskar Lundemo
 Email: oskarlundemo@gmail.com
 
-
-## Screenshots 
-
-### Landing page
-<img width="1800" alt="Skärmavbild 2025-05-20 kl  21 51 00" src="https://github.com/user-attachments/assets/33aca069-4790-4809-a391-7022619e2249" />
-
-### Dashboard
-<img width="1800" alt="Skärmavbild 2025-05-20 kl  21 54 06" src="https://github.com/user-attachments/assets/cfc94edc-367e-4607-9ebd-c9c7ff10e220" />
-
-
-### Conversations 
-
-### Feed
-<img width="2478" height="1660" alt="localhost_5173_ (9)" src="https://github.com/user-attachments/assets/e9492c8a-f0bf-4783-9899-e8c02eeddd5e" />
-
-### Start
-<img width="2478" height="1660" alt="localhost_5173_ (8)" src="https://github.com/user-attachments/assets/551e2ba1-c91c-473f-b5c6-cd3296dd5ce2" />
