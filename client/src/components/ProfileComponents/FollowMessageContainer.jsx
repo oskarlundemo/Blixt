@@ -15,7 +15,7 @@ import {useNavigate} from "react-router-dom";
 
 
 
-export const FollowMessageContainer = ({follows, handleFollow, conversationId}) => {
+export const FollowMessageContainer = ({follows, handleFollow, initiateConversation, conversationId = ''}) => {
 
     const navigate = useNavigate(); // This hook is used for navigating to other pages
 
@@ -50,7 +50,7 @@ export const FollowMessageContainer = ({follows, handleFollow, conversationId}) 
                     color: 'white'
                 }}
                 onClick={() => {
-                    navigate(`/messages/${conversationId}`);
+                    initiateConversation();
                 }}>
                 Message
             </button>

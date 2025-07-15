@@ -1,5 +1,17 @@
 import {prisma} from "../prisma/index.js";
 
+/**
+ * What does this function do?
+ * It searches through the db for users that match the given string
+ *
+ * What inputs does it expect?
+ * Token and search query
+ *
+ * What does it return or send back?
+ * Success message and an array of matching users
+ */
+
+
 
 export const fetchMatchingUsers = async (req, res) => {
 
@@ -21,15 +33,31 @@ export const fetchMatchingUsers = async (req, res) => {
             take: 10,
         })
 
-        res.status(200).json(matchingUsers);
+        res.status(200).json(
+            {
+                results: matchingUsers,
+                message: 'Users found successfully.'
+            }
+        );
 
     } catch (err) {
         console.log(err);
         res.status(500).json({
-            message: err.message,
+            message: 'There was an error while fetching users.',
         })
     }
 }
+
+/**
+ * What does this function do?
+ * Fetches all the posts that hove been made, but not by the user
+ *
+ * What inputs does it expect?
+ * Token and search query
+ *
+ * What does it return or send back?
+ * Success message and an array of matching users
+ */
 
 
 export const getAllPosts = async (req, res) => {
@@ -42,7 +70,8 @@ export const getAllPosts = async (req, res) => {
             where: {
                 user_id: {
                     not: userIdFromToken,
-                }
+                },
+                archived: false
             },
             include: {
                 images: true,
@@ -58,6 +87,5 @@ export const getAllPosts = async (req, res) => {
             message: err.message,
         })
     }
-
 
 }

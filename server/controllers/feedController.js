@@ -1,6 +1,18 @@
 import {prisma} from "../prisma/index.js";
 
 
+/**
+ * What does this function do?
+ * It loads the feed of the logged-in user
+ *
+ * What inputs does it expect?
+ * Token
+ *
+ * What does it return or send back?
+ * An array of all the posts from the profile the user is following
+ */
+
+
 export const loadFeed = async (req, res) => {
 
     try {
@@ -10,6 +22,7 @@ export const loadFeed = async (req, res) => {
         const usersPosts = await prisma.post.findMany({
             where: {
                 user_id: userIdFromToken,
+                archived: false
             },
             include: {
                 images: true,
@@ -40,6 +53,7 @@ export const loadFeed = async (req, res) => {
                 user_id: {
                     in: followedIds,
                 },
+                archived: false,
             },
             include: {
                 images: true,

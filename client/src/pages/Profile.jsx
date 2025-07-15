@@ -15,6 +15,8 @@ import {MenuItem} from "../components/ConversationComponents/MenuItem.jsx";
 import {ProfileStat} from "../components/ProfileComponents/ProfileStat.jsx";
 import {ErrorMessage} from "../components/ErrorMessage.jsx";
 import {PostGrid} from "../components/ProfileComponents/PostGrid.jsx";
+import toast from "react-hot-toast";
+import {Spinner} from "../components/Spinner.jsx";
 
 
 /**
@@ -53,6 +55,7 @@ export const Profile = ({}) => {
     const [bio, setBio] = useState(""); // The bio loaded on mount
     const [profileUsername, setProfileUsername] = useState(""); // The name of the profile
     const [error, setError] = useState(false);
+    const [spinner, setSpinner] = useState(false);
 
     const [active, setActive] = useState('posts') // Ref used for UI slider
     const postsRef = useRef('posts'); // Ref used for UI slider
@@ -153,7 +156,6 @@ export const Profile = ({}) => {
         }
     }
 
-
     const handleFollow = async (e) => {
         try {
             await fetch(`${API_URL}/profile/follow/${profileUser.id}`, {
@@ -176,6 +178,30 @@ export const Profile = ({}) => {
     }
 
 
+    const initiateConversation = async () => {
+        setSpinner(true);
+
+        try {
+            const response = await fetch(`${API_URL}/profile/initiate/conversation/${username}`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+            });
+            if (!response.ok) {
+                toast.error('There was an error while loading the conversation');
+                return;
+            }
+            const data = await response.json();
+            navigate(`/messages/${data.conversationId}`);
+        } catch (err) {
+            console.error(err);
+            toast.error('Something went wrong. Please try again.');
+        } finally {
+            setSpinner(false);
+        }
+    };
+
     return (
         <main className="profile">
 
@@ -185,6 +211,10 @@ export const Profile = ({}) => {
                     more={true}
                     setShowMore={setShowMore}
                 />
+            )}
+
+            {spinner && (
+                <Spinner />
             )}
 
             {/* Error and Loading States */}
@@ -228,6 +258,7 @@ export const Profile = ({}) => {
                                         follows={follows}
                                         conversationId={conversationId}
                                         handleFollow={handleFollow}
+                                        initiateConversation={initiateConversation}
                                     />
                                 ) : (
                                     editing ? (

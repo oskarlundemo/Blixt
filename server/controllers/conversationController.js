@@ -616,27 +616,39 @@ export const addMemberToConversation = async (req, res) => {
     }
 }
 
-
+/**
+ * What does this function do?
+ * It fetches enriched data of a conversation, once it has been inserted and triggered by the supabase realtime client
+ *
+ * What inputs does it expect?
+ * Token from the user and id of the new conversation through the body
+ *
+ * What does it return or send back?
+ * Returns the data of the conversation with a success message
+ */
 
 export const loadNewConversationCard  = async (req, res) => {
 
     try {
 
-        const conversationId = req.body.conversation.conversation_id;
-        const userIdFromToken = req.user.id;
+        const conversationId = req.body.conversation.conversation_id; // ID of conversat
+        const userIdFromToken = req.user.id; // Token
 
+        // Check that the conversation exists
         const conversationExists = await prisma.conversation.findUnique({
             where: {
                 id: conversationId,
             }
         })
 
+        // If it does not, return
         if (!conversationExists)
             return res.status(404).json({
                 message: "The conversation does not exist",
             })
 
 
+        // Check that the user is acutally a member
         const isMember = await prisma.conversationMember.findUnique({
             where: {
                 conversation_id_user_id: {
@@ -646,6 +658,7 @@ export const loadNewConversationCard  = async (req, res) => {
             }
         })
 
+        // No, return
         if (!isMember)
             return res.status(403).json({
                 message: "Unauthorized action, not member of conversation",
@@ -653,6 +666,7 @@ export const loadNewConversationCard  = async (req, res) => {
 
         let newConvoInfo;
 
+        // Is the conversation a group
         if (conversationExists.is_group) {
             newConvoInfo = await prisma.conversation.findUnique({
                 where: {
@@ -677,6 +691,7 @@ export const loadNewConversationCard  = async (req, res) => {
                 },
             })
         } else {
+            // No, return only the opposite member
             newConvoInfo = await prisma.conversation.findUnique({
                 where: {
                     id: conversationId,
@@ -719,16 +734,27 @@ export const loadNewConversationCard  = async (req, res) => {
     }
 }
 
+/**
+ * What does this function do?
+ * It searches through the database for user that matches the provided string
+ *
+ * What inputs does it expect?
+ * Token, search query and the id of the conversation
+ *
+ * What does it return or send back?
+ * Success message and an array of user objects
+ */
 
 
 export const searchForNewGroupMembers = async (req, res) => {
 
     try {
 
-        const conversationId = req.params.conversation_id;
-        const searchQuery = req.query.q
-        const userIdFromToken = req.user.id;
+        const conversationId = req.params.conversation_id; // Id of conversation
+        const searchQuery = req.query.q // Search string
+        const userIdFromToken = req.user.id; // Id from token
 
+        // Is the user admin
         const userIsAdmin = await prisma.conversation.findUnique({
             where: {
                 id: conversationId,
@@ -736,12 +762,14 @@ export const searchForNewGroupMembers = async (req, res) => {
             }
         })
 
+        // No, no allowed to add
         if (!userIsAdmin) {
             res.status(403).send({
                 message: 'Unauthorized action'
             })
         }
 
+        // Find the conversation
         const conversation = await prisma.conversation.findUnique({
             where: {
                 id: conversationId,
@@ -752,15 +780,17 @@ export const searchForNewGroupMembers = async (req, res) => {
             }
         })
 
+        // If the conversation does not exist, return
         if (!conversation) {
             res.status(404).send({
                 message: 'The conversation does not exist'
             })
         }
 
-
+        // Extract the id of the members
         const memberIds = conversation.members.map(m => m.user_id);
 
+        // Include all users BUT not the one doing the searching
         const results = await prisma.user.findMany({
             where: {
                 username: {
@@ -780,17 +810,30 @@ export const searchForNewGroupMembers = async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        res.status(500).json({err: err, message: "Server error"});
+        res.status(500).json({err: err, message: "Server error while retrieving users"});
     }
 }
+
+/**
+ * What does this function do?
+ * It fetches the data related to the latest message of a conversation
+ *
+ * What inputs does it expect?
+ * Token and the id of the conversation
+ *
+ * What does it return or send back?
+ * Success message and an updated conversation
+ */
+
 
 export const latestMessage = async (req, res) => {
 
     try {
 
-        const userId = req.user.id;
-        const conversationId = req.params.conversation_id;
+        const userId = req.user.id; // Id from token
+        const conversationId = req.params.conversation_id; // Id of conversation
 
+        // Check if the conversation exists
         const conversationExists = await prisma.conversation.findUnique({
             where: {
                 id: conversationId,
@@ -809,13 +852,16 @@ export const latestMessage = async (req, res) => {
             }
         })
 
+        // Does not, return
         if (!conversationExists)
             return res.status(404).send({
                 message: 'Conversation does not exist'
             })
 
+        // Extract ids
         const memberIds = conversationExists.members.map(m => m.user_id);
 
+        // Check if the user is in the conversation, if not return
         if  (memberIds.some(m => m.user_id === userId))
             res.status(403).send({
                 message: 'Unauthorized action'
@@ -823,7 +869,8 @@ export const latestMessage = async (req, res) => {
 
         let conversation;
 
-        if (conversationExists.is_group) {
+        // Is conversation a group
+        if (conversationExists.is_group) { // Yes, return all members
             conversation = await prisma.conversation.findUnique({
                 where: {
                     id: conversationId,
@@ -846,6 +893,7 @@ export const latestMessage = async (req, res) => {
                 }
             })
         } else {
+            // No, return only the opposite member
             conversation = await prisma.conversation.findUnique({
                 where: {
                     id: conversationId,

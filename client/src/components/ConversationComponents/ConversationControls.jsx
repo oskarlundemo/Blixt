@@ -36,7 +36,7 @@ export const ConversationControls = ({setShowGroupUsers, showGroupUsers}) => {
                 }}
 
                 admin={activeConversation?.admin_id || ''}
-                title={'Group members'}
+                title={'Conversation members'}
                 svg={
                     <>
                         <svg
