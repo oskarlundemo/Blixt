@@ -4,6 +4,22 @@
 
 Note that the project spins down with inactivity, so it might take 50 seconds before everything is running
 
+
+### 💡 What I have learnt 
+While building Blixt, I deepened my understanding of both backend and frontend technologies:
+
+- I worked extensively with Supabase Auth to manage user authentication. This included implementing sign-up, login, and session persistence, while ensuring secure access to protected routes.
+
+- For image and media uploads, I integrated Cloudinary, learning how to handle cloud-based storage and dynamically serve optimized images throughout the app.
+
+- On the frontend, I explored new UI tools such as:
+
+- Dnd Kit for creating smooth, flexible drag-and-drop interactions—especially useful in rearranging UI elements.
+
+- Framer Motion to implement fluid transitions and animations, making the user experience more dynamic and responsive.
+
+This project pushed me to build a fully interactive and scalable application, combining real-time functionality with modern UI/UX techniques.
+
 ## 📌 Project Overview
 
 Blixt is a modern, full-stack social media web application that replicates the core functionality of Instagram, while adding powerful enhancements for a rich user experience. Users can share photos, videos, and GIFs, interact through likes and comments, follow each other, and personalize their profiles—making Blixt a sleek and social alternative to traditional photo-sharing platforms.
