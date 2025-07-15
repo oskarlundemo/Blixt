@@ -2,9 +2,10 @@ import {Inputfield} from "../InputField.jsx";
 import {useEffect, useState} from "react";
 import {SectionSplitter} from "../SectionSplitter.jsx";
 import {supabase} from "../../services/SupabaseClient.js";
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import {Spinner} from "../Spinner.jsx";
 import toast from "react-hot-toast";
+import {useAuth} from "../../context/AuthContext.jsx";
 
 /**
  * This component is rendered when a user wants to log-in
@@ -19,7 +20,7 @@ import toast from "react-hot-toast";
 export const LoginForm = ({setShowLogin}) => {
 
     const navigate = useNavigate(); // Use this hook for navigation
-
+    const {API_URL} = useAuth();
     const [errors, setErrors] = useState([]); // State to hold errors
     const [disabled, setDisabled] = useState(true); // State to prevent submission if input is not valid
     const [isEmailValid, setIsEmailValid] = useState(false); // State to prevent "forget password" if there is not a valid email
@@ -60,6 +61,44 @@ export const LoginForm = ({setShowLogin}) => {
             return updatedData;
         });
     }
+
+
+    // This function is used for logging in with the guest account
+    const handleGuestLogin = async () => {
+        setLoading(true);
+
+        try {
+            const response = await fetch(`${API_URL}/auth/login/guest`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                toast.error(errorData?.error || 'Something went wrong with the guest account!');
+                setLoading(false);
+                return;
+            }
+
+            const backendData = await response.json();
+            console.log(backendData.message);
+
+            const { data, error } = await supabase.auth.setSession({
+                access_token: backendData.session.access_token,
+                refresh_token: backendData.session.refresh_token,
+            });
+
+            setLoading(false);
+            navigate("/feed");
+        } catch (err) {
+            console.error(err);
+            toast.error('Something went wrong with the guest account!');
+            setLoading(false);
+        }
+    };
 
     // This function is used for handeling the submission of the login form
     const handleSubmit = async (e) => {
@@ -159,7 +198,29 @@ export const LoginForm = ({setShowLogin}) => {
                     type="submit">Forgot password?
                 </button>
 
-                <span>Don't have an account? <a onClick={() => setShowLogin(false)}>Create one</a></span>
+                <p>Don't have an account? {''}
+                    <span
+                    style={{
+                        color: 'var(--accent-color)',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        textDecoration: 'underline',
+                    }}
+                    onClick={() => setShowLogin(false)}>Create one</span></p>
+                <p>Continue as {''}
+                    <span
+
+                        style={{
+                            color: 'var(--accent-color)',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            textDecoration: 'underline',
+                        }}
+
+                    onClick={() => handleGuestLogin()}>
+                    guest
+                </span>
+                </p>
             </div>
 
 

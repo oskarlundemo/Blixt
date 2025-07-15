@@ -1,13 +1,6 @@
-
-
-
-
 import { prisma } from '../prisma/index.js';
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
-
-
-
 
 
 /**
@@ -136,6 +129,19 @@ export const signUpUser = async(req, res) => {
     }
 }
 
+/**
+ * What does this function do?
+ * Adds the user data after the supabase client has registered them
+ *
+ * What inputs does it expect?
+ * The email, username and id passed the body
+ *
+ * What does it return or send back?
+ * Success message and an array of user objects
+ */
+
+
+
 export const addUser = async (req, res) => {
 
     try {
@@ -154,7 +160,7 @@ export const addUser = async (req, res) => {
             }
         });
 
-        res.status(201).json({ message: 'User created' });
+        res.status(201).json({ message: 'User successfully created' });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Error while signing up' });

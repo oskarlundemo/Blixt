@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import '../App.css'
 import {useAuth} from "../context/AuthContext.jsx";
+import toast from "react-hot-toast";
 
 
 /**
@@ -59,6 +60,8 @@ export const BottomMenu = ({showBottomMenu, setShowBottomMenu, archived, setPost
                 .then(res => res.json())
                 .then(data => {
                     setIsPublic(data.isPublic);
+                    const message = isPublic ? 'public' : 'archived';
+                    toast.success(`That post is now ${message}`);
                 })
                 .catch(err => console.log(err));
 

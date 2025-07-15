@@ -37,7 +37,7 @@ export const CreateChat = ({setCreateChatUI = null, following = []}) => {
     useEffect(() => {
         const delayBouncing = setTimeout(() => {
             if (search.trim().length > 0) {
-                fetch(`${API_URL}/chat/search/?q=${search}`, {
+                fetch(`${API_URL}/users/search/?q=${search}`, {
                     method: "GET",
                     headers: {
                         Authorization: `Bearer ${token}`,

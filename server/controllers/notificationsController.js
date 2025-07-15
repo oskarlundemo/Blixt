@@ -38,9 +38,7 @@ export const loadNotifications = async (req, res) => {
 export const createLikeNotification = async (req, res) => {
     try {
 
-
         const userIdFromToken = req.user.id
-
         const { post_id } = req.params;
 
         const post = await prisma.post.findUnique({
@@ -87,21 +85,6 @@ export const createLikeNotification = async (req, res) => {
         res.status(500).json({ error: 'Notification creation failed' });
     }
 };
-
-
-
-
-export const createFollowNotification = async (req, res) => {
-
-    try {
-        
-
-
-    } catch (err) {
-        console.log(err.message);
-        res.status(500).json({ error: 'Notification creation failed' });
-    }
-}
 
 
 export const createCommentNotification = async (req, res) => {

@@ -11,7 +11,6 @@ const createAccountRoute = new Router();
 
 import { body, validationResult } from 'express-validator';
 
-
 export const validateUserInfo = [
     body('username')
         .trim()

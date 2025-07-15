@@ -42,7 +42,7 @@ export const Explore = () => {
                 })
                     .then(res => res.json())
                     .then(data => {
-                        setSearchResults(data);
+                        setSearchResults(data.results);
                     })
                     .catch(err => {
                         toast.error('There was an error with your search query.');
