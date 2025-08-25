@@ -88,48 +88,28 @@ Update the group avatar and description
 
 Delete the entire group chat if needed
 
-
 ## Screenshots 📸
 
-### Log
-<img width="1290" height="2796" alt="localhost_5173_log(iPhone 14 Pro Max)" src="https://github.com/user-attachments/assets/7e414a93-121c-4c17-a5c9-09a8774c7aaf" />
-
-### Create log 
-<img width="1290" height="2796" alt="localhost_5173_log(iPhone 14 Pro Max) (7)" src="https://github.com/user-attachments/assets/41d54bc2-e9a5-4b79-92be-c37af5f4603d" />
-
-### Stats
-
-<img width="1290" height="2796" alt="localhost_5173_log(iPhone 14 Pro Max) (1)" src="https://github.com/user-attachments/assets/8f4dda37-8e55-4e58-a9c6-93c05891d4da" />
-
-<img width="1290" height="2796" alt="localhost_5173_log(iPhone 14 Pro Max) (2)" src="https://github.com/user-attachments/assets/39c34f22-a70e-433b-a0ba-2628ac057318" />
-
-### Exercise progression
-
-<img width="1290" height="2796" alt="localhost_5173_log(iPhone 14 Pro Max) (6)" src="https://github.com/user-attachments/assets/9d650fec-7cd4-4e56-ba9b-e1560ecdceb2" />
+### Start
+<img width="3098" height="2076" alt="localhost_5173_ (17)" src="https://github.com/user-attachments/assets/3d41bedc-c3d8-4dd9-9302-5cc9db86e1c1" />
 
 ### Profile
-<img width="1290" height="2796" alt="localhost_5173_log(iPhone 14 Pro Max) (3)" src="https://github.com/user-attachments/assets/1b88bfca-03d7-46f4-9f10-6b27a7bf72a6" />
+<img width="3098" height="2076" alt="localhost_5173_ (14)" src="https://github.com/user-attachments/assets/42bfcd3a-dbc6-4071-9303-4486fe092904" />
 
-### Create account 
-<img width="1290" height="2796" alt="localhost_5173_log(iPhone 14 Pro Max) (12)" src="https://github.com/user-attachments/assets/978a5178-c8ac-4fb7-badd-b3a329344817" />
+### Feed
+<img width="3098" height="2076" alt="localhost_5173_ (12)" src="https://github.com/user-attachments/assets/4eee11e2-8a5e-46f9-b283-f4548d6a3ac5" />
 
-### Login
-<img width="1290" height="2796" alt="localhost_5173_log(iPhone 14 Pro Max) (11)" src="https://github.com/user-attachments/assets/fcc7fa2d-86f0-44bc-aa4a-6bd42a1427f5" />
+### Conversations 
+<img width="3098" height="2076" alt="localhost_5173_ (11)" src="https://github.com/user-attachments/assets/0eb94975-0609-4661-bbcf-53f4729e2700" />
 
-### Custom exercises 
-<img width="1290" height="2796" alt="localhost_5173_log(iPhone 14 Pro Max) (4)" src="https://github.com/user-attachments/assets/6f608d52-1406-4522-8261-4b960c2f2626" />
+### Chat 
+<img width="3098" height="2076" alt="localhost_5173_ (18)" src="https://github.com/user-attachments/assets/79795a97-a2ae-49ec-becf-66d43d00fdf0" />
 
-### Custom muscle groups  
-<img width="1290" height="2796" alt="localhost_5173_log(iPhone 14 Pro Max) (5)" src="https://github.com/user-attachments/assets/d5d2f94b-c7b5-4d88-a769-88e6d015a738" />
+### Notifications 
+<img width="3098" height="2076" alt="localhost_5173_ (13)" src="https://github.com/user-attachments/assets/0253aa16-d1cb-45d6-989c-3dc184c511b5" />
 
-### Landing page 
-
-<img width="1290" height="2796" alt="localhost_5173_log(iPhone 14 Pro Max) (8)" src="https://github.com/user-attachments/assets/64145418-af8f-477f-a3cc-93dff34bd867" />
-
-<img width="1290" height="2796" alt="localhost_5173_log(iPhone 14 Pro Max) (10)" src="https://github.com/user-attachments/assets/e9002310-9ef2-40cf-bdeb-f07f0490e1bc" />
-
-<img width="1290" height="2796" alt="localhost_5173_log(iPhone 14 Pro Max) (9)" src="https://github.com/user-attachments/assets/b68a2299-56ed-4788-b9a0-2e1f33652c68" />
-
+### Explore page
+<img width="3098" height="2076" alt="localhost_5173_ (15)" src="https://github.com/user-attachments/assets/0571c87d-6228-4fb4-89bf-bc2d0adaa451" />
 
 ## Contact 📧
 
